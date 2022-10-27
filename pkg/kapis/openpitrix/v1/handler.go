@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"kubesphere.io/openpitrix/pkg/client/fs"
 	"math"
 	"net/url"
 	"strconv"
@@ -32,7 +33,6 @@ import (
 
 	"kubesphere.io/openpitrix/pkg/api/application/v1alpha1"
 
-	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 	"kubesphere.io/openpitrix/pkg/api"
 	"kubesphere.io/openpitrix/pkg/apiserver/request"
 	"kubesphere.io/openpitrix/pkg/client/clientset/versioned"
@@ -43,6 +43,7 @@ import (
 	"kubesphere.io/openpitrix/pkg/models/openpitrix"
 	"kubesphere.io/openpitrix/pkg/server/errors"
 	"kubesphere.io/openpitrix/pkg/server/params"
+	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 	"kubesphere.io/openpitrix/pkg/utils/idutils"
 	"kubesphere.io/openpitrix/pkg/utils/stringutils"
 )
@@ -55,7 +56,7 @@ func NewOpenpitrixClient(ksInformers informers.InformerFactory, ksClient version
 	var s3Client s3.Interface
 	if option != nil && option.S3Options != nil && len(option.S3Options.Endpoint) != 0 {
 		var err error
-		s3Client, err = s3.NewS3Client(option.S3Options)
+		s3Client, err = fs.NewFsClient(option.S3Options)
 		if err != nil {
 			klog.Errorf("failed to connect to storage, please check storage service status, error: %v", err)
 		}
@@ -427,7 +428,7 @@ func (h *openpitrixHandler) ListApps(req *restful.Request, resp *restful.Respons
 	if req.PathParameter("workspace") != "" {
 		conditions.Match[openpitrix.WorkspaceLabel] = req.PathParameter("workspace")
 	}
-
+	klog.Info("to----------------------------------------------------------")
 	result, err := h.openpitrix.ListApps(conditions, orderBy, reverse, limit, offset)
 
 	if err != nil {

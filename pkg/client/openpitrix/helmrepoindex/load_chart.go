@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"kubesphere.io/openpitrix/pkg/client/fs"
 	"net/url"
 	"strings"
 	"time"
@@ -58,7 +59,7 @@ func loadData(ctx context.Context, u string, cred *v1alpha1.HelmRepoCredential) 
 	var resp *bytes.Buffer
 	if strings.HasPrefix(u, "s3://") {
 		region, endpoint, bucket, p := parseS3Url(parsedURL)
-		client, err := s3.NewS3Client(&s3.Options{
+		client, err := fs.NewFsClient(&s3.Options{
 			Endpoint:        endpoint,
 			Bucket:          bucket,
 			Region:          region,
@@ -66,6 +67,7 @@ func loadData(ctx context.Context, u string, cred *v1alpha1.HelmRepoCredential) 
 			SecretAccessKey: cred.SecretAccessKey,
 			DisableSSL:      !strings.HasPrefix(region, "https://"),
 			ForcePathStyle:  true,
+			FilePath:        "",
 		})
 
 		if err != nil {

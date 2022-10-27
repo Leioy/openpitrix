@@ -24,27 +24,33 @@ import (
 
 // Options contains configuration to access a s3 service
 type Options struct {
-	Endpoint        string `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
-	Region          string `json:"region,omitempty" yaml:"region,omitempty"`
-	DisableSSL      bool   `json:"disableSSL" yaml:"disableSSL"`
-	ForcePathStyle  bool   `json:"forcePathStyle" yaml:"forcePathStyle"`
-	AccessKeyID     string `json:"accessKeyID,omitempty" yaml:"accessKeyID,omitempty"`
-	SecretAccessKey string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty"`
-	SessionToken    string `json:"sessionToken,omitempty" yaml:"sessionToken,omitempty"`
-	Bucket          string `json:"bucket,omitempty" yaml:"bucket,omitempty"`
+	Endpoint                string `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+	Region                  string `json:"region,omitempty" yaml:"region,omitempty"`
+	DisableSSL              bool   `json:"disableSSL" yaml:"disableSSL"`
+	ForcePathStyle          bool   `json:"forcePathStyle" yaml:"forcePathStyle"`
+	AccessKeyID             string `json:"accessKeyID,omitempty" yaml:"accessKeyID,omitempty"`
+	SecretAccessKey         string `json:"secretAccessKey,omitempty" yaml:"secretAccessKey,omitempty"`
+	SessionToken            string `json:"sessionToken,omitempty" yaml:"sessionToken,omitempty"`
+	Bucket                  string `json:"bucket,omitempty" yaml:"bucket,omitempty"`
+	FilePath                string `json:"filePath" yaml:"filePath"`
+	LeaderElectionNamespace string `json:"leaderElectionNamespace" yaml:"leaderElectionNamespace"`
+	LeaderElectionID        string `json:"leaderElectionID" yaml:"leaderElectionID"`
 }
 
 // NewS3Options creates a default disabled Options(empty endpoint)
 func NewS3Options() *Options {
 	return &Options{
-		Endpoint:        "",
-		Region:          "",
-		DisableSSL:      true,
-		ForcePathStyle:  true,
-		AccessKeyID:     "",
-		SecretAccessKey: "",
-		SessionToken:    "",
-		Bucket:          "",
+		Endpoint:                "",
+		Region:                  "",
+		DisableSSL:              true,
+		ForcePathStyle:          true,
+		AccessKeyID:             "",
+		SecretAccessKey:         "",
+		SessionToken:            "",
+		Bucket:                  "",
+		FilePath:                "",
+		LeaderElectionNamespace: "",
+		LeaderElectionID:        "",
 	}
 }
 
@@ -83,4 +89,8 @@ func (s *Options) AddFlags(fs *pflag.FlagSet, c *Options) {
 	fs.BoolVar(&s.DisableSSL, "s3-disable-SSL", c.DisableSSL, "disable ssl")
 
 	fs.BoolVar(&s.ForcePathStyle, "s3-force-path-style", c.ForcePathStyle, "force path style")
+
+	fs.StringVar(&s.FilePath, "s3-file-path", c.FilePath, "chart file path")
+	fs.StringVar(&s.LeaderElectionNamespace, "s3-leader-election-namespace", c.LeaderElectionNamespace, "LeaderElectionNamespace")
+	fs.StringVar(&s.LeaderElectionID, "s3-LeaderElectionID", c.LeaderElectionID, "bucket name of s2i s3")
 }

@@ -19,6 +19,7 @@ package app
 import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog"
+	"kubesphere.io/openpitrix/pkg/client/fs"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -81,7 +82,7 @@ func addAllControllers(mgr manager.Manager, client k8s.Client, informerFactory i
 
 	var opS3Client s3.Interface
 	if !cmOptions.OpenPitrixOptions.AppStoreConfIsEmpty() {
-		opS3Client, err = s3.NewS3Client(cmOptions.OpenPitrixOptions.S3Options)
+		opS3Client, err = fs.NewFsClient(cmOptions.OpenPitrixOptions.S3Options)
 		if err != nil {
 			klog.Fatalf("failed to connect to s3, please check openpitrix s3 service status, error: %v", err)
 		}
