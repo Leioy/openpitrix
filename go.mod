@@ -109,7 +109,7 @@ require (
 	k8s.io/component-base v0.25.0
 	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.70.1
-	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1
+	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1 // indirect
 	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed
 	sigs.k8s.io/kustomize/api v0.12.1
 	sigs.k8s.io/kustomize/kyaml v0.13.9 // indirect
@@ -124,7 +124,7 @@ require (
 	github.com/emicklei/go-restful-openapi v1.4.1
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/go-openapi/errors v0.20.2 // indirect
-	github.com/go-openapi/spec v0.19.7
+	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/strfmt v0.21.3
 	github.com/golang/example v0.0.0-20170904185048-46695d81d1fa
 	github.com/googleapis/gnostic v0.5.5 // indirect
