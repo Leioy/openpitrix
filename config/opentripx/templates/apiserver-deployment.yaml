@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: opentripx-apiserver
+  name: {{ include "opentripx.name" . }}-apiserver
+  namespace: {{ .Release.Namespace }}
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+    type: RollingUpdate
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: opentripx-apiserver
+  template:
+    metadata:
+      labels:
+        app: opentripx-apiserver
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - command:
+            - apiserver
+            - --logtostderr=true
+          image: {{ .Values.apiserver.image.repository }}:{{ .Values.apiserver.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.apiserver.image.pullPolicy }}
+          name: {{ include "opentripx.name" . }}-apiserver
+          ports:
+            - containerPort: 9090
+              protocol: TCP
+          resources:
+          {{- toYaml .Values.apiserver.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/openpitrix
+              name: {{ include "opentripx.name" . }}-config
+            - mountPath: /etc/localtime
+              name: host-time
+              readOnly: true
+            - mountPath: {{ .Values.opentripx.path | default "/root/charts"}}
+              name: {{ include "opentripx.name" .}}-pvc
+        {{- if .Values.apiserver.extraVolumeMounts }}
+          {{- toYaml .Values.apiserver.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+          env:
+        {{- if .Values.env }}
+        {{- toYaml .Values.env | nindent 8 }}
+        {{- end }}
+{{/*          livenessProbe:*/}}
+{{/*            failureThreshold: 8*/}}
+{{/*            httpGet:*/}}
+{{/*              path: /kapis/version*/}}
+{{/*              port: 9090*/}}
+{{/*              scheme: HTTP*/}}
+{{/*            initialDelaySeconds: 15*/}}
+{{/*            timeoutSeconds: 15*/}}
+      serviceAccountName: {{ include "opentripx.serviceAccountName" . }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: {{ include "opentripx.name" . }}-config
+          name: {{ include "opentripx.name" . }}-config
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+        - name: {{ include "opentripx.name" .}}-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "opentripx.name" .}}-pvc
+      {{- if .Values.apiserver.extraVolumes }}
+        {{ toYaml .Values.apiserver.extraVolumes | nindent 6 }}
+      {{- end }}

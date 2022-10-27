@@ -1,0 +1,9 @@
+
+{{- if false -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubesphere-openpitrix-system
+  labels:
+    "kubesphere.io/workspace": system-workspace
+{{- end }}

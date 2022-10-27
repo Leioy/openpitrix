@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opentripx.name" . }}-controller
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: opentripx-controller
+spec:
+  type: {{ .Values.controller.service.type }}
+  ports:
+    - port: {{ .Values.controller.service.port }}
+      protocol: TCP
+      targetPort: 8443
+      name: http
+  selector:
+    app: opentripx-controller
