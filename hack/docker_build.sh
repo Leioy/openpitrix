@@ -34,7 +34,17 @@ ${CONTAINER_CLI} "${CONTAINER_BUILDER}" \
   -f build/controller-manager/Dockerfile \
   -t "${REPO}"/opentripx-controller-manager:"${TAG}" .
 
+${CONTAINER_CLI} "${CONTAINER_BUILDER}" \
+  --build-arg "TARGETARCH=${TARGETARCH}" \
+  --build-arg "TARGETOS=${TARGETOS}" \
+  -f build/clear-crds/Dockerfile \
+  -t "${REPO}"/openpitrix-clear-crds:latest config/opentripx/crds/
+
+
+
+
 if [[ -z "${DRY_RUN:-}" ]]; then
   ${CONTAINER_CLI} push "${REPO}"/opentripx-apiserver:"${TAG}"
   ${CONTAINER_CLI} push "${REPO}"/opentripx-controller-manager:"${TAG}"
+  ${CONTAINER_CLI} push "${REPO}"/openpitrix-clear-crds:latest
 fi
