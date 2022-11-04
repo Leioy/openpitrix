@@ -50,14 +50,6 @@ spec:
         {{- if .Values.env }}
         {{- toYaml .Values.env | nindent 8 }}
         {{- end }}
-{{/*          livenessProbe:*/}}
-{{/*            failureThreshold: 8*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /kapis/version*/}}
-{{/*              port: 9090*/}}
-{{/*              scheme: HTTP*/}}
-{{/*            initialDelaySeconds: 15*/}}
-{{/*            timeoutSeconds: 15*/}}
       serviceAccountName: {{ include "opentripx.serviceAccountName" . }}
       {{- with .Values.tolerations }}
       tolerations:

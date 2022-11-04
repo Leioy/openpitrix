@@ -5,7 +5,7 @@ metadata:
 spec:
   group: openpitrix.io
   version: v1alpha1
-  url: http://opentripx-apiserver.kubesphere-openpitrix-system.svc:80
+  url: http://{{ include "opentripx.name" . }}-apiserver.{{ .Release.Namespace }}.svc:80
 status:
   state: Available
 ---
@@ -17,6 +17,6 @@ metadata:
 spec:
   group: openpitrix.io
   version: v2
-  url: http://opentripx-apiserver.kubesphere-openpitrix-system.svc:80
+  url: http://{{ include "opentripx.name" . }}-apiserver.{{ .Release.Namespace }}.svc:80
 status:
   state: Available

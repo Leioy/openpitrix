@@ -39,7 +39,6 @@ spec:
             - containerPort: 8443
               protocol: TCP
           resources:
-            requests:
             {{- toYaml .Values.controller.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /etc/openpitrix
