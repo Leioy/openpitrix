@@ -19,6 +19,7 @@ package helmrelease
 import (
 	"context"
 	"errors"
+	"kubesphere.io/utils/helm"
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -38,7 +39,6 @@ import (
 	clusterv1alpha1 "kubesphere.io/openpitrix/pkg/api/cluster/v1alpha1"
 
 	"kubesphere.io/openpitrix/pkg/client/informers/externalversions"
-	"kubesphere.io/openpitrix/pkg/client/openpitrix/helmwrapper"
 	"kubesphere.io/openpitrix/pkg/client/s3"
 	"kubesphere.io/openpitrix/pkg/constants"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
@@ -79,9 +79,9 @@ type ReconcileHelmRelease struct {
 
 	MaxConcurrent int
 	// wait time when check release is ready or not
-	WaitTime time.Duration
-
-	StopChan <-chan struct{}
+	WaitTime   time.Duration
+	KubeConfig string
+	StopChan   <-chan struct{}
 }
 
 //	=========================>
@@ -234,7 +234,7 @@ func (r *ReconcileHelmRelease) doCheck(rls *v1alpha1.HelmRelease) (retryAfter ti
 	backoffKey := rlsBackoffKey(rls)
 	clusterName := rls.GetRlsCluster()
 
-	var clusterConfig string
+	var clusterConfig = r.KubeConfig
 	if r.MultiClusterEnable && clusterName != "" {
 		clusterConfig, err = r.clusterClients.GetClusterKubeconfig(clusterName)
 		if err != nil {
@@ -243,10 +243,13 @@ func (r *ReconcileHelmRelease) doCheck(rls *v1alpha1.HelmRelease) (retryAfter ti
 		}
 	}
 
-	hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name,
-		helmwrapper.SetMock(r.helmMock))
-
-	ready, err := hw.IsReleaseReady(r.WaitTime)
+	hw, err := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
+	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name,
+	//	helmwrapper.SetMock(r.helmMock))
+	if err != nil {
+		return 0, err
+	}
+	ready, err := hw.IsReleaseReady(r.WaitTime, helm.SetHelmKubeConfig(clusterConfig))
 
 	if err != nil {
 		// release resources not ready
@@ -335,10 +338,13 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 		klog.Errorf("empty chart data failed, release name %s, chart name: %s", rls.Name, rls.Spec.ChartName)
 		return reconcile.Result{}, ErrAppVersionDataIsEmpty
 	}
-
+	clusterConfig := r.KubeConfig
 	clusterName := rls.GetRlsCluster()
 
-	var clusterConfig string
+	if err != nil {
+		klog.Errorf("openKubeConfig path:%s fail", r.KubeConfig)
+		return reconcile.Result{}, err
+	}
 	if r.MultiClusterEnable && clusterName != "" {
 		clusterConfig, err = r.clusterClients.GetClusterKubeconfig(clusterName)
 		if err != nil {
@@ -347,23 +353,33 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 		}
 	}
 
+	var hw helm.Executor
+	hw, err = helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name,
+		helm.SetAnnotations(map[string]string{constants.CreatorAnnotationKey: rls.GetCreator()}),
+		helm.SetLabels(map[string]string{v1alpha1.ApplicationInstance: rls.GetTrueName()}))
+	if err != nil {
+		return reconcile.Result{}, err
+	}
 	// If clusterConfig is empty, this application will be installed in current host.
-	hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name,
-		helmwrapper.SetAnnotations(map[string]string{constants.CreatorAnnotationKey: rls.GetCreator()}),
-		helmwrapper.SetLabels(map[string]string{
-			v1alpha1.ApplicationInstance: rls.GetTrueName(),
-		}),
-		helmwrapper.SetMock(r.helmMock))
+	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name,
+	//	helmwrapper.SetAnnotations(map[string]string{constants.CreatorAnnotationKey: rls.GetCreator()}),
+	//	helmwrapper.SetLabels(map[string]string{
+	//		v1alpha1.ApplicationInstance: rls.GetTrueName(),
+	//	}),
+	//	helmwrapper.SetMock(r.helmMock))
 
 	var currentState string
+	var jobName string
 	if upgrade {
-		err = hw.Upgrade(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
+		jobName, err = hw.Upgrade(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		//err = hw.Upgrade(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusUpgraded
 	} else {
-		err = hw.Install(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
+		jobName, err = hw.Install(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		//err = hw.Install(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusCreated
 	}
-
+	klog.Infof("jobName--------------------------------------------:%s", jobName)
 	var msg string
 	if err != nil {
 		// install or upgrade failed
@@ -387,8 +403,8 @@ func (r *ReconcileHelmRelease) uninstallHelmRelease(rls *v1alpha1.HelmRelease) e
 	}
 
 	clusterName := rls.GetRlsCluster()
-	var clusterConfig string
-	var err error
+	var clusterConfig = r.KubeConfig
+	//var err error
 	if r.MultiClusterEnable && clusterName != "" {
 		clusterInfo, err := r.clusterClients.Get(clusterName)
 		if err != nil {
@@ -405,10 +421,17 @@ func (r *ReconcileHelmRelease) uninstallHelmRelease(rls *v1alpha1.HelmRelease) e
 		clusterConfig = string(clusterInfo.Spec.Connection.KubeConfig)
 	}
 
-	hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name, helmwrapper.SetMock(r.helmMock))
-
-	err = hw.Uninstall()
-
+	hw, err := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
+	//if err != nil {
+	//	return err
+	//}
+	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name, helmwrapper.SetMock(r.helmMock))
+	//err := hw.Uninstall()
+	jobName, err := hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
+	if err != nil {
+		return err
+	}
+	klog.Infof("jobName:%s", jobName)
 	return err
 }
 
@@ -427,3 +450,16 @@ func (r *ReconcileHelmRelease) SetupWithManager(mgr ctrl.Manager) error {
 		For(&v1alpha1.HelmRelease{}).
 		Complete(r)
 }
+
+//func (r *ReconcileHelmRelease) OpenKubeConfig() (string, error) {
+//	var kubeConfig string
+//	if r.KubeConfig != "" {
+//		data, err := os.ReadFile(r.KubeConfig)
+//		if err != nil {
+//			return "", err
+//		}
+//		kubeConfig = string(data)
+//	}
+//
+//	return kubeConfig, nil
+//}

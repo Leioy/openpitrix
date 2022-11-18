@@ -35,6 +35,7 @@ type Options struct {
 	FilePath                string `json:"filePath" yaml:"filePath"`
 	LeaderElectionNamespace string `json:"leaderElectionNamespace" yaml:"leaderElectionNamespace"`
 	LeaderElectionID        string `json:"leaderElectionID" yaml:"leaderElectionID"`
+	Swagger                 bool   `json:"swagger" yaml:"swagger"`
 }
 
 // NewS3Options creates a default disabled Options(empty endpoint)
@@ -51,6 +52,7 @@ func NewS3Options() *Options {
 		FilePath:                "",
 		LeaderElectionNamespace: "",
 		LeaderElectionID:        "",
+		Swagger:                 false,
 	}
 }
 
