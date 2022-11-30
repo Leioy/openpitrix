@@ -17,8 +17,11 @@ limitations under the License.
 package app
 
 import (
+	"fmt"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/klog"
+	"kubesphere.io/openpitrix/pkg/client/fs"
+	"os"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
@@ -81,7 +84,7 @@ func addAllControllers(mgr manager.Manager, client k8s.Client, informerFactory i
 
 	var opS3Client s3.Interface
 	if !cmOptions.OpenPitrixOptions.AppStoreConfIsEmpty() {
-		opS3Client, err = s3.NewS3Client(cmOptions.OpenPitrixOptions.S3Options)
+		opS3Client, err = fs.NewFsClient(cmOptions.OpenPitrixOptions.S3Options)
 		if err != nil {
 			klog.Fatalf("failed to connect to s3, please check openpitrix s3 service status, error: %v", err)
 		}
@@ -101,6 +104,16 @@ func addAllControllers(mgr manager.Manager, client k8s.Client, informerFactory i
 
 	// "helmrelease" controller
 	if cmOptions.IsControllerEnabled("helmrelease") {
+
+		var kubeConfig string
+		if cmOptions.KubernetesOptions.KubeConfig != "" {
+			data, err := os.ReadFile(cmOptions.KubernetesOptions.KubeConfig)
+			if err != nil {
+				return fmt.Errorf("failed to create helmrelease controller: %v", err)
+			}
+			kubeConfig = string(data)
+		}
+
 		reconcileHelmRelease := &helmrelease.ReconcileHelmRelease{
 			// nil interface is valid value.
 			StorageClient:      opS3Client,
@@ -109,7 +122,9 @@ func addAllControllers(mgr manager.Manager, client k8s.Client, informerFactory i
 			WaitTime:           cmOptions.OpenPitrixOptions.ReleaseControllerOptions.WaitTime,
 			MaxConcurrent:      cmOptions.OpenPitrixOptions.ReleaseControllerOptions.MaxConcurrent,
 			StopChan:           stopCh,
+			KubeConfig:         kubeConfig,
 		}
+
 		addControllerWithSetup(mgr, "helmrelease", reconcileHelmRelease)
 	}
 

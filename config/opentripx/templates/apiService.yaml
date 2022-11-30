@@ -1,0 +1,22 @@
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1alpha1.opentripx.kubesphere.io
+spec:
+  group: openpitrix.io
+  version: v1alpha1
+  url: http://{{ include "opentripx.name" . }}-apiserver.{{ .Release.Namespace }}.svc:80
+status:
+  state: Available
+---
+
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: APIService
+metadata:
+  name: v1.opentripx.kubesphere.io
+spec:
+  group: openpitrix.io
+  version: v2
+  url: http://{{ include "opentripx.name" . }}-apiserver.{{ .Release.Namespace }}.svc:80
+status:
+  state: Available

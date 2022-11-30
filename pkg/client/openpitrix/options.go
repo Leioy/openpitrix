@@ -88,7 +88,7 @@ func (s *Options) AddFlags(fs *pflag.FlagSet, c *Options) {
 	fs.BoolVar(&s.S3Options.DisableSSL, "openpitrix-s3-disable-SSL", c.S3Options.DisableSSL, "disable ssl")
 
 	fs.BoolVar(&s.S3Options.ForcePathStyle, "openpitrix-s3-force-path-style", c.S3Options.ForcePathStyle, "force path style")
-
+	fs.StringVar(&s.S3Options.FilePath, "s3-file-path", c.S3Options.FilePath, "file save path")
 	fs.DurationVar(&s.ReleaseControllerOptions.WaitTime, "openpitrix-release-controller-options-wait-time", c.ReleaseControllerOptions.WaitTime, "wait time when check release is ready or not")
 	fs.IntVar(&s.ReleaseControllerOptions.MaxConcurrent, "openpitrix-release-controller-options-max-concurrent", c.ReleaseControllerOptions.MaxConcurrent, "the maximum number of concurrent Reconciles which can be run for release controller")
 }

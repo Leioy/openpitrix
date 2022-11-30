@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"kubesphere.io/utils/helm"
 	"sort"
 	"strings"
 
@@ -41,7 +42,6 @@ import (
 	typed_v1alpha1 "kubesphere.io/openpitrix/pkg/client/clientset/versioned/typed/application/v1alpha1"
 	"kubesphere.io/openpitrix/pkg/client/informers/externalversions"
 	listers_v1alpha1 "kubesphere.io/openpitrix/pkg/client/listers/application/v1alpha1"
-	"kubesphere.io/openpitrix/pkg/client/openpitrix/helmwrapper"
 	"kubesphere.io/openpitrix/pkg/constants"
 	"kubesphere.io/openpitrix/pkg/models"
 	"kubesphere.io/openpitrix/pkg/server/params"
@@ -362,7 +362,11 @@ func (c *releaseOperator) DescribeApplication(workspace, clusterName, namespace,
 		}
 
 		// If clusterConfig is empty, this application will be installed in current host.
-		hw := helmwrapper.NewHelmWrapper(clusterConfig, namespace, rls.Spec.Name)
+		//hw := helmwrapper.NewHelmWrapper(clusterConfig, namespace, rls.Spec.Name)
+		hw, err := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
+		if err != nil {
+			return nil, err
+		}
 		manifest, err := hw.Manifest()
 		if err != nil {
 			klog.Errorf("get manifest failed, error: %s", err)

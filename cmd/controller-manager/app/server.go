@@ -150,20 +150,21 @@ func run(s *options.KubeSphereControllerManagerOptions, ctx context.Context) err
 		CertDir: s.WebhookCertDir,
 		Port:    8443,
 	}
+	s3 := s.OpenPitrixOptions.S3Options
 
 	if s.LeaderElect {
 		mgrOptions = manager.Options{
 			CertDir:                 s.WebhookCertDir,
 			Port:                    8443,
 			LeaderElection:          s.LeaderElect,
-			LeaderElectionNamespace: "kubesphere-openpitrix-system",
-			LeaderElectionID:        "ks-controller-manager-leader-election",
+			LeaderElectionNamespace: s3.LeaderElectionNamespace,
+			LeaderElectionID:        s3.LeaderElectionID,
 			LeaseDuration:           &s.LeaderElection.LeaseDuration,
 			RetryPeriod:             &s.LeaderElection.RetryPeriod,
 			RenewDeadline:           &s.LeaderElection.RenewDeadline,
 		}
 	}
-
+	klog.Infof("%s", mgrOptions)
 	klog.V(0).Info("setting up manager")
 	ctrl.SetLogger(klogr.New())
 	// Use 8443 instead of 443 cause we need root permission to bind port 443

@@ -36,7 +36,7 @@ const (
 	GroupName = "openpitrix.io"
 )
 
-var GroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1"}
+var GroupVersion = schema.GroupVersion{Group: GroupName, Version: "v2"}
 
 func AddToContainer(c *restful.Container, ksInfomrers informers.InformerFactory, ksClient versioned.Interface, options *openpitrixoptions.Options, opClient openpitrix.Interface) error {
 	mimePatch := []string{restful.MIME_JSON, runtime.MimeJsonPatchJson, runtime.MimeMergePatchJson}

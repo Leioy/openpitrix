@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: opentripx-controller
+  name: {{ include "opentripx.name" . }}-controller
+  namespace: {{ .Release.Namespace }}
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+    type: RollingUpdate
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: opentripx-controller
+  template:
+    metadata:
+      labels:
+        app: opentripx-controller
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - command:
+            - controller-manager
+            - --logtostderr=true
+            - --leader-elect=true
+          image: {{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
+          name: {{ include "opentripx.name" . }}-controller
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.controller.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/openpitrix
+              name: {{ include "opentripx.name" . }}-config
+            - mountPath: /etc/localtime
+              name: host-time
+              readOnly: true
+            - mountPath: {{ .Values.opentripx.path | default "/root/charts"}}
+              name: {{ include "opentripx.name" .}}-pvc
+              readOnly: true
+        {{- if .Values.controller.extraVolumeMounts }}
+          {{- toYaml .Values.controller.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+          env:
+        {{- if .Values.env }}
+        {{- toYaml .Values.env | nindent 8 }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: {{ include "opentripx.serviceAccountName" . }}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: {{ include "opentripx.name" . }}-config
+          configMap:
+            name: {{ include "opentripx.name" . }}-config
+            defaultMode: 420
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+        - name: {{ include "opentripx.name" .}}-pvc
+          persistentVolumeClaim:
+            claimName: {{ include "opentripx.name" .}}-pvc
+      {{- if .Values.controller.extraVolumes }}
+        {{ toYaml .Values.controller.extraVolumes | nindent 6 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
