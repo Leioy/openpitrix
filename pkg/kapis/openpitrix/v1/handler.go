@@ -17,9 +17,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"k8s.io/client-go/kubernetes"
 	"kubesphere.io/openpitrix/pkg/client/fs"
 	"math"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -52,7 +54,7 @@ type openpitrixHandler struct {
 	openpitrix openpitrix.Interface
 }
 
-func NewOpenpitrixClient(ksInformers informers.InformerFactory, ksClient versioned.Interface, option *openpitrixoptions.Options, cc clusterclient.ClusterClients, stopCh <-chan struct{}) openpitrix.Interface {
+func NewOpenpitrixClient(ksInformers informers.InformerFactory, ksClient versioned.Interface, option *openpitrixoptions.Options, cc clusterclient.ClusterClients, kubeConfig string, k8sClient kubernetes.Interface, stopCh <-chan struct{}) openpitrix.Interface {
 	var s3Client s3.Interface
 	if option != nil && option.S3Options != nil && len(option.S3Options.Endpoint) != 0 {
 		var err error
@@ -61,8 +63,15 @@ func NewOpenpitrixClient(ksInformers informers.InformerFactory, ksClient version
 			klog.Errorf("failed to connect to storage, please check storage service status, error: %v", err)
 		}
 	}
+	if kubeConfig != "" {
+		data, err := os.ReadFile(kubeConfig)
+		if err != nil {
+			klog.Errorf("failed to create helmrelease controller: %v", err)
+		}
+		kubeConfig = string(data)
+	}
 
-	return openpitrix.NewOpenpitrixOperator(ksInformers, ksClient, s3Client, cc, stopCh)
+	return openpitrix.NewOpenpitrixOperator(ksInformers, ksClient, s3Client, cc, kubeConfig, k8sClient, stopCh)
 }
 
 func (h *openpitrixHandler) CreateRepo(req *restful.Request, resp *restful.Response) {
@@ -716,7 +725,7 @@ func (h *openpitrixHandler) DeleteApplication(req *restful.Request, resp *restfu
 	applicationId := req.PathParameter("application")
 	namespace := req.PathParameter("namespace")
 
-	err := h.openpitrix.DeleteApplication(workspace, clusterName, namespace, applicationId)
+	rls, err := h.openpitrix.DeleteApplication(workspace, clusterName, namespace, applicationId)
 
 	if err != nil {
 		klog.Errorln(err)
@@ -724,7 +733,7 @@ func (h *openpitrixHandler) DeleteApplication(req *restful.Request, resp *restfu
 		return
 	}
 
-	resp.WriteEntity(errors.None)
+	resp.WriteEntity(rls)
 }
 
 func (h *openpitrixHandler) ListApplications(req *restful.Request, resp *restful.Response) {
@@ -825,8 +834,8 @@ func (h *openpitrixHandler) CreateApplication(req *restful.Request, resp *restfu
 	if user != nil {
 		createClusterRequest.Username = user.GetName()
 	}
-
-	err = h.openpitrix.CreateApplication(workspace, clusterName, namespace, createClusterRequest)
+	var rls *v1alpha1.HelmRelease
+	rls, err = h.openpitrix.CreateApplication(workspace, clusterName, namespace, createClusterRequest)
 
 	if err != nil {
 		klog.Errorln(err)
@@ -834,7 +843,7 @@ func (h *openpitrixHandler) CreateApplication(req *restful.Request, resp *restfu
 		return
 	}
 
-	resp.WriteEntity(errors.None)
+	resp.WriteEntity(rls)
 }
 
 func (h *openpitrixHandler) CreateCategory(req *restful.Request, resp *restful.Response) {
@@ -1010,4 +1019,19 @@ func (h *openpitrixHandler) DeleteAttachments(req *restful.Request, resp *restfu
 	if err != nil {
 		api.HandleInternalError(resp, nil, err)
 	}
+}
+
+func (h *openpitrixHandler) DetailsApplication(req *restful.Request, resp *restful.Response) {
+	name := req.PathParameter("namespace")
+	application := req.PathParameter("application")
+	workspaces := req.PathParameter("workspaces")
+	rls, err := h.openpitrix.DetailsApplication(workspaces, "", name, application)
+
+	if err != nil {
+		handleOpenpitrixError(resp, err)
+		return
+	}
+
+	resp.WriteEntity(rls)
+
 }
