@@ -21,6 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"k8s.io/client-go/kubernetes"
 	"kubesphere.io/utils/helm"
 	"sort"
 	"strings"
@@ -55,10 +56,11 @@ import (
 type ReleaseInterface interface {
 	ListApplications(workspace, clusterName, namespace string, conditions *params.Conditions, limit, offset int, orderBy string, reverse bool) (*models.PageableResponse, error)
 	DescribeApplication(workspace, clusterName, namespace, applicationId string) (*Application, error)
-	CreateApplication(workspace, clusterName, namespace string, request CreateClusterRequest) error
+	CreateApplication(workspace, clusterName, namespace string, request CreateClusterRequest) (*v1alpha1.HelmRelease, error)
 	ModifyApplication(request ModifyClusterAttributesRequest) error
-	DeleteApplication(workspace, clusterName, namespace, id string) error
+	DeleteApplication(workspace, clusterName, namespace, id string) (*v1alpha1.HelmRelease, error)
 	UpgradeApplication(request UpgradeClusterRequest) error
+	DetailsApplication(workspace, clusterName, namespace, applicationId string) (*v1alpha1.HelmRelease, error)
 }
 
 type releaseOperator struct {
@@ -68,9 +70,11 @@ type releaseOperator struct {
 	appVersionLister listers_v1alpha1.HelmApplicationVersionLister
 	cachedRepos      reposcache.ReposCache
 	clusterClients   clusterclient.ClusterClients
+	kubeConfig       string
+	k8sClient        kubernetes.Interface
 }
 
-func newReleaseOperator(cached reposcache.ReposCache, k8sFactory informers.SharedInformerFactory, ksFactory externalversions.SharedInformerFactory, ksClient versioned.Interface, cc clusterclient.ClusterClients) ReleaseInterface {
+func newReleaseOperator(cached reposcache.ReposCache, k8sFactory informers.SharedInformerFactory, ksFactory externalversions.SharedInformerFactory, ksClient versioned.Interface, cc clusterclient.ClusterClients, kubeConfig string, k8sClient kubernetes.Interface) ReleaseInterface {
 	c := &releaseOperator{
 		informers:        k8sFactory,
 		rlsClient:        ksClient.ApplicationV1alpha1().HelmReleases(),
@@ -78,6 +82,8 @@ func newReleaseOperator(cached reposcache.ReposCache, k8sFactory informers.Share
 		cachedRepos:      cached,
 		clusterClients:   cc,
 		appVersionLister: ksFactory.Application().V1alpha1().HelmApplicationVersions().Lister(),
+		kubeConfig:       kubeConfig,
+		k8sClient:        k8sClient,
 	}
 
 	return c
@@ -142,25 +148,25 @@ func (c *releaseOperator) UpgradeApplication(request UpgradeClusterRequest) erro
 }
 
 // create all helm release in host cluster
-func (c *releaseOperator) CreateApplication(workspace, clusterName, namespace string, request CreateClusterRequest) error {
+func (c *releaseOperator) CreateApplication(workspace, clusterName, namespace string, request CreateClusterRequest) (*v1alpha1.HelmRelease, error) {
 	version, err := c.getAppVersion("", request.VersionId)
 
 	if err != nil {
 		klog.Errorf("get helm application version %s failed, error: %v", request.Name, err)
-		return err
+		return nil, err
 	}
 
 	exists, err := c.releaseExists(workspace, clusterName, namespace, request.Name)
 
 	if err != nil && !apierrors.IsNotFound(err) {
 		klog.Errorf("get helm release %s failed, error: %v", request.Name, err)
-		return err
+		return nil, err
 	}
 
 	if exists {
 		err = fmt.Errorf("release %s exists", request.Name)
 		klog.Error(err)
-		return err
+		return nil, err
 	}
 
 	rls := &v1alpha1.HelmRelease{
@@ -202,12 +208,12 @@ func (c *releaseOperator) CreateApplication(workspace, clusterName, namespace st
 
 	if err != nil {
 		klog.Errorln(err)
-		return err
+		return nil, err
 	} else {
 		klog.Infof("create helm release %s success in %s", request.Name, namespace)
 	}
 
-	return nil
+	return rls, nil
 }
 
 func (c *releaseOperator) releaseExists(workspace, clusterName, namespace, name string) (bool, error) {
@@ -344,6 +350,7 @@ func (c *releaseOperator) DescribeApplication(workspace, clusterName, namespace,
 	app := &Application{}
 
 	var clusterConfig string
+	clusterConfig = c.kubeConfig
 	if rls != nil {
 		// TODO check clusterName, workspace, namespace
 		if clusterName != "" {
@@ -367,7 +374,7 @@ func (c *releaseOperator) DescribeApplication(workspace, clusterName, namespace,
 		if err != nil {
 			return nil, err
 		}
-		manifest, err := hw.Manifest()
+		manifest, err := hw.Manifest(helm.SetHelmKubeConfig(clusterConfig))
 		if err != nil {
 			klog.Errorf("get manifest failed, error: %s", err)
 		}
@@ -381,15 +388,15 @@ func (c *releaseOperator) DescribeApplication(workspace, clusterName, namespace,
 	return app, nil
 }
 
-func (c *releaseOperator) DeleteApplication(workspace, clusterName, namespace, id string) error {
+func (c *releaseOperator) DeleteApplication(workspace, clusterName, namespace, id string) (*v1alpha1.HelmRelease, error) {
 
 	rls, err := c.rlsLister.Get(id)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
-			return nil
+			return nil, nil
 		}
 		klog.Errorf("get release %s/%s failed, err: %s", namespace, id, err)
-		return err
+		return nil, err
 	}
 
 	// TODO, check workspace, cluster and namespace
@@ -400,12 +407,12 @@ func (c *releaseOperator) DeleteApplication(workspace, clusterName, namespace, i
 
 	if err != nil {
 		klog.Errorf("delete release %s/%s failed, error: %s", namespace, id, err)
-		return err
+		return nil, err
 	} else {
 		klog.V(2).Infof("delete release %s/%s", namespace, id)
 	}
 
-	return nil
+	return rls, nil
 }
 
 // get app version from repo and helm application
@@ -442,4 +449,28 @@ func (c *releaseOperator) getAppVersionWithData(repoId, id string) (ret *v1alpha
 		return nil, err
 	}
 	return
+}
+
+// get release details
+func (c *releaseOperator) DetailsApplication(workspace, clusterName, namespace, applicationId string) (*v1alpha1.HelmRelease, error) {
+	//TODO implement me
+	//rls, err = c.rlsClient.Get(context.TODO(), applicationId, metav1.GetOptions{})
+
+	rls, err := c.rlsLister.Get(applicationId)
+	name := rls.Annotations[v1alpha1.JobName]
+
+	pods, err := c.k8sClient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: fmt.Sprintf("job-name=%s", name),
+	})
+
+	if len(pods.Items) > 0 {
+		rls.Annotations[v1alpha1.PodName] = pods.Items[0].Name
+	}
+
+	if err != nil && !apierrors.IsNotFound(err) {
+		klog.Error(err)
+		return nil, err
+	}
+
+	return rls, nil
 }

@@ -62,4 +62,7 @@ const (
 
 	RepoSyncPeriod          = "app.kubesphere.io/sync-period"
 	OriginWorkspaceLabelKey = "kubesphere.io/workspace-origin"
+
+	JobName = "openpitrix.kubesphere.io/jobName"
+	PodName = "openpitrix.kubesphere.io/podName"
 )

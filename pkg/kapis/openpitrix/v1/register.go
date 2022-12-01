@@ -598,6 +598,14 @@ func AddToContainer(c *restful.Container, ksInfomrers informers.InformerFactory,
 		Param(webservice.PathParameter("namespace", "the name of the project").Required(true)).
 		Param(webservice.PathParameter("application", "the id of the application").Required(true)))
 
+	webservice.Route(webservice.GET("/workspaces/{workspace}/namespaces/{namespace}/applications/{application}/detail").
+		To(handler.DetailsApplication).
+		Returns(http.StatusOK, api.StatusOK, openpitrix.Application{}).
+		Metadata(restfulspec.KeyOpenAPITags, []string{constants.NamespaceResourcesTag}).
+		Doc("GET the installation task name").
+		Param(webservice.PathParameter("namespace", "the name of the project").Required(true)).
+		Param(webservice.PathParameter("application", "the id of the application").Required(true)))
+
 	webservice.Route(webservice.DELETE("/workspaces/{workspace}/namespaces/{namespace}/applications/{application}").
 		To(handler.DeleteApplication).
 		Doc("Delete the specified application").

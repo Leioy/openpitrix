@@ -84,6 +84,8 @@ type ReconcileHelmRelease struct {
 	StopChan   <-chan struct{}
 }
 
+var JobName string
+
 //	=========================>
 //	^                         |
 //	|        <==upgraded<==upgrading================
@@ -119,6 +121,16 @@ func (r *ReconcileHelmRelease) Reconcile(ctx context.Context, request reconcile.
 		instance.Status.LastUpdate = metav1.Now()
 		err = r.Status().Update(context.TODO(), instance)
 		return reconcile.Result{}, err
+	}
+	if JobName != "" && len(JobName) > 0 && instance.Status.State != "" {
+
+		err = r.updateJobName(instance)
+		if err != nil {
+			klog.Errorf("update jobName:%s fail", JobName)
+		}
+		JobName = ""
+		return reconcile.Result{}, err
+
 	}
 
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -322,6 +334,18 @@ func (r *ReconcileHelmRelease) updateStatus(rls *v1alpha1.HelmRelease, currentSt
 	return err
 }
 
+func (r *ReconcileHelmRelease) updateJobName(rls *v1alpha1.HelmRelease) error {
+	s := rls.Annotations
+	if s[v1alpha1.JobName] != "" {
+		delete(s, v1alpha1.JobName)
+	}
+	s[v1alpha1.JobName] = JobName
+	rls.Annotations = s
+	err := r.Update(context.TODO(), rls)
+
+	return err
+}
+
 // createOrUpgradeHelmRelease will run helm install to install a new release if upgrade is false,
 // run helm upgrade if upgrade is true
 func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRelease, upgrade bool) (reconcile.Result, error) {
@@ -358,6 +382,7 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 		helm.SetAnnotations(map[string]string{constants.CreatorAnnotationKey: rls.GetCreator()}),
 		helm.SetLabels(map[string]string{v1alpha1.ApplicationInstance: rls.GetTrueName()}))
 	if err != nil {
+		klog.Errorf("Failed to create a new HelmExecutor %s", clusterConfig)
 		return reconcile.Result{}, err
 	}
 	// If clusterConfig is empty, this application will be installed in current host.
@@ -369,17 +394,17 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 	//	helmwrapper.SetMock(r.helmMock))
 
 	var currentState string
-	var jobName string
+
 	if upgrade {
-		jobName, err = hw.Upgrade(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		JobName, err = hw.Upgrade(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
 		//err = hw.Upgrade(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusUpgraded
 	} else {
-		jobName, err = hw.Install(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		JobName, err = hw.Install(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
 		//err = hw.Install(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusCreated
 	}
-	klog.Infof("jobName--------------------------------------------:%s", jobName)
+
 	var msg string
 	if err != nil {
 		// install or upgrade failed
@@ -427,11 +452,11 @@ func (r *ReconcileHelmRelease) uninstallHelmRelease(rls *v1alpha1.HelmRelease) e
 	//}
 	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name, helmwrapper.SetMock(r.helmMock))
 	//err := hw.Uninstall()
-	jobName, err := hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
+	JobName, err = hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
 	if err != nil {
 		return err
 	}
-	klog.Infof("jobName:%s", jobName)
+
 	return err
 }
 
