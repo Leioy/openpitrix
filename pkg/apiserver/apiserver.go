@@ -20,15 +20,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	restfulspec "github.com/emicklei/go-restful-openapi"
 	"net/http"
 	rt "runtime"
 	"time"
 
+	"github.com/go-openapi/spec"
 	"kubesphere.io/openpitrix/pkg/apiserver/filters"
 	"kubesphere.io/openpitrix/pkg/apiserver/request"
 	"kubesphere.io/openpitrix/pkg/client/k8s"
 	"kubesphere.io/openpitrix/pkg/models/openpitrix"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/emicklei/go-restful"
@@ -103,6 +104,12 @@ func (s *APIServer) PrepareRun(stopCh <-chan struct{}) error {
 
 	s.installKubeSphereAPIs()
 
+	if s.Config.OpenPitrixOptions.S3Options.Swagger {
+		config := restfulspec.Config{WebServices: s.container.RegisteredWebServices(),
+			APIPath: "/apidocs.json", PostBuildSwaggerObjectHandler: swaggerConfig}
+		s.container.Add(restfulspec.NewOpenAPIService(config))
+		s.container.Handle("/swagger/", http.StripPrefix("/swagger/", http.FileServer(http.Dir("/mnt/d/gowork/ks-openpitrix/api/dist"))))
+	}
 	for _, ws := range s.container.RegisteredWebServices() {
 		klog.V(2).Infof("%s", ws.RootPath())
 	}
@@ -116,7 +123,8 @@ func (s *APIServer) PrepareRun(stopCh <-chan struct{}) error {
 
 // Install all KubeSphere api groups
 // Installation happens before all informers start to cache objects, so
-//   any attempt to list objects using listers will get empty results.
+//
+//	any attempt to list objects using listers will get empty results.
 func (s *APIServer) installKubeSphereAPIs() {
 	urlruntime.Must(openpitrixv1.AddToContainer(s.container, s.InformerFactory, s.KubernetesClient.KubeSphere(), s.Config.OpenPitrixOptions, s.OpenpitrixClient))
 	urlruntime.Must(openpitrixv2alpha1.AddToContainer(s.container, s.InformerFactory, s.KubernetesClient.KubeSphere(), s.Config.OpenPitrixOptions))
@@ -280,6 +288,33 @@ func logRequestAndResponse(req *restful.Request, resp *restful.Response, chain *
 		resp.ContentLength(),
 		time.Since(start)/time.Millisecond,
 	)
+}
+
+func swaggerConfig(swo *spec.Swagger) {
+	swo.Info = &spec.Info{
+		InfoProps: spec.InfoProps{
+			Title:       "OpenpitrixService",
+			Description: "Resource for managing Openpitrix",
+			Contact: &spec.ContactInfo{
+				ContactInfoProps: spec.ContactInfoProps{
+					Name:  "openpitrix",
+					Email: "openpitrix@kubesphere.io",
+					URL:   "http://openpitrix.io",
+				},
+			},
+			License: &spec.License{
+				LicenseProps: spec.LicenseProps{
+					Name: "MIT",
+					URL:  "http://mit.org",
+				},
+			},
+			Version: "1.0.0",
+		},
+	}
+
+	//swo.Tags = []spec.Tag{spec.Tag{TagProps: spec.TagProps{
+	//	Name:        "users",
+	//	Description: "Managing users"}}}
 }
 
 type errorResponder struct{}
