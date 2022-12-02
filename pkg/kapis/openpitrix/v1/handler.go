@@ -437,7 +437,7 @@ func (h *openpitrixHandler) ListApps(req *restful.Request, resp *restful.Respons
 	if req.PathParameter("workspace") != "" {
 		conditions.Match[openpitrix.WorkspaceLabel] = req.PathParameter("workspace")
 	}
-	klog.Info("to----------------------------------------------------------")
+
 	result, err := h.openpitrix.ListApps(conditions, orderBy, reverse, limit, offset)
 
 	if err != nil {
