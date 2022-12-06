@@ -22,11 +22,12 @@ import (
 	"errors"
 	"fmt"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"kubesphere.io/utils/helm"
+	"os"
 	"sort"
 	"strings"
-
-	"kubesphere.io/openpitrix/pkg/apiserver/query"
 
 	"github.com/go-openapi/strfmt"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -35,10 +36,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/informers"
 	"k8s.io/klog"
+	"kubesphere.io/openpitrix/pkg/apiserver/query"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"kubesphere.io/openpitrix/pkg/api/application/v1alpha1"
-
 	"kubesphere.io/openpitrix/pkg/client/clientset/versioned"
 	typed_v1alpha1 "kubesphere.io/openpitrix/pkg/client/clientset/versioned/typed/application/v1alpha1"
 	"kubesphere.io/openpitrix/pkg/client/informers/externalversions"
@@ -349,8 +351,7 @@ func (c *releaseOperator) DescribeApplication(workspace, clusterName, namespace,
 
 	app := &Application{}
 
-	var clusterConfig string
-	clusterConfig = c.kubeConfig
+	var clusterConfig = c.kubeConfig
 	if rls != nil {
 		// TODO check clusterName, workspace, namespace
 		if clusterName != "" {
@@ -453,8 +454,6 @@ func (c *releaseOperator) getAppVersionWithData(repoId, id string) (ret *v1alpha
 
 // get release details
 func (c *releaseOperator) DetailsApplication(workspace, clusterName, namespace, applicationId string) (*v1alpha1.HelmRelease, error) {
-	//TODO implement me
-	//rls, err = c.rlsClient.Get(context.TODO(), applicationId, metav1.GetOptions{})
 
 	rls, err := c.rlsLister.Get(applicationId)
 	name := rls.Annotations[v1alpha1.JobName]
@@ -473,4 +472,50 @@ func (c *releaseOperator) DetailsApplication(workspace, clusterName, namespace, 
 	}
 
 	return rls, nil
+}
+
+func GenerateKubeConfiguration(kubeConfig string) (string, error) {
+	if kubeConfig == "" {
+		config, err := rest.InClusterConfig()
+
+		ca, err := os.ReadFile(config.TLSClientConfig.CAFile)
+		if err != nil {
+			return "", err
+		}
+		clusters := make(map[string]*clientcmdapi.Cluster)
+		clusters["default-cluster"] = &clientcmdapi.Cluster{
+			Server:                   config.Host,
+			CertificateAuthorityData: ca,
+		}
+		contexts := make(map[string]*clientcmdapi.Context)
+		contexts["default-context"] = &clientcmdapi.Context{
+			Cluster:  "default-cluster",
+			AuthInfo: "default-user",
+		}
+		authinfos := make(map[string]*clientcmdapi.AuthInfo)
+		authinfos["default-user"] = &clientcmdapi.AuthInfo{
+			Token: config.BearerToken,
+		}
+
+		clientConfig := clientcmdapi.Config{
+			Kind:           "Config",
+			APIVersion:     "v1",
+			Clusters:       clusters,
+			Contexts:       contexts,
+			CurrentContext: "default-context",
+			AuthInfos:      authinfos,
+		}
+		write, err := clientcmd.Write(clientConfig)
+		if err != nil {
+			return "", err
+		}
+		return string(write), nil
+	}
+
+	file, err := os.ReadFile(kubeConfig)
+	if err != nil {
+		return "", err
+	}
+	return string(file), nil
+
 }

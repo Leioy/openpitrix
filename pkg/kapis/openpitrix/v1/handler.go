@@ -21,7 +21,6 @@ import (
 	"kubesphere.io/openpitrix/pkg/client/fs"
 	"math"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -62,13 +61,6 @@ func NewOpenpitrixClient(ksInformers informers.InformerFactory, ksClient version
 		if err != nil {
 			klog.Errorf("failed to connect to storage, please check storage service status, error: %v", err)
 		}
-	}
-	if kubeConfig != "" {
-		data, err := os.ReadFile(kubeConfig)
-		if err != nil {
-			klog.Errorf("failed to create helmrelease controller: %v", err)
-		}
-		kubeConfig = string(data)
 	}
 
 	return openpitrix.NewOpenpitrixOperator(ksInformers, ksClient, s3Client, cc, kubeConfig, k8sClient, stopCh)

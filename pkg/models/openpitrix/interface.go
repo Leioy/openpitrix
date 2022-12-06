@@ -46,7 +46,7 @@ type openpitrixOperator struct {
 	CategoryInterface
 }
 
-func NewOpenpitrixOperator(ksInformers ks_informers.InformerFactory, ksClient versioned.Interface, s3Client s3.Interface, cc clusterclient.ClusterClients, kubeConfig string, k8sClient kubernetes.Interface, stopCh <-chan struct{}) Interface {
+func NewOpenpitrixOperator(ksInformers ks_informers.InformerFactory, ksClient versioned.Interface, s3Client s3.Interface, cc clusterclient.ClusterClients, kubeConfigPath string, k8sClient kubernetes.Interface, stopCh <-chan struct{}) Interface {
 	klog.Infof("start helm repo informer")
 	cachedReposData := reposcache.NewReposCache()
 	helmReposInformer := ksInformers.KubeSphereSharedInformerFactory().Application().V1alpha1().HelmRepos().Informer()
@@ -77,11 +77,16 @@ func NewOpenpitrixOperator(ksInformers ks_informers.InformerFactory, ksClient ve
 
 	cachedReposData.SetCategoryIndexer(indexer)
 
+	KubeConfig, err := GenerateKubeConfiguration(kubeConfigPath)
+	if err != nil {
+		klog.Errorf("GenerateKubeConfig Failed error: %s", err)
+	}
+
 	return &openpitrixOperator{
 		AttachmentInterface:  newAttachmentOperator(s3Client),
 		ApplicationInterface: newApplicationOperator(cachedReposData, ksInformers.KubeSphereSharedInformerFactory(), ksClient, s3Client),
 		RepoInterface:        newRepoOperator(cachedReposData, ksInformers.KubeSphereSharedInformerFactory(), ksClient),
-		ReleaseInterface:     newReleaseOperator(cachedReposData, ksInformers.KubernetesSharedInformerFactory(), ksInformers.KubeSphereSharedInformerFactory(), ksClient, cc, kubeConfig, k8sClient),
+		ReleaseInterface:     newReleaseOperator(cachedReposData, ksInformers.KubernetesSharedInformerFactory(), ksInformers.KubeSphereSharedInformerFactory(), ksClient, cc, KubeConfig, k8sClient),
 		CategoryInterface:    newCategoryOperator(cachedReposData, ksInformers.KubeSphereSharedInformerFactory(), ksClient),
 	}
 }

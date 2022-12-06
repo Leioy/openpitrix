@@ -34,7 +34,6 @@ type Options struct {
 	Bucket                  string `json:"bucket,omitempty" yaml:"bucket,omitempty"`
 	FilePath                string `json:"filePath" yaml:"filePath"`
 	LeaderElectionNamespace string `json:"leaderElectionNamespace" yaml:"leaderElectionNamespace"`
-	LeaderElectionID        string `json:"leaderElectionID" yaml:"leaderElectionID"`
 	Swagger                 bool   `json:"swagger" yaml:"swagger"`
 }
 
@@ -51,7 +50,6 @@ func NewS3Options() *Options {
 		Bucket:                  "",
 		FilePath:                "",
 		LeaderElectionNamespace: "",
-		LeaderElectionID:        "",
 		Swagger:                 false,
 	}
 }
@@ -94,5 +92,4 @@ func (s *Options) AddFlags(fs *pflag.FlagSet, c *Options) {
 
 	fs.StringVar(&s.FilePath, "s3-file-path", c.FilePath, "chart file path")
 	fs.StringVar(&s.LeaderElectionNamespace, "s3-leader-election-namespace", c.LeaderElectionNamespace, "LeaderElectionNamespace")
-	fs.StringVar(&s.LeaderElectionID, "s3-LeaderElectionID", c.LeaderElectionID, "bucket name of s2i s3")
 }
