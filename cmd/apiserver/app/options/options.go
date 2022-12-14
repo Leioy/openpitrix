@@ -20,10 +20,10 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	v1 "k8s.io/api/core/v1"
+
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
+	openpitrix"kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 
 	cliflag "k8s.io/component-base/cli/flag"
@@ -112,7 +112,7 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 	}
 
 	sch := scheme.Scheme
-	_ = v1.SchemeBuilder.AddToScheme(sch)
+	// _ = v1.SchemeBuilder.AddToScheme(sch)
 	if err := apis.AddToScheme(sch); err != nil {
 		klog.Fatalf("unable add APIs to scheme: %v", err)
 	}

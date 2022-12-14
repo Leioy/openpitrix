@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This is a modified version of Kubernetes
-KUBE_GO_PACKAGE=kubesphere.io/kubesphere
+KUBE_GO_PACKAGE=kubesphere.io/openpitrix
 
 # Ensure the go tool exists and is a viable version.
 kube::golang::verify_go_version() {
