@@ -21,10 +21,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"k8s.io/client-go/kubernetes"
-	"kubesphere.io/utils/helm"
 	"sort"
 	"strings"
+
+	"k8s.io/client-go/kubernetes"
+	"kubesphere.io/utils/helm"
 
 	"kubesphere.io/openpitrix/pkg/apiserver/query"
 
@@ -74,7 +75,10 @@ type releaseOperator struct {
 	k8sClient        kubernetes.Interface
 }
 
-func newReleaseOperator(cached reposcache.ReposCache, k8sFactory informers.SharedInformerFactory, ksFactory externalversions.SharedInformerFactory, ksClient versioned.Interface, cc clusterclient.ClusterClients, kubeConfig string, k8sClient kubernetes.Interface) ReleaseInterface {
+func newReleaseOperator(cached reposcache.ReposCache,
+	k8sFactory informers.SharedInformerFactory, ksFactory externalversions.SharedInformerFactory,
+	ksClient versioned.Interface, cc clusterclient.ClusterClients,
+	kubeConfig string, k8sClient kubernetes.Interface) ReleaseInterface {
 	c := &releaseOperator{
 		informers:        k8sFactory,
 		rlsClient:        ksClient.ApplicationV1alpha1().HelmReleases(),

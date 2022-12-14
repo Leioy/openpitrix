@@ -61,7 +61,7 @@ func TestOpenPitrixRelease(t *testing.T) {
 	}
 
 	// add app version to indexer
-	appvers, err := ksClient.ApplicationV1alpha1().HelmApplicationVersions().List(context.TODO(), metav1.ListOptions{})
+	appvers, _ := ksClient.ApplicationV1alpha1().HelmApplicationVersions().List(context.TODO(), metav1.ListOptions{})
 	for _, ver := range appvers.Items {
 		err := fakeInformerFactory.KubeSphereSharedInformerFactory().Application().V1alpha1().HelmApplicationVersions().
 			Informer().GetIndexer().Add(&ver)
@@ -71,7 +71,11 @@ func TestOpenPitrixRelease(t *testing.T) {
 		}
 	}
 
-	rlsOperator := newReleaseOperator(reposcache.NewReposCache(), fakeInformerFactory.KubernetesSharedInformerFactory(), fakeInformerFactory.KubeSphereSharedInformerFactory(), ksClient, nil)
+	rlsOperator := newReleaseOperator(reposcache.NewReposCache(),
+		fakeInformerFactory.KubernetesSharedInformerFactory(),
+		fakeInformerFactory.KubeSphereSharedInformerFactory(),
+		ksClient, nil,
+		"", k8sClient)
 
 	req := CreateClusterRequest{
 		Name:      "test-rls",
@@ -79,7 +83,7 @@ func TestOpenPitrixRelease(t *testing.T) {
 		VersionId: createAppResp.VersionID,
 		Workspace: testWorkspace,
 	}
-	err = rlsOperator.CreateApplication(testWorkspace, "", "default", req)
+	_, err = rlsOperator.CreateApplication(testWorkspace, "", "default", req)
 
 	if err != nil {
 		klog.Errorf("create release failed, error: %s", err)
@@ -123,7 +127,7 @@ func TestOpenPitrixRelease(t *testing.T) {
 	_ = describeRls
 
 	//delete release
-	err = rlsOperator.DeleteApplication(testWorkspace, "", "default", rlsId)
+	_, err = rlsOperator.DeleteApplication(testWorkspace, "", "default", rlsId)
 	if err != nil {
 		klog.Errorf("failed to delete release, error: %s", err)
 		t.FailNow()
