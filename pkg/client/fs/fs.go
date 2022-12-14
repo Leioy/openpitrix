@@ -32,7 +32,7 @@ func (c *Client) Upload(key, fileName string, body io.Reader, size int) error {
 		klog.Errorf("write to file failed %s, error: %s", formatterPath(key), err)
 		return err
 	}
-	f.Close()
+	defer f.Close()
 	//TODO implement me
 	return nil
 }

@@ -38,7 +38,7 @@ ${CONTAINER_CLI} "${CONTAINER_BUILDER}" \
   --build-arg "TARGETARCH=${TARGETARCH}" \
   --build-arg "TARGETOS=${TARGETOS}" \
   -f build/clear-crds/Dockerfile \
-  -t "${REPO}"/openpitrix-clear-crds:latest config/opentripx/crds/
+  -t "${REPO}"/openpitrix-clear-crds:latest config/openpitrix/charts/opentripx/crds
 
 
 

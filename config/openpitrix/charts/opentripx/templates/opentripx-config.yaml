@@ -16,4 +16,3 @@ data:
         bucket: app-store
         filePath: {{  .Values.opentripx.path   }}
         leaderElectionNamespace: {{ .Release.Namespace }}
-        leaderElectionID: {{ default "ks-controller-manager-leader-election" .Values.opentripx.leaderElectionID }}

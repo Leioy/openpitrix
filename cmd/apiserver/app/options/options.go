@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
+	openpitrix"kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 
 	cliflag "k8s.io/component-base/cli/flag"
@@ -95,7 +95,6 @@ func (s *ServerRunOptions) NewAPIServer(stopCh <-chan struct{}) (*apiserver.APIS
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", s.GenericServerRunOptions.InsecurePort),
 	}
-
 	apiServer.ClusterClient = clusterclient.NewClusterClient(informerFactory.KubeSphereSharedInformerFactory().Cluster().V1alpha1().Clusters())
 
 	apiServer.OpenpitrixClient = openpitrixv1.NewOpenpitrixClient(informerFactory, apiServer.KubernetesClient.KubeSphere(), s.OpenPitrixOptions, nil, s.KubernetesOptions.KubeConfig, kubernetesClient.Kubernetes(), stopCh)

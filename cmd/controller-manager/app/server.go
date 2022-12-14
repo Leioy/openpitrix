@@ -158,7 +158,7 @@ func run(s *options.KubeSphereControllerManagerOptions, ctx context.Context) err
 			Port:                    8443,
 			LeaderElection:          s.LeaderElect,
 			LeaderElectionNamespace: s3.LeaderElectionNamespace,
-			LeaderElectionID:        s3.LeaderElectionID,
+			LeaderElectionID:        "ks-controller-manager-leader-election",
 			LeaseDuration:           &s.LeaderElection.LeaseDuration,
 			RetryPeriod:             &s.LeaderElection.RetryPeriod,
 			RenewDeadline:           &s.LeaderElection.RenewDeadline,
