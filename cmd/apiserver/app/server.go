@@ -27,6 +27,7 @@ import (
 
 	"kubesphere.io/openpitrix/cmd/apiserver/app/options"
 	"kubesphere.io/openpitrix/pkg/config"
+	"kubesphere.io/openpitrix/pkg/version"
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 )
 
@@ -73,9 +74,9 @@ cluster's shared state through which all other components interact.`,
 
 	versionCmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print the version of KubeSphere DevOps apiserver",
+		Short: "Print the version of OpenPitrix Apiserver",
 		Run: func(cmd *cobra.Command, args []string) {
-			// TODO implement the version output
+			cmd.Println(version.Get())
 		},
 	}
 
