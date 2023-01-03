@@ -23,7 +23,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	openpitrix"kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
+	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 
 	cliflag "k8s.io/component-base/cli/flag"

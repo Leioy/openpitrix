@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "opentripx.fullname" . }}
+  name: {{ include "openpitrix.fullname" . }}
   labels:
-    {{- include "opentripx.labels" . | nindent 4 }}
+    {{- include "openpitrix.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "opentripx.fullname" . }}
+    name: {{ include "openpitrix.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

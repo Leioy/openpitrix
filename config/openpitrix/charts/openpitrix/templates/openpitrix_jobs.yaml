@@ -14,13 +14,13 @@ spec:
         app: openpitrix
         component: openpitrix-import-job
     spec:
-      serviceAccountName: {{ include "opentripx.serviceAccountName" . }}
+      serviceAccountName: {{ include "openpitrix.serviceAccountName" . }}
       restartPolicy: OnFailure
       initContainers:
         - name: wait-apiserver
           image: busybox:latest
           imagePullPolicy: IfNotPresent
-          command: ['sh', '-c', 'until nc -z {{ include "opentripx.name" . }}-apiserver.{{ .Release.Namespace }}.svc 80; do echo "waiting for apiserver"; sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z {{ include "openpitrix.name" . }}-apiserver.{{ .Release.Namespace }}.svc 80; do echo "waiting for apiserver"; sleep 2; done;']
       containers:
         - name: import
           command:
@@ -30,13 +30,13 @@ spec:
           imagePullPolicy: {{ .Values.job.image.pullPolicy }}
           volumeMounts:
             - mountPath: /etc/openpitrix
-              name: {{ include "opentripx.name" . }}-config
-            - mountPath: {{ .Values.opentripx.path | default "/root/charts"}}
-              name: {{ include "opentripx.name" .}}-pvc
+              name: {{ include "openpitrix.name" . }}-config
+            - mountPath: {{ .Values.openpitrix.path | default "/root/charts"}}
+              name: {{ include "openpitrix.name" .}}-pvc
       volumes:
-        - name: {{ include "opentripx.name" . }}-config
+        - name: {{ include "openpitrix.name" . }}-config
           configMap:
-            name: {{ include "opentripx.name" . }}-config
-        - name: {{ include "opentripx.name" .}}-pvc
+            name: {{ include "openpitrix.name" . }}-config
+        - name: {{ include "openpitrix.name" .}}-pvc
           persistentVolumeClaim:
-            claimName: {{ include "opentripx.name" .}}-pvc
+            claimName: {{ include "openpitrix.name" .}}-pvc
