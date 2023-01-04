@@ -8,7 +8,7 @@ source "${KUBE_ROOT}/hack/lib/init.sh"
 
 # push to kubesphere with default latest tag
 TAG=${TAG:-v0.0.2}
-REPO=${REPO:-jw008}
+REPO=${REPO:-isyes}
 
 # If set, just building, no pushing
 DRY_RUN=${DRY_RUN:-}

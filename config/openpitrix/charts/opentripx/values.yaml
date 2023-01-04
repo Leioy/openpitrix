@@ -49,14 +49,14 @@ controller:
     type: ClusterIP
     port: 443
   image:
-    repository: docker.io/jw008/opentripx-controller-manager
+    repository: isyes/opentripx-controller-manager
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: v0.0.2
 
 apiserver:
   image:
-    repository: jw008/opentripx-apiserver
+    repository: isyes/opentripx-apiserver
     pullPolicy: IfNotPresent
     tag: v0.0.2
   service:
