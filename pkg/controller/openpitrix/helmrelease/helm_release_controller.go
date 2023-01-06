@@ -437,8 +437,11 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 		} else {
 			update.Annotations["kubesphere.io/opAction"] = "install"
 		}
-		err := r.Update(context.TODO(), update)
-		return reconcile.Result{}, err
+		err = r.Update(context.TODO(), update)
+		if err != nil {
+			currentState = v1alpha1.HelmStatusFailed
+			msg = err.Error()
+		}
 	}
 
 	instance := &v1alpha1.HelmRelease{}
