@@ -27,4 +27,4 @@ spec:
         - name: post-install-job
           image: jw008/openpitrix-clear-crds:latest
           imagePullPolicy: IfNotPresent
-      serviceAccountName: {{ include "opentripx.serviceAccountName" . }}
+      serviceAccountName: {{ include "openpitrix.serviceAccountName" . }}

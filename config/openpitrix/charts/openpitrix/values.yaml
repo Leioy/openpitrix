@@ -1,4 +1,4 @@
-# Default values for opentripx.
+# Default values for openpitrix.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -49,16 +49,16 @@ controller:
     type: ClusterIP
     port: 443
   image:
-    repository: isyes/opentripx-controller-manager
+    repository: docker.io/jw008/openpitrix-controller-manager
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: v0.0.2
+    tag: v0.0.1
 
 apiserver:
   image:
-    repository: isyes/opentripx-apiserver
+    repository: jw008/openpitrix-apiserver
     pullPolicy: IfNotPresent
-    tag: v0.0.2
+    tag: v0.0.1
   service:
     type: ClusterIP
     port: 443
@@ -97,8 +97,6 @@ tolerations: []
 
 affinity: {}
 
-opentripx:
+openpitrix:
   path: ""
   leaderElectionID: ""
-
-env: []

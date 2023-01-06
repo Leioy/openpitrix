@@ -23,6 +23,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
+	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 
 	"net/http"
