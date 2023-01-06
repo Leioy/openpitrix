@@ -26,6 +26,9 @@ import (
 	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	"kubesphere.io/openpitrix/pkg/utils/clusterclient"
 
+	"net/http"
+	"strings"
+
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	"kubesphere.io/openpitrix/pkg/apis"
@@ -33,10 +36,8 @@ import (
 	"kubesphere.io/openpitrix/pkg/client/clientset/versioned/scheme"
 	apiserverconfig "kubesphere.io/openpitrix/pkg/config"
 	"kubesphere.io/openpitrix/pkg/informers"
+	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	genericoptions "kubesphere.io/openpitrix/pkg/server/options"
-
-	"net/http"
-	"strings"
 
 	"kubesphere.io/openpitrix/pkg/client/k8s"
 )

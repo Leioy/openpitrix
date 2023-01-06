@@ -12,6 +12,8 @@ keywords:
 home: https://kubesphere.io
 sources:
   - https://github.com/kubesphere
+kubeVersion: ">=1.19.0"
+ksVersion: ">=3.0.0"
 dependencies:
   - name: openpitrix
     condition: openpitrix.enabled
