@@ -19,11 +19,15 @@ package helmrelease
 import (
 	"context"
 	"errors"
-	"kubesphere.io/utils/helm"
+	"fmt"
+	"sort"
 	"time"
 
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/flowcontrol"
+	"kubesphere.io/utils/helm"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -84,8 +88,6 @@ type ReconcileHelmRelease struct {
 	StopChan   <-chan struct{}
 }
 
-var JobName string
-
 //	=========================>
 //	^                         |
 //	|        <==upgraded<==upgrading================
@@ -121,16 +123,6 @@ func (r *ReconcileHelmRelease) Reconcile(ctx context.Context, request reconcile.
 		instance.Status.LastUpdate = metav1.Now()
 		err = r.Status().Update(context.TODO(), instance)
 		return reconcile.Result{}, err
-	}
-	if JobName != "" && len(JobName) > 0 && instance.Status.State != "" {
-
-		err = r.updateJobName(instance)
-		if err != nil {
-			klog.Errorf("update jobName:%s fail", JobName)
-		}
-		JobName = ""
-		return reconcile.Result{}, err
-
 	}
 
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -217,24 +209,61 @@ func (r *ReconcileHelmRelease) reconcile(instance *v1alpha1.HelmRelease) (reconc
 	case v1alpha1.HelmStatusUpgrading:
 		// We can update the release now.
 		return r.createOrUpgradeHelmRelease(instance, true)
-	case v1alpha1.HelmStatusCreated, v1alpha1.HelmStatusUpgraded:
+	case v1alpha1.HelmStatusUpgraded:
 		if instance.Status.Version != instance.Spec.Version {
-			// Start a new backoff.
-			r.checkReleaseStatusBackoff.DeleteEntry(rlsBackoffKey(instance))
-
-			instance.Status.State = v1alpha1.HelmStatusUpgrading
-			err = r.Status().Update(context.TODO(), instance)
-			return reconcile.Result{}, err
-		} else {
-			retry, err := r.checkReleaseIsReady(instance)
-			return reconcile.Result{RequeueAfter: retry}, err
+			return r.checkReleaseJobStatus(instance)
 		}
+	case v1alpha1.HelmStatusCreated:
+		// retry, err := r.checkReleaseIsReady(instance)
+		return r.checkReleaseJobStatus(instance)
 	case v1alpha1.HelmStatusRollbacking:
 		// TODO: rollback helm release
 		return reconcile.Result{}, nil
 	}
 
 	return reconcile.Result{}, nil
+}
+
+func (r *ReconcileHelmRelease) checkReleaseJobStatus(instance *v1alpha1.HelmRelease) (reconcile.Result, error) {
+	if instance.Annotations["kubesphere.io/jobName"] == "" {
+		// todo, error output
+		return reconcile.Result{}, nil
+	}
+	jobName := instance.Annotations["kubesphere.io/jobName"]
+	namespace := instance.GetRlsNamespace()
+	// todo, handle multiple cluster scenary
+	latestJobCondition, err := r.latestJobCondition(context.TODO(), namespace, jobName)
+	if err != nil {
+		return reconcile.Result{}, nil
+	}
+
+	instance = instance.DeepCopy()
+	if latestJobCondition.Type == batchv1.JobComplete && latestJobCondition.Status == corev1.ConditionTrue {
+		delete(instance.Annotations, "kubesphere.io/jobName")
+		err = r.updateStatus(instance, v1alpha1.HelmStatusActive, "")
+
+	} else if latestJobCondition.Type == batchv1.JobFailed && latestJobCondition.Status == corev1.ConditionTrue {
+		delete(instance.Annotations, "kubesphere.io/jobName")
+		err = r.updateStatus(instance, v1alpha1.HelmStatusFailed, fmt.Sprintf("helm executor job failed: %s", latestJobCondition.Message))
+	} else {
+		return reconcile.Result{RequeueAfter: 3 * time.Second}, nil
+	}
+
+	return reconcile.Result{}, err
+}
+func (r *ReconcileHelmRelease) latestJobCondition(ctx context.Context, namespace, name string) (batchv1.JobCondition, error) {
+	job := &batchv1.Job{}
+	if err := r.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, job); err != nil {
+		return batchv1.JobCondition{}, err
+	}
+	jobConditions := job.Status.Conditions
+	sort.Slice(jobConditions, func(i, j int) bool {
+		return jobConditions[i].LastTransitionTime.After(jobConditions[j].LastTransitionTime.Time)
+	})
+	if len(job.Status.Conditions) > 0 {
+		return jobConditions[0], nil
+	}
+	return batchv1.JobCondition{}, nil
 }
 
 func rlsBackoffKey(rls *v1alpha1.HelmRelease) string {
@@ -334,18 +363,6 @@ func (r *ReconcileHelmRelease) updateStatus(rls *v1alpha1.HelmRelease, currentSt
 	return err
 }
 
-func (r *ReconcileHelmRelease) updateJobName(rls *v1alpha1.HelmRelease) error {
-	s := rls.Annotations
-	if s[v1alpha1.JobName] != "" {
-		delete(s, v1alpha1.JobName)
-	}
-	s[v1alpha1.JobName] = JobName
-	rls.Annotations = s
-	err := r.Update(context.TODO(), rls)
-
-	return err
-}
-
 // createOrUpgradeHelmRelease will run helm install to install a new release if upgrade is false,
 // run helm upgrade if upgrade is true
 func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRelease, upgrade bool) (reconcile.Result, error) {
@@ -394,13 +411,13 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 	//	helmwrapper.SetMock(r.helmMock))
 
 	var currentState string
-
+	var jobName string
 	if upgrade {
-		JobName, err = hw.Upgrade(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		jobName, err = hw.Upgrade(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
 		//err = hw.Upgrade(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusUpgraded
 	} else {
-		JobName, err = hw.Install(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
+		jobName, err = hw.Install(context.TODO(), rls.Spec.ChartName, chartData, rls.Spec.Values, helm.SetHelmKubeConfig(clusterConfig))
 		//err = hw.Install(rls.Spec.ChartName, string(chartData), string(rls.Spec.Values))
 		currentState = v1alpha1.HelmStatusCreated
 	}
@@ -411,8 +428,29 @@ func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRele
 		currentState = v1alpha1.HelmStatusFailed
 		msg = err.Error()
 	}
-	err = r.updateStatus(rls, currentState, msg)
 
+	if jobName != "" {
+		update := rls.DeepCopy()
+		update.Annotations["kubesphere.io/jobName"] = jobName
+		if upgrade {
+			update.Annotations["kubesphere.io/opAction"] = "upgrade"
+		} else {
+			update.Annotations["kubesphere.io/opAction"] = "install"
+		}
+		err = r.Update(context.TODO(), update)
+		if err != nil {
+			currentState = v1alpha1.HelmStatusFailed
+			msg = err.Error()
+		}
+	}
+
+	instance := &v1alpha1.HelmRelease{}
+	err = r.Get(context.TODO(), client.ObjectKeyFromObject(rls), instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	err = r.updateStatus(instance, currentState, msg)
 	return reconcile.Result{}, err
 }
 
@@ -445,14 +483,14 @@ func (r *ReconcileHelmRelease) uninstallHelmRelease(rls *v1alpha1.HelmRelease) e
 
 		clusterConfig = string(clusterInfo.Spec.Connection.KubeConfig)
 	}
-
-	hw, err := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
+	// todo, handle error
+	hw, _ := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
 	//if err != nil {
 	//	return err
 	//}
 	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name, helmwrapper.SetMock(r.helmMock))
 	//err := hw.Uninstall()
-	JobName, err = hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
+	_, err := hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
 	if err != nil {
 		return err
 	}
