@@ -88,8 +88,6 @@ type ReconcileHelmRelease struct {
 	StopChan   <-chan struct{}
 }
 
-var JobName string
-
 //	=========================>
 //	^                         |
 //	|        <==upgraded<==upgrading================
@@ -125,16 +123,6 @@ func (r *ReconcileHelmRelease) Reconcile(ctx context.Context, request reconcile.
 		instance.Status.LastUpdate = metav1.Now()
 		err = r.Status().Update(context.TODO(), instance)
 		return reconcile.Result{}, err
-	}
-	if JobName != "" && len(JobName) > 0 && instance.Status.State != "" {
-
-		err = r.updateJobName(instance)
-		if err != nil {
-			klog.Errorf("update jobName:%s fail", JobName)
-		}
-		JobName = ""
-		return reconcile.Result{}, err
-
 	}
 
 	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -223,12 +211,7 @@ func (r *ReconcileHelmRelease) reconcile(instance *v1alpha1.HelmRelease) (reconc
 		return r.createOrUpgradeHelmRelease(instance, true)
 	case v1alpha1.HelmStatusUpgraded:
 		if instance.Status.Version != instance.Spec.Version {
-			// Start a new backoff.
-			r.checkReleaseStatusBackoff.DeleteEntry(rlsBackoffKey(instance))
-
-			instance.Status.State = v1alpha1.HelmStatusUpgrading
-			err = r.Status().Update(context.TODO(), instance)
-			return reconcile.Result{}, err
+			return r.checkReleaseJobStatus(instance)
 		}
 	case v1alpha1.HelmStatusCreated:
 		// retry, err := r.checkReleaseIsReady(instance)
@@ -380,18 +363,6 @@ func (r *ReconcileHelmRelease) updateStatus(rls *v1alpha1.HelmRelease, currentSt
 	return err
 }
 
-func (r *ReconcileHelmRelease) updateJobName(rls *v1alpha1.HelmRelease) error {
-	s := rls.Annotations
-	if s[v1alpha1.JobName] != "" {
-		delete(s, v1alpha1.JobName)
-	}
-	s[v1alpha1.JobName] = JobName
-	rls.Annotations = s
-	err := r.Update(context.TODO(), rls)
-
-	return err
-}
-
 // createOrUpgradeHelmRelease will run helm install to install a new release if upgrade is false,
 // run helm upgrade if upgrade is true
 func (r *ReconcileHelmRelease) createOrUpgradeHelmRelease(rls *v1alpha1.HelmRelease, upgrade bool) (reconcile.Result, error) {
@@ -509,14 +480,14 @@ func (r *ReconcileHelmRelease) uninstallHelmRelease(rls *v1alpha1.HelmRelease) e
 
 		clusterConfig = string(clusterInfo.Spec.Connection.KubeConfig)
 	}
-
-	hw, err := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
+	// todo, handle error
+	hw, _ := helm.NewExecutor(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name)
 	//if err != nil {
 	//	return err
 	//}
 	//hw := helmwrapper.NewHelmWrapper(clusterConfig, rls.GetRlsNamespace(), rls.Spec.Name, helmwrapper.SetMock(r.helmMock))
 	//err := hw.Uninstall()
-	JobName, err = hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
+	_, err := hw.Uninstall(context.TODO(), helm.SetHelmKubeConfig(clusterConfig))
 	if err != nil {
 		return err
 	}
