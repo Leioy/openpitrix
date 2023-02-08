@@ -1,0 +1,17 @@
+{
+  "name": "app-store",
+  "description": "App Store!",
+  "author": "bunnymiao",
+  "version": "1.0.0",
+  "homepage": "",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "nanoid": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/nanoid": "^2.1.0"
+  }
+}
