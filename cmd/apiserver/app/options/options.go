@@ -36,7 +36,6 @@ import (
 	"kubesphere.io/openpitrix/pkg/client/clientset/versioned/scheme"
 	apiserverconfig "kubesphere.io/openpitrix/pkg/config"
 	"kubesphere.io/openpitrix/pkg/informers"
-	openpitrixv1 "kubesphere.io/openpitrix/pkg/kapis/openpitrix/v1"
 	genericoptions "kubesphere.io/openpitrix/pkg/server/options"
 
 	"kubesphere.io/openpitrix/pkg/client/k8s"
