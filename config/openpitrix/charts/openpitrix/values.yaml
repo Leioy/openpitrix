@@ -49,14 +49,14 @@ controller:
     type: ClusterIP
     port: 443
   image:
-    repository: docker.io/jw008/openpitrix-controller-manager
+    repository: docker.io/weitingwei/openpitrix-controller-manager
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: v0.0.1
 
 apiserver:
   image:
-    repository: jw008/openpitrix-apiserver
+    repository: docker.io/weitingwei/openpitrix-apiserver
     pullPolicy: IfNotPresent
     tag: v0.0.1
   service:
