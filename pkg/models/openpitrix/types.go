@@ -283,6 +283,12 @@ type AppVersionReview struct {
 
 	// Workspace of the app version
 	Workspace string `json:"workspace,omitempty"`
+
+	// app icon
+	Icon string `json:"icon,omitempty"`
+
+	// the isv user who create the app
+	Isv string `json:"isv,omitempty"`
 }
 
 type CreateAppRequest struct {

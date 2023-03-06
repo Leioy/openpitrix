@@ -819,6 +819,12 @@ func convertAppVersionReview(app *v1alpha1.HelmApplication, appVersion *v1alpha1
 	review.VersionName = appVersion.GetVersionName()
 	review.Workspace = appVersion.GetWorkspace()
 
+	review.Icon = app.Spec.Icon
+	// If this keys exists, the workspace of this app has been deleted, set the isv to empty.
+	if _, exists := app.Annotations[constants.DanglingAppCleanupKey]; !exists {
+		review.Isv = app.GetWorkspace()
+	}
+
 	review.StatusTime = strfmt.DateTime(status.Audit[0].Time.Time)
 	review.AppName = app.GetTrueName()
 	return review
