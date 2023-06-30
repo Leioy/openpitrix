@@ -1,0 +1,13 @@
+client:
+  title: KubeSphere
+  description: ""
+  encryptKey: kubesphere
+
+  # apps manage page navigations
+  manageAppNavs:
+    - name: "apps"
+      children:
+        - { name: store, title: APPS, icon: appcenter }
+        - { name: categories, title: APP_CATEGORY_PL, icon: tag }
+        - { name: reviews, title: APP_REVIEW, icon: safe-notice }
+

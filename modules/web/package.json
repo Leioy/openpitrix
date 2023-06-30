@@ -3,28 +3,28 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
-  "license": "MIT",
   "workspaces": [
     "extensions/*"
   ],
   "scripts": {
-    "dev:client": "ksc dev",
-    "dev:server": "ksc-server",
-    "dev": "concurrently -k --raw 'yarn dev:client' 'yarn dev:server'",
-    "start": "NODE_ENV=production ksc-server",
     "build:dll": "ksc build:dll",
-    "build:prod": "ksc build:prod",
     "build:ext": "ksc build:ext",
-    "create:ext": "ksc create:ext"
+    "build:prod": "ksc build:prod",
+    "create:ext": "ksc create:ext",
+    "dev": "concurrently -k --raw 'yarn dev:client' 'yarn dev:server'",
+    "dev:client": "ksc dev -u true",
+    "dev:server": "ksc-server",
+    "start": "NODE_ENV=production ksc-server"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
   ],
-  "engines": {
-    "node": ">= 6.0.0",
-    "npm": ">= 3.0.0"
+  "dependencies": {
+    "@ks-console/bootstrap": "^4.0.0-alpha.27",
+    "@ks-console/server": "^4.0.0-alpha.17",
+    "@ks-console/shared": "4.0.0-alpha.22"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.7",
@@ -53,12 +53,17 @@
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-react": "^7.14.5",
     "@babel/runtime": "^7.15.4",
-    "@kubed/components": "^0.0.52",
-    "@kubed/hooks": "^0.0.9",
-    "@kubed/icons": "^0.0.4",
+    "@kubed/charts": "^0.0.8",
+    "@kubed/code-editor": "^0.0.15",
+    "@kubed/components": "^0.0.76",
+    "@kubed/diff-viewer": "^0.0.10",
+    "@kubed/hooks": "^0.0.14",
+    "@kubed/icons": "^0.0.8",
+    "@kubed/log-viewer": "^0.0.9",
     "@kubed/stook": "^0.0.4",
     "@kubed/stook-devtools": "^0.0.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
+    "@tanstack/react-query": "^4.13.5",
     "@types/lodash": "^4.14.176",
     "@types/qs": "^6.9.7",
     "@types/react": "^16.9.56",
@@ -143,9 +148,8 @@
     "webpackbar": "^5.0.0-3",
     "yargs": "^17.0.1"
   },
-  "dependencies": {
-    "@ks-console/bootstrap": "^4.0.0-alpha.20",
-    "@ks-console/server": "^4.0.0-alpha.12",
-    "@ks-console/shared": "4.0.0-alpha.13"
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
   }
 }
