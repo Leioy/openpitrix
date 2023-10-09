@@ -1,5 +1,12 @@
 {
-  "exclude": ["node_modules", "lib", "esm", "cjs", "**/*.test.ts", "**/*.test.tsx"],
+  "exclude": [
+    "node_modules",
+    "lib",
+    "esm",
+    "cjs",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+  ],
   "compilerOptions": {
     "strict": true,
     "target": "ES2015",
@@ -13,6 +20,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
   }
 }
