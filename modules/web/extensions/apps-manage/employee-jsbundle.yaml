@@ -1,0 +1,10 @@
+apiVersion: extensions.kubesphere.io/v1alpha1
+kind: JSBundle
+metadata:
+  name: v1alpha1.employee.kubesphere.io
+spec:
+  rawFrom:
+    url: http://apps-manage-frontend.default.svc/dist/apps-manage-frontend/index.js
+status:
+  state: Available
+  link: /dist/apps-manage-frontend/index.js
