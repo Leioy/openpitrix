@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { get } from 'lodash';
 import { useStore } from '@kubed/stook';
 import { notify } from '@kubed/components';
 import { useParams } from 'react-router-dom';
@@ -15,14 +16,17 @@ import {
   transferAppStatus,
   getVersionTypesName,
   getAppCategoryNames,
+  getBrowserLang,
 } from '@ks-console/shared';
 
-const PATH = '/apps-manage/store/:appId';
+const PATH = '/apps-manage/store/:appName';
 
 const { HANDLE_TYPE_TO_SHOW, useAppDetail, handleApp } = openpitrixStore;
 
 function AppDetailPage(): JSX.Element {
-  const { appId = '' } = useParams();
+  const { appName = '' } = useParams();
+  const userLang = (get(globals.user, 'lang') || getBrowserLang()) as 'zh';
+
   const [detail, setDetail] = useStore<AppDetail>('selectedApp');
   const [modalType, setModalType] = useState<string>('');
   const defaultTabs = [
@@ -44,14 +48,14 @@ function AppDetailPage(): JSX.Element {
     },
   ];
   const tabs = useMemo(() => {
-    if (isRadonDB(appId)) {
+    if (isRadonDB(appName)) {
       return defaultTabs.filter(({ title }) => !['APP_RELEASE', 'APP_INSTANCES'].includes(title));
     }
 
     return defaultTabs;
   }, []);
   const actions = useMemo(() => {
-    if (detail?.status === 'active') {
+    if (detail?.status?.state === 'active') {
       return [
         {
           key: 'suspend',
@@ -80,36 +84,41 @@ function AppDetailPage(): JSX.Element {
     ];
   }, [detail?.status]);
   const { refetch: refetchAppDetails } = useAppDetail(
-    { app_id: appId },
+    { name: appName },
     {
-      enabled: !detail && !!appId,
+      enabled: !detail && !!appName,
       onSuccess: appDetails => setDetail({ ...appDetails, refetchAppDetails }),
     },
   );
   const attrs = [
     {
       label: t('APP_ID'),
-      value: detail?.app_id,
+      value: detail?.metadata?.uid,
     },
     {
       label: t('STATUS'),
-      value: transferAppStatus(detail?.status),
+      value: transferAppStatus(detail?.status.state),
     },
     {
       label: t('CATEGORY'),
-      value: getAppCategoryNames(detail?.category_set || []),
+      // TODO 缺少category
+      value: 'CATEGORY',
+      // value: getAppCategoryNames(detail?.category_set || []),
     },
     {
       label: t('TYPE'),
-      value: getVersionTypesName(detail?.app_version_types || ''),
+      // TODO 缺少 app_version_types
+      value: 'TYPE',
+      // value: getVersionTypesName(detail?.app_version_types || ''),
     },
     {
       label: t('WORKSPACE'),
+      // TODO 缺少 isv
       value: detail?.isv || '-',
     },
     {
       label: t('CREATION_TIME_TCAP'),
-      value: getLocalTime(detail?.create_time || new Date().toDateString()).format(
+      value: getLocalTime(detail?.metadata.creationTimestamp || new Date().toDateString()).format(
         'YYYY-MM-DD HH:mm:ss',
       ),
     },
@@ -121,7 +130,7 @@ function AppDetailPage(): JSX.Element {
 
   async function handleConfirmOk(): Promise<void> {
     await handleApp(
-      { app_id: detail?.app_id },
+      { app_id: detail?.metadata.name },
       {
         action: modalType,
         app_version_types: detail?.app_version_types,
@@ -142,15 +151,15 @@ function AppDetailPage(): JSX.Element {
       <DetailPagee
         tabs={tabs}
         cardProps={{
-          name: detail?.name,
-          desc: detail?.description,
+          name: detail?.metadata.name,
+          desc: detail?.spec.description[userLang],
           icon: (
             <Image
               alt=""
               className="mr12"
-              src={getAvatar(detail?.icon || '')}
+              src={getAvatar(detail?.spec.icon || '')}
               iconSize={32}
-              iconLetter={detail?.name}
+              iconLetter={detail?.metadata.name}
             />
           ),
           authKey: 'apps',
@@ -169,7 +178,9 @@ function AppDetailPage(): JSX.Element {
           onCancel={closeModal}
           onOk={handleConfirmOk}
           confirmLoading={false}
-          content={t(`APP_${(modalType || 'suspend').toUpperCase()}_TIP`, { name: detail?.name })}
+          content={t(`APP_${(modalType || 'suspend').toUpperCase()}_TIP`, {
+            name: detail?.metadata.name,
+          })}
         />
       )}
     </>
