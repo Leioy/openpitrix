@@ -2,27 +2,25 @@ import { useMutation, useQuery } from 'react-query';
 import { request, UseListOptions, PathParams } from '@ks-console/shared';
 import { defaultUrl, useBaseList } from './base';
 
-type RepoPathParams = PathParams & { repo_id?: string; app_id?: string; version_id?: string };
+type RepoPathParams = PathParams & { repo_name?: string; app_name?: string; version_id?: string };
 
-export function getRepoUrl({ workspace, repo_id, name }: RepoPathParams): string {
-  let prefix = defaultUrl;
+export function getRepoUrl({ workspace, repo_name }: RepoPathParams): string {
+  let prefix = defaultUrl + '/repos';
+  if (repo_name) {
+    prefix += `/${repo_name}`;
+  }
 
   if (workspace) {
-    prefix += `/workspaces/${workspace}`;
+    prefix += `?workspaces=${workspace}`;
   }
-
-  if (repo_id) {
-    return `${prefix}/repos/${repo_id}/${name || ''}`;
-  }
-
-  return `${prefix}/repos`;
+  return `${prefix}`;
 }
 
 export function useRepoList(
-  { workspace, app_id, version_id }: RepoPathParams,
+  { workspace, app_name, version_id }: RepoPathParams,
   options?: Partial<UseListOptions<any>>,
 ) {
-  const url = getRepoUrl({ workspace, app_id, version_id });
+  const url = getRepoUrl({ workspace, app_name, version_id });
 
   return useBaseList(url, { format: data => data, ...options }, workspace, 'repos');
 }
@@ -33,15 +31,15 @@ export function validateRepoUrl(workspace: string, params: Record<string, string
 
 type RepoMutateProps = {
   params: Record<string, any>;
-  repo_id?: string;
+  repo_name?: string;
 };
 
 export function useRepoMutation(workspace: string, options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation(
-    ({ params, repo_id }: RepoMutateProps) => {
-      const url = getRepoUrl({ workspace, repo_id });
-      const mutator = repo_id ? request.patch : request.post;
+    ({ params, repo_name }: RepoMutateProps) => {
+      const url = getRepoUrl({ workspace, repo_name });
+      const mutator = repo_name ? request.patch : request.post;
 
       return mutator(url, params);
     },
@@ -56,7 +54,7 @@ export function useReposDeleteMutation(workspace: string, options?: { onSuccess?
   return useMutation(
     (reposId: string[]) =>
       Promise.allSettled(
-        reposId.map((repo_id: string) => request.delete(getRepoUrl({ workspace, repo_id }))),
+        reposId.map((repo_name: string) => request.delete(getRepoUrl({ workspace, repo_name }))),
       ),
     {
       onSuccess,
@@ -64,8 +62,8 @@ export function useReposDeleteMutation(workspace: string, options?: { onSuccess?
   );
 }
 
-export function fetchRepoDetail(workspace: string, repo_id: string): Record<string, any> {
-  const url = getRepoUrl({ workspace, repo_id });
+export function fetchRepoDetail(workspace: string, app_name: string): Record<string, any> {
+  const url = getRepoUrl({ workspace, app_name });
 
   return request.get(url);
 }

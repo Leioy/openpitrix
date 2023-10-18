@@ -81,7 +81,7 @@ function DetailDrawer({
           className="mb12"
           canEdit={false}
           fileStore={fileStore}
-          appId={detail?.app_id}
+          appName={detail?.metadata.name}
           versionId={detail?.version_id}
           type={'MODIFY_VERSION'}
           packageName={getPackageName(versionDetail, appDetail?.name)}

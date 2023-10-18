@@ -45,7 +45,7 @@ function UrlInput({ formData, onChange, onValidate, isSubmitting }: Props): JSX.
   const protocols = [
     { label: 'http://', value: 'http' },
     { label: 'https://', value: 'https' },
-    { label: 's3://', value: 's3' },
+    // { label: 's3://', value: 's3' },
   ];
   const initUrlInputValue = useMemo(() => {
     if (formData.url) {

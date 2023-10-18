@@ -18,6 +18,7 @@ import {
 
 import RepoManagementModal from './RepoManagementModal';
 import { getRepoUrl, useReposDeleteMutation } from '../../stores';
+import type { RepoData } from '../../types/repo';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -28,13 +29,13 @@ function Repos(): JSX.Element {
   const repoListUrl = getRepoUrl({ workspace });
   const tableRef = useRef<TableRef>();
   const [modalType, setModalType] = useState<string>('');
-  const [selectedRows, setSelectedRows] = useState<any[]>();
+  const [selectedRows, setSelectedRows] = useState<RepoData[]>();
   const { mutateAsync, isLoading } = useReposDeleteMutation(workspace);
   const tableParameters = {
     order: 'create_time',
     status: 'active',
   };
-  const renderItemActions = useItemActions({
+  const renderItemActions = useItemActions<RepoData>({
     authKey: 'app-repos',
     params: { workspace },
     actions: [
@@ -70,7 +71,7 @@ function Repos(): JSX.Element {
         action: 'delete',
         onClick: () => {
           const selectedFlatRows = tableRef?.current?.getSelectedFlatRows() || [];
-          setSelectedRows(selectedFlatRows);
+          setSelectedRows(selectedFlatRows as unknown as RepoData);
           setModalType('delete');
         },
         props: { color: 'error' },
@@ -93,16 +94,16 @@ function Repos(): JSX.Element {
       },
     ],
   });
-  const columns: Column[] = [
+  const columns: Column<RepoData>[] = [
     {
       title: t('NAME'),
-      field: 'metadata.name',
+      field: 'spec.name',
       width: '25%',
       searchable: true,
       render: (name, record) => (
         <Field
           value={<Link to={record.metadata.name}>{name}</Link>}
-          label={record.description || '-'}
+          label={name || '-'}
           avatar={<Icon name="catalog" size={40} />}
         />
       ),
@@ -166,7 +167,7 @@ function Repos(): JSX.Element {
   }
 
   async function handleRepoDelete(): Promise<void> {
-    const reposId: string[] = selectedRows?.map((item: any) => item.repo_id) || [];
+    const reposId: string[] = selectedRows?.map(item => item.metadata.name) || [];
     await mutateAsync(reposId);
     notify.success(t('DELETED_SUCCESSFUL'));
     closeModal();

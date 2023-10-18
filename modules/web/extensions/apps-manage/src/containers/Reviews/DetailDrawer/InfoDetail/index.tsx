@@ -24,17 +24,27 @@ function InfoDetail({ detail, versionName }: Props): JSX.Element {
     <>
       <LabelText>{t('BASIC_INFORMATION')}</LabelText>
       <StyledField
-        avatar={<Image src={detail.icon} iconLetter={detail.name} iconSize={100} canLoading />}
+        avatar={
+          <Image
+            src={detail.spec.icon}
+            iconLetter={detail.metadata.name}
+            iconSize={100}
+            canLoading
+          />
+        }
         value={
           <BaseInfo
-            name={detail.name}
-            home={detail.home}
+            name={detail.metadata.name}
+            home={detail.spec.appHome}
             isv={detail.isv}
             versionName={versionName}
           />
         }
         label={
-          <PreField value={<pre>{detail.description || '-'}</pre>} label={t('INTRODUCTION')} />
+          <PreField
+            value={<pre>{detail.spec.description.zh || '-'}</pre>}
+            label={t('INTRODUCTION')}
+          />
         }
       />
       <LabelText>{t('APP_DESCRIPTION')}</LabelText>
