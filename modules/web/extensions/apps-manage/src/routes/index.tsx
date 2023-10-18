@@ -8,6 +8,8 @@ import StoreManage from '../containers/StoreManage';
 import ListLayout from '../containers/Base/ListLayout';
 import AppDetailPage from '../containers/AppDetailPage';
 import CategoriesManage from '../containers/CategoriesManage';
+import RepoManage from '../containers/RepoManage';
+import InstanceManage from '../containers/InstanceManage';
 
 const PATH = '/apps-manage';
 
@@ -42,10 +44,18 @@ export default [
           },
         ],
       },
+      {
+        path: 'repo',
+        element: <RepoManage />,
+      },
+      {
+        path: 'instance',
+        element: <InstanceManage />,
+      },
     ],
   },
   {
-    path: '/apps-manage/store/:appId',
+    path: '/apps-manage/store/:appName',
     element: <AppDetailPage />,
     children: [
       {
