@@ -9,9 +9,10 @@ type Props = {
   columns: Column[];
   categoryId?: string;
   batchActions?: ReactNode[] | null;
+  toolbarRight?: ReactNode[] | null;
 };
 
-function AppDataTable({ columns, categoryId, batchActions }: Props): JSX.Element {
+function AppDataTable({ columns, categoryId, batchActions, toolbarRight }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
       category_id: categoryId,
@@ -50,12 +51,13 @@ function AppDataTable({ columns, categoryId, batchActions }: Props): JSX.Element
     <DataTable
       simpleSearch
       tableName="APP"
-      rowKey="app_id"
+      rowKey="metadata.uid"
       url={getBaseUrl({}, 'apps')}
       columns={columns}
       parameters={queryParams}
       format={data => data}
       batchActions={batchActions}
+      toolbarRight={toolbarRight}
       serverDataFormat={formatServerData}
       transformRequestParams={requestParamsTransformer}
       emptyOptions={{

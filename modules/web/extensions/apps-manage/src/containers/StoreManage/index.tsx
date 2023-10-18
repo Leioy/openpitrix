@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useStore } from '@kubed/stook';
 import { Appcenter } from '@kubed/icons';
-import { Banner, Field } from '@kubed/components';
+import { Banner, Field, Button } from '@kubed/components';
 
 import {
   Image,
@@ -12,9 +13,12 @@ import {
   getLocalTime,
   StatusIndicator,
   transferAppStatus,
-  getAppCategoryNames,
+  useActionMenu,
+  // getAppCategoryNames,
+  getBrowserLang,
 } from '@ks-console/shared';
-
+import { useDisclosure } from '@kubed/hooks';
+import CreateApp from '../AppCreate';
 import AppDataTable from '../../components/AppDataTable';
 
 export const TableItemField = styled(Field)`
@@ -34,25 +38,28 @@ export const TableItemField = styled(Field)`
 `;
 
 function StoreManage(): JSX.Element {
+  const userLang = get(globals.user, 'lang') || getBrowserLang();
   const [, setSelectedApp] = useStore<AppDetail>('selectedApp');
+  const { isOpen, open, close } = useDisclosure(false);
+
   const columns: Column[] = [
     {
       title: t('NAME'),
-      field: 'name',
+      field: 'metadata.name',
       width: '30%',
       searchable: true,
       render: (name, app) => (
         <TableItemField
           onClick={() => setSelectedApp(app as AppDetail)}
-          label={app.description}
-          value={<Link to={`/apps-manage/store/${app.app_id}`}>{name}</Link>}
-          avatar={<Image iconSize={40} src={app.icon} iconLetter={name} />}
+          label={app.spec.description[userLang]}
+          value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
+          avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
         />
       ),
     },
     {
       title: t('STATUS'),
-      field: 'status',
+      field: 'status.state',
       canHide: true,
       width: '10%',
       render: status => (
@@ -67,7 +74,7 @@ function StoreManage(): JSX.Element {
     },
     {
       title: t('LATEST_VERSION'),
-      field: 'latest_app_version.name',
+      field: 'metadata.resourceVersion',
       canHide: true,
       width: '16%',
     },
@@ -76,7 +83,8 @@ function StoreManage(): JSX.Element {
       field: 'category_set',
       canHide: true,
       width: '17%',
-      render: categories => getAppCategoryNames(categories),
+      // TODO 此处后端未实现。接口未返回
+      // render: categories => getAppCategoryNames(categories),
     },
     {
       title: t('UPDATE_TIME_TCAP'),
@@ -86,6 +94,11 @@ function StoreManage(): JSX.Element {
       render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
     },
   ];
+  const renderBtn = (
+    <Button variant="text" radius="lg" onClick={open}>
+      创建应用
+    </Button>
+  );
 
   return (
     <>
@@ -95,7 +108,8 @@ function StoreManage(): JSX.Element {
         title={t('APP_PL')}
         description={t('APP_STORE_DESC')}
       />
-      <AppDataTable columns={columns} />
+      <AppDataTable columns={columns} toolbarRight={renderBtn} />
+      <CreateApp visible={isOpen} onCancel={close} />
     </>
   );
 }

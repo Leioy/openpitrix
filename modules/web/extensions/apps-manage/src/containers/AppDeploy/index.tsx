@@ -12,7 +12,7 @@ import { FormWrapper, StepsWrapper, StyledCol } from './styles';
 
 function AppDeploy(): JSX.Element {
   const navigate = useNavigate();
-  const { appId = '' } = useParams<'appId'>();
+  const { appName = '' } = useParams<'appName'>();
   const { deployApp } = openpitrixStore;
   const baseInfoFormRef = useRef<AppBaseInfoFormRef>(null);
   const configRef = useRef<AppConfigRefType>(null);
@@ -27,7 +27,7 @@ function AppDeploy(): JSX.Element {
       component: (
         <AppBaseInfoForm
           ref={baseInfoFormRef}
-          appId={appId}
+          appName={appName}
           versionStatus="active"
           confirmedData={confirmedBaseInfoData}
         />
@@ -37,12 +37,12 @@ function AppDeploy(): JSX.Element {
     },
     {
       title: 'APP_SETTINGS',
-      component: isRadonDB(appId) ? (
+      component: isRadonDB(appName) ? (
         <>{/* {TODO: Render DB App Config} */}</>
       ) : (
         <AppConfigForm
           ref={configRef}
-          appId={appId}
+          appName={appName}
           versionId={confirmedBaseInfoData?.version_id}
         />
       ),
@@ -63,7 +63,7 @@ function AppDeploy(): JSX.Element {
   const handleOk = async (): Promise<void> => {
     setIsSubmitting(true);
     const finalData = {
-      app_id: appId,
+      name: appName,
       ...confirmedBaseInfoData,
       conf: configRef.current?.conf,
     };
