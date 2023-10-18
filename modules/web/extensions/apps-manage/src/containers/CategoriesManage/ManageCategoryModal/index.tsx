@@ -10,7 +10,7 @@ type Props = {
   visible: boolean;
   detail?: CategoryDetail;
   categoryNames: string[];
-  onOk?: (data: Pick<CategoryDetail, 'name' | 'description'>) => void;
+  onOk?: (data: Pick<CategoryDetail, 'metadata' | 'spec'>) => void;
   onCancel: () => void;
 };
 
@@ -23,12 +23,16 @@ function ManageCategoryModal({
 }: Props): JSX.Element {
   const [form] = useForm();
 
+  const defaultVal = {
+    name: detail?.spec.displayName.zh,
+  };
+
   const nameValidator = (rule: RuleObject, value: string, callback: any) => {
     if (!value) {
       return callback();
     }
 
-    if (value !== detail?.name && categoryNames.includes(value)) {
+    if (value !== detail?.metadata.name && categoryNames.includes(value)) {
       return callback(t('NAME_EXIST_DESC'));
     }
 
@@ -36,7 +40,28 @@ function ManageCategoryModal({
   };
 
   function handleOK(): void {
-    form.validateFields().then(onOk);
+    form.validateFields().then(res => {
+      const params = {
+        apiVersion: 'application.kubesphere.io/v2',
+        kind: 'Category',
+        metadata: {
+          name: detail?.metadata.name || res.name,
+        },
+        spec: {
+          // description: {
+          //   en: 'database1',
+          //   zh: 'database1',
+          // },
+          displayName: {
+            en: res.name,
+            zh: res.name,
+          },
+        },
+      } as unknown as Pick<CategoryDetail, 'metadata' | 'spec'>;
+      if (onOk) {
+        onOk(params);
+      }
+    });
   }
 
   return (
@@ -47,7 +72,7 @@ function ManageCategoryModal({
       onOk={handleOK}
       onCancel={onCancel}
     >
-      <Form form={form} initialValues={detail}>
+      <Form form={form} initialValues={defaultVal}>
         <FormItem
           name={['name']}
           label={t('NAME')}

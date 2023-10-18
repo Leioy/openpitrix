@@ -7,6 +7,7 @@ import {
   Image,
   Column,
   CategoryDetail,
+  AppDetail,
   openpitrixStore,
   useBatchActions,
   DeleteConfirmModal,
@@ -29,17 +30,18 @@ function CategoriesManage(): JSX.Element {
   const [modalType, setModalType] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryDetail>();
   const [currentManageCategory, setCurrentManageCategory] = useState<CategoryDetail | undefined>();
-  const columns: Column[] = [
+  const columns: Column<AppDetail>[] = [
     {
       title: t('NAME'),
-      field: 'name',
+      field: 'metadata.name',
       width: '50%',
       searchable: true,
       render: (name, app) => (
         <TableItemField
-          label={app.description}
-          value={<Link to={`/apps/${app.app_id}`}>{name}</Link>}
-          avatar={<Image iconSize={40} src={app.icon} iconLetter={name} />}
+          label={app.spec.displayName.zh}
+          // TODO 此处跳转地址有问题
+          value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
+          avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
         />
       ),
     },
@@ -80,20 +82,20 @@ function CategoriesManage(): JSX.Element {
 
   const handleCategoryDelete = async (): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { category_id } = currentManageCategory || {};
+    const { metadata } = currentManageCategory || {};
 
-    if (!category_id) {
+    if (!metadata?.name) {
       return;
     }
 
-    await deleteCategory(category_id);
+    await deleteCategory(metadata?.name);
     mutateSuccess(t('DELETED_SUCCESSFULLY'));
   };
 
   const handleOk = async (
-    data: Pick<CategoryDetail, 'name' | 'description'>,
+    data: Pick<CategoryDetail, 'metadata' | 'spec'>,
   ): Promise<Promise<void>> => {
-    const categoryId = currentManageCategory?.category_id;
+    const categoryId = currentManageCategory?.metadata?.name;
 
     if (!categoryId) {
       await createCategory(data);
@@ -131,11 +133,11 @@ function CategoriesManage(): JSX.Element {
           </Categories>
         </FirstColumn>
         <SecondColumn>
-          {selectedCategory?.category_id && (
+          {selectedCategory?.metadata?.name && (
             <AppDataTable
               columns={columns}
               batchActions={renderBatchActions()}
-              categoryId={selectedCategory.category_id}
+              categoryId={selectedCategory.metadata?.name}
             />
           )}
         </SecondColumn>
@@ -146,13 +148,13 @@ function CategoriesManage(): JSX.Element {
           detail={currentManageCategory}
           onCancel={closeModal}
           onOk={handleOk}
-          categoryNames={categories.map(({ name }) => name)}
+          categoryNames={categories.map(({ metadata }) => metadata.name)}
         />
       )}
       {modalType === 'delete' && (
         <DeleteConfirmModal
           visible={true}
-          tip={t('DELETE_CATEGORY_DESC', { name: currentManageCategory?.name })}
+          tip={t('DELETE_CATEGORY_DESC', { name: currentManageCategory?.metadata?.name })}
           onOk={handleCategoryDelete}
           onCancel={closeModal}
         />

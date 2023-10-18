@@ -25,18 +25,18 @@ function CategoryItem({
       return 'tag';
     }
 
-    return detail?.description;
-  }, [detail?.description]);
+    return detail?.spec.displayName.zh;
+  }, [detail?.spec.displayName.zh]);
 
   return (
     <Category onClick={() => onSelectCategory(detail)} className={cx({ active: isActive })}>
       {iconName && <Icon size={16} className="mr12" name={iconName} />}
-      {t(`APP_CATE_${detail?.name?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-        defaultValue: detail?.name,
+      {t(`APP_CATE_${detail?.spec.displayName.zh?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
+        defaultValue: detail?.spec.displayName.zh,
       })}
       <Others>
-        <span className="total_count">{detail?.app_total || 0}</span>
-        {!isUnCategorizedCtg(detail?.category_id) && (
+        <span className="total_count">{detail?.status.total || 0}</span>
+        {!isUnCategorizedCtg(detail?.metadata.name) && (
           <Actions className="actions">
             <Icon
               name="trash"
