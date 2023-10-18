@@ -39,16 +39,16 @@ export function getCategoryDisplayName(name: string): string {
 }
 
 export function getAppCategoryNames(categories: CategoryDetail[]): string {
-  const names = categories.reduce(
-    (acc: string[], { category_id, name, status }: CategoryDetail) => {
-      if (category_id && status !== 'disabled') {
-        const result = isUnCategorizedCtg(category_id) ? t('APP_CATE_UNCATEGORIZED') : name;
-        acc.push(t(result || category_id));
-      }
-      return acc;
-    },
-    [],
-  );
+  const names = categories.reduce((acc: string[], { metadata }: CategoryDetail) => {
+    // TODO  if (metadata.name && status !== 'disabled') {
+    if (metadata.name) {
+      const result = isUnCategorizedCtg(metadata.name)
+        ? t('APP_CATE_UNCATEGORIZED')
+        : metadata.name;
+      acc.push(t(result || metadata.name));
+    }
+    return acc;
+  }, []);
 
   return isEmpty(names) ? '-' : names.join(', ');
 }
