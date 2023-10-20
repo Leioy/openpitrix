@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { ReactNode, useState } from 'react';
 import { get } from 'lodash';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useStore } from '@kubed/stook';
 import { Appcenter } from '@kubed/icons';
-import { Banner, Field, Button } from '@kubed/components';
+import { Banner, Field, Button, notify } from '@kubed/components';
 
 import {
   Image,
@@ -13,9 +13,13 @@ import {
   getLocalTime,
   StatusIndicator,
   transferAppStatus,
-  useActionMenu,
+  // useActionMenu,
   // getAppCategoryNames,
   getBrowserLang,
+  useItemActions,
+  Icon,
+  DeleteConfirmModal,
+  openpitrixStore,
 } from '@ks-console/shared';
 import { useDisclosure } from '@kubed/hooks';
 import CreateApp from '../AppCreate';
@@ -36,11 +40,34 @@ export const TableItemField = styled(Field)`
     max-width: 300px;
   }
 `;
-
+const { deleteApp } = openpitrixStore;
 function StoreManage(): JSX.Element {
   const userLang = get(globals.user, 'lang') || getBrowserLang();
-  const [, setSelectedApp] = useStore<AppDetail>('selectedApp');
+  const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
   const { isOpen, open, close } = useDisclosure(false);
+  const [delVisible, setDelVisible] = useState(false);
+
+  async function handleDelete() {
+    await deleteApp({ app_name: selectData.metadata.name });
+    setDelVisible(false);
+    notify.success(t('DELETED_SUCCESSFULLY'));
+  }
+  const renderItemActions = useItemActions<AppDetail>({
+    authKey: 'app-repos',
+    params: {},
+    actions: [
+      {
+        key: 'delete',
+        icon: <Icon name="trash" />,
+        text: t('DELETE'),
+        action: 'delete',
+        onClick: (_, record) => {
+          setDelVisible(true);
+          setSelectedApp(record);
+        },
+      },
+    ],
+  });
 
   const columns: Column[] = [
     {
@@ -87,18 +114,32 @@ function StoreManage(): JSX.Element {
       // render: categories => getAppCategoryNames(categories),
     },
     {
+      title: t('App Templates'),
+      field: 'spec.appType',
+      canHide: true,
+      width: '17%',
+      // TODO 此处后端未实现。接口未返回
+      // render: categories => getAppCategoryNames(categories),
+    },
+    {
       title: t('UPDATE_TIME_TCAP'),
       field: 'status_time',
       canHide: true,
       width: '17%',
       render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
     },
+    {
+      id: 'more',
+      title: '',
+      width: 20,
+      render: renderItemActions as unknown as () => ReactNode,
+    },
   ];
-  const renderBtn = (
+  const renderBtn: ReactNode[] = [
     <Button variant="text" radius="lg" onClick={open}>
       创建应用
-    </Button>
-  );
+    </Button>,
+  ];
 
   return (
     <>
@@ -110,6 +151,14 @@ function StoreManage(): JSX.Element {
       />
       <AppDataTable columns={columns} toolbarRight={renderBtn} />
       <CreateApp visible={isOpen} onCancel={close} />
+      <DeleteConfirmModal
+        visible={delVisible}
+        type="APP_REPOSITORY"
+        resource={selectData?.metadata.name}
+        onOk={handleDelete}
+        onCancel={() => setDelVisible(false)}
+        confirmLoading={false}
+      />
     </>
   );
 }

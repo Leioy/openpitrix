@@ -51,7 +51,7 @@ function AppDataTable({ columns, categoryId, batchActions, toolbarRight }: Props
     <DataTable
       simpleSearch
       tableName="APP"
-      rowKey="metadata.uid"
+      rowKey="metadata.name"
       url={getBaseUrl({}, 'apps')}
       columns={columns}
       parameters={queryParams}

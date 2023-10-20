@@ -27,14 +27,14 @@ function CreateTemplateApp({
   onOk,
   onCancel,
 }: CreateTemplateAppProps) {
-  const manager = globals.user.username;
+  // const manager = globals.user.username;
   const [active, setActive] = useState(0);
   const [baseInfo, setBaseInfo] = useState<WorkspaceFormValues>({} as WorkspaceFormValues);
-  const formRef = useRef<WorkspaceBasicInfoFormRef>(null);
-  const clusterFormRef = useRef<WorkspaceClusterSettingsFormRef>(null);
+  const formRef = useRef<any>(null);
+  const clusterFormRef = useRef<any>(null);
   const nextStep = () => setActive(current => (current < 1 ? current + 1 : current));
   const prevStep = () => setActive(current => (current > 0 ? current - 1 : current));
-  const handleOk = (value: WorkspaceClusterSettingsFormValues) => {
+  const handleOk = (value: any) => {
     const clusters = get(value, 'spec.placement.clusters');
     set(baseInfo, 'spec.placement.clusters', clusters);
     onOk?.(baseInfo);
@@ -117,7 +117,8 @@ function CreateTemplateApp({
             progressDescription={t('IN_PROGRESS')}
             icon={<Appcenter size={24} />}
           >
-            <WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={handleNext} />
+            <div>WorkspaceBasicInfoForm</div>
+            {/*<WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={handleNext} />*/}
           </TabStep>
           <TabStep
             label={t('CLUSTER_SETTINGS')}
@@ -126,11 +127,13 @@ function CreateTemplateApp({
             progressDescription={t('IN_PROGRESS')}
             icon={<Cluster size={24} />}
           >
-            <WorkspaceClusterSettingsForm ref={clusterFormRef} onOk={handleOk} />
+            <div>WorkspaceClusterSettingsForm</div>
+            {/*<WorkspaceClusterSettingsForm ref={clusterFormRef} onOk={handleOk} />*/}
           </TabStep>
         </Steps>
       ) : (
-        <WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={onOk} />
+        <div>WorkspaceBasicInfoForm</div>
+        // <WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={onOk} />
       )}
     </Modal>
   );

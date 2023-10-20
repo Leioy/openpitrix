@@ -4,16 +4,22 @@ import { Button, Loading } from '@kubed/components';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import type { AppConfigRefType, AppBaseInfoData, AppBaseInfoFormRef } from '@ks-console/shared';
-import { isRadonDB, AppConfigForm, AppBaseInfoForm, openpitrixStore } from '@ks-console/shared';
-
+import { isRadonDB, safeBtoa } from '@ks-console/shared';
+import { AppConfigForm, AppBaseInfoForm } from '../../components/AppForms';
+import { deployApp } from '../../stores';
 import Steps from './Steps';
 
 import { FormWrapper, StepsWrapper, StyledCol } from './styles';
 
-function AppDeploy(): JSX.Element {
+interface Props {
+  close: () => void;
+  onOk: () => void;
+  appName: string;
+  versionId?: string;
+}
+
+function AppDeploy({ close, appName, versionId }: Props): JSX.Element {
   const navigate = useNavigate();
-  const { appName = '' } = useParams<'appName'>();
-  const { deployApp } = openpitrixStore;
   const baseInfoFormRef = useRef<AppBaseInfoFormRef>(null);
   const configRef = useRef<AppConfigRefType>(null);
   const [confirmedBaseInfoData, setConfirmedBaseInfoData] = useState<AppBaseInfoData>();
@@ -28,6 +34,7 @@ function AppDeploy(): JSX.Element {
         <AppBaseInfoForm
           ref={baseInfoFormRef}
           appName={appName}
+          versionId={versionId}
           versionStatus="active"
           confirmedData={confirmedBaseInfoData}
         />
@@ -54,6 +61,7 @@ function AppDeploy(): JSX.Element {
     baseInfoFormRef.current
       ?.validateFields()
       .then(baseInfoData => {
+        console.log(123, baseInfoData);
         setConfirmedBaseInfoData(baseInfoData);
         setCurrentStep(current => (current < steps.length - 1 ? current + 1 : current));
       })
@@ -62,16 +70,31 @@ function AppDeploy(): JSX.Element {
 
   const handleOk = async (): Promise<void> => {
     setIsSubmitting(true);
+    console.log(confirmedBaseInfoData);
     const finalData = {
-      name: appName,
+      // name: appName,
       ...confirmedBaseInfoData,
-      conf: configRef.current?.conf,
+      value: configRef.current?.conf,
+      app_type: 'helm',
+      app_id: appName,
     };
-    const { cluster, namespace, workspace, ...rest } = finalData;
+    const { cluster, namespace, workspace } = finalData;
+    const params = {
+      kind: 'ApplicationRelease',
+      metadata: {
+        name: confirmedBaseInfoData?.name,
+      },
+      spec: {
+        app_id: appName,
+        app_type: 'helm',
+        appVersion_id: confirmedBaseInfoData?.version_id,
+        values: safeBtoa(configRef.current?.conf),
+      },
+    };
 
-    await deployApp(rest, { cluster, namespace, workspace });
+    await deployApp(params, { cluster, namespace, workspace });
     setIsSubmitting(false);
-    navigate(`/${workspace}/clusters/${cluster}/projects/${namespace}/applications`);
+    // navigate(`/${workspace}/clusters/${cluster}/projects/${namespace}/applications`);
   };
 
   useEffect(() => setCurrentStep(0), []);
@@ -82,22 +105,31 @@ function AppDeploy(): JSX.Element {
         <Steps steps={steps} current={currentStep} />
       </StepsWrapper>
       <FormWrapper>
-        <StyledCol span={10}>
+        <StyledCol span={12}>
           {appListIsLoading && <Loading className="page-loading" />}
           {!appListIsLoading && steps[currentStep]?.component}
         </StyledCol>
-        <StyledCol span={2}>
-          {currentStep < steps.length - 1 ? (
-            <Button color="dark" onClick={handleNext}>
-              {t('NEXT')}
-            </Button>
-          ) : (
-            <Button color="dark" onClick={handleOk} loading={isSubmitting}>
-              {t('INSTALL')}
-            </Button>
-          )}
-        </StyledCol>
       </FormWrapper>
+      <div className="kubed-modal-footer">
+        {currentStep < 1 ? (
+          <Button color="default" onClick={close}>
+            {t('CANCEL')}
+          </Button>
+        ) : (
+          <Button color="dark" onClick={() => setCurrentStep(0)}>
+            {t('BEFORE')}
+          </Button>
+        )}
+        {currentStep > 0 ? (
+          <Button color="dark" onClick={handleOk}>
+            {t('OK')}
+          </Button>
+        ) : (
+          <Button color="dark" onClick={handleNext}>
+            {t('NEXT')}
+          </Button>
+        )}
+      </div>
     </>
   );
 }

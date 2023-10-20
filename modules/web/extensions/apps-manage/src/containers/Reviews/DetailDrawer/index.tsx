@@ -37,13 +37,13 @@ function DetailDrawer({
 }: Props): JSX.Element {
   const { fileStore, useAppDetail, useVersionDetail } = openpitrixStore;
   const [tabKey, setTabKey] = useState<string>('appInfo');
-  const { data: appDetail } = useAppDetail({ app_id: detail.app_id });
+  const { data: appDetail } = useAppDetail({ app_name: detail.metadata.name });
   const { data: versionDetail } = useVersionDetail({
-    app_id: detail.app_id,
+    app_name: detail.metadata.name,
     version_id: detail.version_id,
   });
   const { data: files = {} } = fileStore.useQueryFiles(
-    { app_id: detail.app_id, version_id: detail.version_id },
+    { name: detail.app_id, version_id: detail.version_id },
     { enabled: !!detail.app_id && !!detail.version_id },
   );
   const readme = useMemo(() => {
@@ -68,7 +68,7 @@ function DetailDrawer({
     },
   ];
   const navContentMap: Record<string, ReactNode> = {
-    appInfo: <InfoDetail detail={appDetail} versionName={versionDetail?.name} />,
+    appInfo: <InfoDetail detail={appDetail} versionName={versionDetail?.metadata.name} />,
     readme: readme ? (
       <ReactMarkdown>{readme}</ReactMarkdown>
     ) : (
@@ -84,7 +84,7 @@ function DetailDrawer({
           appName={detail?.metadata.name}
           versionId={detail?.version_id}
           type={'MODIFY_VERSION'}
-          packageName={getPackageName(versionDetail, appDetail?.name)}
+          packageName={getPackageName(versionDetail, appDetail?.metadata.name)}
           updateTime={detail?.update_time || detail?.status_time}
         />
         <TextPreview files={files} />
@@ -93,7 +93,7 @@ function DetailDrawer({
     updateLog: (
       <>
         <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{versionDetail?.description || t('NO_UPDATE_LOG_DESC')}</pre>
+        <pre>{versionDetail?.spec.description || t('NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };

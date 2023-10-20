@@ -55,13 +55,13 @@ function Banner({ onBack }: Props): JSX.Element {
                     avatar={
                       <Image
                         iconSize={48}
-                        src={appDetail.icon}
-                        iconLetter={appDetail.name}
+                        src={appDetail.spec.icon}
+                        iconLetter={appDetail.metadata.name}
                         alt=""
                       />
                     }
-                    label={appDetail.description || '-'}
-                    value={appDetail.name || '-'}
+                    label={appDetail.spec.description.zh || '-'}
+                    value={appDetail.metadata.name || '-'}
                   />
                 )}
               </AppOutLine>

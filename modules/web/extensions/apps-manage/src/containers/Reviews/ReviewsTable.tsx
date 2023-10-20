@@ -148,7 +148,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const handleSubmit = async (action: string, data?: RejectFormData) => {
     setIsSubmitting(true);
-    const pathParams = pick(selectedRow, ['app_id', 'version_id']);
+    const pathParams = pick(selectedRow, ['app_name', 'version_id']);
 
     setIsSubmitting(false);
     await store.handleReview({ ...pathParams, action, ...data });
