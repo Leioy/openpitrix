@@ -49,7 +49,7 @@ export default [
         element: <RepoManage />,
       },
       {
-        path: 'instance',
+        path: 'deploy',
         element: <InstanceManage />,
       },
     ],
@@ -75,7 +75,7 @@ export default [
         element: <AuditRecords />,
       },
       {
-        path: 'app-instances',
+        path: 'deploy',
         element: <InstanceList />,
       },
     ],

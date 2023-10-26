@@ -4,6 +4,6 @@
   "CREATE_YAML_APPS": "创建yaml应用",
   "CREATE_TEMPLATE_APPS": "创建模板应用",
   "REPO_MANAGE": "repo 源管理",
-  "INSTANCE_MANAGE": "实例管理",
+  "DEPLOY_MANAGE": "部署管理",
   "ADD_APP_REPO": "添加应用仓库"
 }
