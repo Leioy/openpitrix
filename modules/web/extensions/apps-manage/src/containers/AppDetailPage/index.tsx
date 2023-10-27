@@ -32,19 +32,19 @@ function AppDetailPage(): JSX.Element {
   const defaultTabs = [
     {
       path: `${PATH}/versions`,
-      title: 'VERSIONS',
+      title: t('VERSIONS'),
     },
     {
       path: `${PATH}/app-information`,
-      title: 'APP_INFORMATION',
+      title: t('APP_INFORMATION'),
     },
     {
       path: `${PATH}/audit-records`,
-      title: 'APP_REVIEW',
+      title: t('APP_REVIEW'),
     },
     {
       path: `${PATH}/app-instances`,
-      title: 'APP_INSTANCES',
+      title: t('APP_INSTANCES'),
     },
   ];
   const tabs = useMemo(() => {

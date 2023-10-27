@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Collapse, Modal, notify } from '@kubed/components';
 
 import { getWebsiteUrl, showOutSiteLink, openpitrixStore } from '@ks-console/shared';
-
+import { useV3action } from '@ks-console/console';
 import { Desc, Header, HeaderFieldItem, Logo, Note, StyledCollapse } from './styles';
 import { CreateHelmApp } from './CreateHelmApp';
 import { CreateYamlApp } from './CreateYamlApp';
@@ -21,12 +21,29 @@ const { createApp } = openpitrixStore;
 
 export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
   const { url } = getWebsiteUrl();
+  const { open, render: RenderTemplate } = useV3action('app.template.create.v2');
   // TODO: htmlLinkControl
   const htmlDesc = t('APP_CREATE_GUIDE', { docUrl: url });
   const [modalType, setModalType] = useState<ModalType>('create_helm');
   const [modalVisible, setModalVisible] = useState(false);
 
   function hanldleBtn(type: ModalType) {
+    if (type === 'create_template') {
+      console.log(13);
+      open?.({
+        v3Module: 'edgeStore',
+        v3StoreParams: {
+          module: 'apptemplates',
+          // cluster: '',
+          // workspace: '',
+          success: () => {
+            notify.success(t('UPDATE_SUCCESSFUL'));
+            // refetch();
+          },
+        },
+      });
+      return;
+    }
     setModalType(type);
     setModalVisible(!modalVisible);
   }
@@ -124,6 +141,7 @@ export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
         </StyledCollapse>
       </Modal>
       {renderModal()}
+      {RenderTemplate?.()}
     </>
   );
 }

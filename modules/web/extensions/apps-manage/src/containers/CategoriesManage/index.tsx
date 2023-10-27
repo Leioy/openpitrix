@@ -8,11 +8,10 @@ import {
   Column,
   CategoryDetail,
   AppDetail,
-  openpitrixStore,
   useBatchActions,
   DeleteConfirmModal,
 } from '@ks-console/shared';
-
+import { useCategoryList, createCategory, updateCategory, deleteCategory } from '../../stores';
 import CategoryList from './CategoryList';
 import { TableItemField } from '../StoreManage';
 import ManageCategoryModal from './ManageCategoryModal';
@@ -21,7 +20,6 @@ import AppDataTable from '../../components/AppDataTable';
 import { Categories, Columns, FirstColumn, Head, SecondColumn } from './styles';
 
 function CategoriesManage(): JSX.Element {
-  const { useCategoryList, createCategory, updateCategory, deleteCategory } = openpitrixStore;
   const {
     data: categories = [],
     isLoading,

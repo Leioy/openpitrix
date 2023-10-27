@@ -10,5 +10,9 @@
   "NO_APPLICATION_FOUND": "未发现应用实例。",
   "APPLICATION_EMPTY_DESC": "请添加一个实例。",
   "APP_DEPLOY": "应用部署",
-  "DEPLOY_MANAGE": "部署管理"
+  "DEPLOY_MANAGE": "部署管理",
+  "VERSIONS": "版本",
+  "APP_INFORMATION": "应用信息",
+  "APP_REVIEW": "应用审核",
+  "APP_INSTANCES": "应用实例"
 }

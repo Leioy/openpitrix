@@ -5,6 +5,7 @@ import { Form, FormItem, Input, Modal, useForm } from '@kubed/components';
 import { CategoryDetail, Icon } from '@ks-console/shared';
 
 import IconSelector from './IconSelector';
+import { Body } from './styles';
 
 type Props = {
   visible: boolean;
@@ -56,6 +57,7 @@ function ManageCategoryModal({
             en: res.name,
             zh: res.name,
           },
+          icon: res.icon,
         },
       } as unknown as Pick<CategoryDetail, 'metadata' | 'spec'>;
       if (onOk) {
@@ -72,22 +74,24 @@ function ManageCategoryModal({
       onOk={handleOK}
       onCancel={onCancel}
     >
-      <Form form={form} initialValues={defaultVal}>
-        <FormItem
-          name={['name']}
-          label={t('NAME')}
-          help={t('CATEGORY_NAME_DESC')}
-          rules={[
-            { required: true, message: t('ENTER_CATEGORY_NAME_TIP') },
-            { validator: nameValidator },
-          ]}
-        >
-          <Input autoComplete="off" maxLength={20} />
-        </FormItem>
-        <FormItem name={['description']} label={t('ICON')}>
-          <IconSelector />
-        </FormItem>
-      </Form>
+      <Body>
+        <Form form={form} initialValues={defaultVal}>
+          <FormItem
+            name={['name']}
+            label={t('NAME')}
+            help={t('CATEGORY_NAME_DESC')}
+            rules={[
+              { required: true, message: t('ENTER_CATEGORY_NAME_TIP') },
+              { validator: nameValidator },
+            ]}
+          >
+            <Input autoComplete="off" maxLength={20} />
+          </FormItem>
+          <FormItem name={['icon']} label={t('ICON')}>
+            <IconSelector />
+          </FormItem>
+        </Form>
+      </Body>
     </Modal>
   );
 }

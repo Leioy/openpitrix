@@ -120,7 +120,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
       onOk={handleOk}
       onCancel={onCancel}
       titleIcon={<Firewall size={20} />}
-      title={detail ? 'EDIT_APP_REPO' : 'ADD_APP_REPO'}
+      title={t(detail ? 'EDIT_APP_REPO' : 'ADD_APP_REPO')}
       confirmLoading={isLoading}
     >
       <StyledForm form={form} initialValues={initFormData} onValuesChange={handleValuesChange}>
