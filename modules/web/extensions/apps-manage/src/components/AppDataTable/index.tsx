@@ -6,13 +6,20 @@ import { Column, DataTable, openpitrixStore, useListQueryParams } from '@ks-cons
 const { getBaseUrl, SORT_KEY } = openpitrixStore;
 
 type Props = {
+  tableRef?: any;
   columns: Column[];
   categoryId?: string;
   batchActions?: ReactNode[] | null;
   toolbarRight?: ReactNode[] | null;
 };
 
-function AppDataTable({ columns, categoryId, batchActions, toolbarRight }: Props): JSX.Element {
+function AppDataTable({
+  columns,
+  categoryId,
+  batchActions,
+  toolbarRight,
+  tableRef,
+}: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
       category_id: categoryId,
@@ -49,6 +56,7 @@ function AppDataTable({ columns, categoryId, batchActions, toolbarRight }: Props
 
   return (
     <DataTable
+      ref={tableRef}
       simpleSearch
       tableName="APP"
       rowKey="metadata.name"

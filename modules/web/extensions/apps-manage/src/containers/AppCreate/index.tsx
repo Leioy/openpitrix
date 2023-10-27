@@ -12,13 +12,14 @@ type Props = {
   visible?: boolean;
   onUpload?: () => void;
   onCancel?: () => void;
+  tableRef: any;
 };
 
 type ModalType = 'create_helm' | 'create_yaml' | 'create_template';
 
 const { createApp } = openpitrixStore;
 
-export function CreateApp({ visible, onCancel }: Props): JSX.Element {
+export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
   const { url } = getWebsiteUrl();
   // TODO: htmlLinkControl
   const htmlDesc = t('APP_CREATE_GUIDE', { docUrl: url });
@@ -34,8 +35,8 @@ export function CreateApp({ visible, onCancel }: Props): JSX.Element {
     await createApp({}, fileData);
     notify.success(t('UPLOAD_SUCCESSFUL'));
     setModalVisible(false);
-    // tableRef.current?.refetch();
-    // closeModal();
+    onCancel?.();
+    tableRef.current?.refetch();
   }
 
   function renderModal() {

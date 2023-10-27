@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useRef } from 'react';
 import { get } from 'lodash';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
@@ -43,6 +43,7 @@ export const TableItemField = styled(Field)`
 const { deleteApp } = openpitrixStore;
 function StoreManage(): JSX.Element {
   const userLang = get(globals.user, 'lang') || getBrowserLang();
+  const tableRef = useRef();
   const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
   const { isOpen, open, close } = useDisclosure(false);
   const [delVisible, setDelVisible] = useState(false);
@@ -149,8 +150,8 @@ function StoreManage(): JSX.Element {
         title={t('APP_PL')}
         description={t('APP_STORE_DESC')}
       />
-      <AppDataTable columns={columns} toolbarRight={renderBtn} />
-      <CreateApp visible={isOpen} onCancel={close} />
+      <AppDataTable tableRef={tableRef} columns={columns} toolbarRight={renderBtn} />
+      <CreateApp visible={isOpen} onCancel={close} tableRef={tableRef} />
       <DeleteConfirmModal
         visible={delVisible}
         type="APP_REPOSITORY"

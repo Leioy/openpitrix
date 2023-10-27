@@ -35,7 +35,7 @@ export function CreateYamlApp(props: Props) {
     <ModalStyle
       title={t('CREATE_YAML_APPS')}
       titleIcon={<Firewall />}
-      width={960}
+      width={660}
       visible={visible}
       onCancel={onCancel}
       onOk={handleOk}
