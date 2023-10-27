@@ -1,5 +1,5 @@
-import routes from './routes';
-import locales from './locales';
+// import routes from './routes';
+// import locales from './locales';
 
 const menu = {
   parent: 'global',
@@ -12,9 +12,9 @@ const menu = {
 };
 
 const extensionConfig = {
-  routes,
+  // routes,
   menus: [menu],
-  locales,
+  // locales,
 };
 
 globals.context.registerExtension(extensionConfig);

@@ -4,6 +4,11 @@
   "CREATE_YAML_APPS": "创建yaml应用",
   "CREATE_TEMPLATE_APPS": "创建模板应用",
   "REPO_MANAGE": "repo 源管理",
-  "INSTANCE_MANAGE": "实例管理",
-  "ADD_APP_REPO": "添加应用仓库"
+  "APP_INSTANCES_MANAGE": "实例管理",
+  "ADD_APP_REPO": "添加应用仓库",
+  "APP_INSTANCES_MANAGE_DESC": "实例管理描述",
+  "NO_APPLICATION_FOUND": "未发现应用实例。",
+  "APPLICATION_EMPTY_DESC": "请添加一个实例。",
+  "APP_DEPLOY": "应用部署",
+  "DEPLOY_MANAGE": "部署管理"
 }

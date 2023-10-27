@@ -14,8 +14,8 @@ import {
   openpitrixStore,
   InfoConfirmModal,
   transferAppStatus,
-  getVersionTypesName,
-  getAppCategoryNames,
+  // getVersionTypesName,
+  // getAppCategoryNames,
   getBrowserLang,
 } from '@ks-console/shared';
 
@@ -130,10 +130,10 @@ function AppDetailPage(): JSX.Element {
 
   async function handleConfirmOk(): Promise<void> {
     await handleApp(
-      { app_id: detail?.metadata.name },
+      { app_name: detail?.metadata.name },
       {
         action: modalType,
-        app_version_types: detail?.app_version_types,
+        // app_version_types: detail?.app_version_types,
       },
     );
     const type = HANDLE_TYPE_TO_SHOW[modalType] || modalType;

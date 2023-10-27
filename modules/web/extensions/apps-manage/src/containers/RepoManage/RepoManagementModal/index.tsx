@@ -106,7 +106,7 @@ function RepoManagementModal({ visible, detail, onCancel, onOk }: Props): JSX.El
   function handleOk(): void {
     form.validateFields().then(() => {
       if (detail?.metadata.name) {
-        return mutate({ params: currentFormData, repo_id: detail.metadata.name });
+        return mutate({ params: currentFormData, repo_name: detail.metadata.name });
       }
 
       return mutate({ params: currentFormData });

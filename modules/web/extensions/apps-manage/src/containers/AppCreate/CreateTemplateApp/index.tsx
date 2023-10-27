@@ -4,7 +4,6 @@ import { Modal, Steps, Button, TabStep } from '@kubed/components';
 import { Cluster, Enterprise, Appcenter } from '@kubed/icons';
 
 import { isMultiCluster, WorkspaceFormValues } from '@ks-console/shared';
-import { AppTemplateBaseInfForm } from '../../../components/AppForms/AppTemplateBaseInfForm';
 // import type { WorkspaceBasicInfoFormRef } from '../../WorkspaceBasicInfoForm';
 // import { WorkspaceBasicInfoForm } from '../../WorkspaceBasicInfoForm';
 // import type {
@@ -119,7 +118,6 @@ function CreateTemplateApp({
             icon={<Appcenter size={24} />}
           >
             <div>WorkspaceBasicInfoForm</div>
-            <AppTemplateBaseInfForm form={formRef} />
             {/*<WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={handleNext} />*/}
           </TabStep>
           <TabStep

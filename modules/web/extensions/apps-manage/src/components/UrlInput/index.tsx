@@ -124,9 +124,10 @@ function UrlInput({ formData, onChange, onValidate, isSubmitting }: Props): JSX.
       [`${target.name}`]: target.value,
     });
 
-    onChange?.({
-      credential: patchCredential,
-    });
+    // TODO s4地址暂时隐藏
+    // onChange?.({
+    //   credential: patchCredential,
+    // });
     resetValidateStatus();
   }
 
