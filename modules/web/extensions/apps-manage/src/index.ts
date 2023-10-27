@@ -2,7 +2,7 @@ import routes from './routes';
 import locales from './locales';
 
 const menu = {
-  parent: 'global',
+  parent: 'topbar',
   name: 'apps-manage',
   title: 'APP_STORE_MANAGEMENT',
   icon: 'openpitrix',
