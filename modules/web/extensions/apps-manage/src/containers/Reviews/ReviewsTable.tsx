@@ -44,7 +44,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
         icon: <Icon name="eye" />,
         text: t('VIEW_DETAILS'),
         action: 'view',
-        onClick: (_, record) => console.log(record),
+        onClick: (_, record) => {
+          showReview(record)
+        },
       },
     ],
   });
@@ -148,10 +150,10 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const handleSubmit = async (action: string, data?: RejectFormData) => {
     setIsSubmitting(true);
-    const pathParams = pick(selectedRow, ['app_name', 'version_id']);
+    const pathParams = pick(selectedRow, ['metadata']);
 
     setIsSubmitting(false);
-    await store.handleReview({ ...pathParams, action, ...data });
+    await store.handleReview({ app_name: pathParams.metadata.name, action, ...data });
     onCancel();
     notify.success(t(action === 'pass' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
     tableRef.current?.refetch();
@@ -164,7 +166,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
         ref={tableRef}
         tableName="APP_REVIEW"
         rowKey="version_id"
-        url={getBaseUrl({}, 'reviews')}
+        // TODO reviews
+        url={getBaseUrl({}, 'apps')}
         parameters={queryParams}
         columns={columns}
         format={data => data}

@@ -29,7 +29,6 @@ export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
 
   function hanldleBtn(type: ModalType) {
     if (type === 'create_template') {
-      console.log(13);
       open?.({
         v3Module: 'edgeStore',
         v3StoreParams: {
