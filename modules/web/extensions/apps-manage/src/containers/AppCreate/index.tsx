@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Collapse, Modal, notify } from '@kubed/components';
 
-import { getWebsiteUrl, showOutSiteLink, openpitrixStore } from '@ks-console/shared';
-import { useV3action } from '@ks-console/console';
+import { getWebsiteUrl, showOutSiteLink, openpitrixStore, useV3action } from '@ks-console/shared';
 import { Desc, Header, HeaderFieldItem, Logo, Note, StyledCollapse } from './styles';
 import { CreateHelmApp } from './CreateHelmApp';
 import { CreateYamlApp } from './CreateYamlApp';
