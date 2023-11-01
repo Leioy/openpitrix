@@ -1,0 +1,11 @@
+frontend:
+  enabled: true
+  image:
+    repository: kubespheredev/edgewize-frontend
+    tag: latest
+
+backend:
+  enabled: true
+  image:
+    repository: kubespheredev/edgewize-api
+    tag: latest

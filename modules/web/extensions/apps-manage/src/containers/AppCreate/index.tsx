@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Collapse, Modal, notify } from '@kubed/components';
 
-import { getWebsiteUrl, showOutSiteLink, openpitrixStore } from '@ks-console/shared';
+import { getWebsiteUrl, showOutSiteLink, openpitrixStore, useV3action } from '@ks-console/shared';
 import { Desc, Header, HeaderFieldItem, Logo, Note, StyledCollapse } from './styles';
 import { CreateHelmApp } from './CreateHelmApp';
 import { CreateYamlApp } from './CreateYamlApp';
@@ -17,10 +17,6 @@ type Props = {
 type ModalType = 'create_helm' | 'create_yaml' | 'create_template';
 
 const { createApp } = openpitrixStore;
-const useV3action = (key?: string) => ({
-  open: (param: any) => true,
-  render: () => (<div>sdsd</div>),
-});
 
 export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
   const { url } = getWebsiteUrl();
@@ -32,16 +28,15 @@ export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
 
   function hanldleBtn(type: ModalType) {
     if (type === 'create_template') {
-      open?.({
+      open({
         v3Module: 'edgeStore',
+        module: 'apptemplates',
         v3StoreParams: {
-          module: 'apptemplates',
-          // cluster: '',
-          // workspace: '',
-          success: () => {
-            notify.success(t('UPDATE_SUCCESSFUL'));
-            // refetch();
-          },
+          module: 'edgeappsets',
+        },
+        success: () => {
+          notify.success(t('UPDATE_SUCCESSFUL'));
+          tableRef?.current?.refetch();
         },
       });
       return;

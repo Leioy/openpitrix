@@ -3,7 +3,7 @@
 
 const menu = {
   parent: 'global',
-  name: 'edgewize',
+  name: 'v2/edgewize',
   title: 'edgewize-io',
   icon: 'cluster',
   order: 0,

@@ -1,0 +1,50 @@
+apiVersion: kubesphere.io/v1alpha1
+name: apps-manage
+version: 0.1.0
+displayName:
+  zh: 应用商店
+  en: Sample Extension
+description:
+  zh: 这是一个示例扩展组件，这是它的描述
+  en: This is a sample extension, and this is its description
+category: networking
+keywords:
+  - networking
+home: https://kubesphere.io
+sources:
+  - https://github.com/kubesphere
+kubeVersion: ">=1.19.0"
+ksVersion: ">=4.0.0-alpha"
+maintainers:
+  - name: "ks"
+    email: "ks@kubesphere.io"
+    url: ""
+provider:
+  en:
+    name: "QingCloud"
+    email: "ks@kubesphere.io"
+    url: ""
+icon: ./static/favicon.svg
+screenshots:
+  - ./static/screenshots/screenshot.png
+dependencies:
+  - name: frontend
+    tags:
+    - extension
+  - name: backend
+    tags:
+    - agent
+# installationMode describes how to install subcharts, it can be HostOnly or Multicluster.
+# In Multicluster mode, the subchart with tag `extension` will only be deployed to the host cluster,
+# and the subchart with tag `agent` will be deployed to all selected clusters.
+installationMode: HostOnly
+# external dependencies example
+#externalDependencies:
+#  - name: a
+#    type: extension
+#    version: ">= 2.6.0"
+#    required: true
+#  - name: b
+#    type: extension
+#    version: ">= 2.2.0"
+#    required: true
