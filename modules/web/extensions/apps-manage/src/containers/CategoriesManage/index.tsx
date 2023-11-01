@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { parse } from 'qs';
 import { Banner, LoadingOverlay, notify } from '@kubed/components';
 
 import {
@@ -11,10 +12,17 @@ import {
   useBatchActions,
   DeleteConfirmModal,
 } from '@ks-console/shared';
-import { useCategoryList, createCategory, updateCategory, deleteCategory } from '../../stores';
+import {
+  useCategoryList,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  useAppModifyCateGoryMutation,
+} from '../../stores';
 import CategoryList from './CategoryList';
 import { TableItemField } from '../StoreManage';
 import ManageCategoryModal from './ManageCategoryModal';
+import ModifyCategoryModal from './ModifyCategoryModal';
 import AppDataTable from '../../components/AppDataTable';
 
 import { Categories, Columns, FirstColumn, Head, SecondColumn } from './styles';
@@ -56,6 +64,19 @@ function CategoriesManage(): JSX.Element {
       width: '25%',
     },
   ];
+
+  const tableRef = useRef();
+
+  const modifyCategoryMutation = useAppModifyCateGoryMutation({
+    onSuccess: () => {
+      mutateSuccess(t('MODIFY_CATEGORY_SUCCESSFULLY'));
+    },
+  });
+
+  const handleOpenChangeCategoryModal = () => {
+    setModalType('modify');
+  };
+
   const renderBatchActions = useBatchActions({
     authKey: 'apps',
     actions: [
@@ -63,6 +84,7 @@ function CategoriesManage(): JSX.Element {
         key: 'adjust',
         text: t('CHANGE_CATEGORY'),
         action: 'delete',
+        onClick: handleOpenChangeCategoryModal,
       },
     ],
   });
@@ -104,6 +126,34 @@ function CategoriesManage(): JSX.Element {
     mutateSuccess(t(categoryId ? 'MODIFY_SUCCESSFUL' : 'CREATE_SUCCESSFUL'));
   };
 
+  const handleModifyCategoryOk = async (category: string): Promise<Promise<void>> => {
+    const currentTable = tableRef.current as any;
+    if (currentTable) {
+      const selectedRows = currentTable.getSelectedFlatRows();
+
+      const { workspace, cluster, zone } = parse(window.location.search, {
+        ignoreQueryPrefix: true,
+      });
+      const baseMutateData = selectedRows?.map(({ metadata }) => {
+        return {
+          workspace,
+          cluster,
+          zone,
+          app_name: metadata.name,
+        };
+      });
+
+      try {
+        await modifyCategoryMutation.mutateAsync({
+          baseMutateData,
+          param: { category_id: category },
+        } as any);
+      } catch (error) {
+        console.error('Mutation failed:', error);
+      }
+    }
+  };
+
   return (
     <>
       <Banner
@@ -133,6 +183,7 @@ function CategoriesManage(): JSX.Element {
         <SecondColumn>
           {selectedCategory?.metadata?.name && (
             <AppDataTable
+              tableRef={tableRef}
               columns={columns}
               batchActions={renderBatchActions()}
               categoryId={selectedCategory.metadata?.name}
@@ -155,6 +206,15 @@ function CategoriesManage(): JSX.Element {
           tip={t('DELETE_CATEGORY_DESC', { name: currentManageCategory?.metadata?.name })}
           onOk={handleCategoryDelete}
           onCancel={closeModal}
+        />
+      )}
+      {modalType === 'modify' && selectedCategory?.metadata?.name && (
+        <ModifyCategoryModal
+          visible={true}
+          categoryId={selectedCategory.metadata?.name}
+          onCancel={closeModal}
+          onOk={handleModifyCategoryOk}
+          categories={categories}
         />
       )}
     </>

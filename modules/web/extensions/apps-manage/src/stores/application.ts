@@ -8,7 +8,7 @@ import {
   PathParams,
 } from '@ks-console/shared';
 
-import { defaultUrl, getBaseOpenPitrixPath } from './base';
+import { defaultUrl, getBaseOpenPitrixPath, getAppBaseOpenPitrixPath } from './base';
 
 export type ApplicationPathParams = PathParams & {
   cluster_id?: string;
@@ -61,6 +61,28 @@ export function getApplicationUrl({
   return url;
 }
 
+export function getAppUrl({
+  workspace,
+  namespace,
+  cluster,
+  cluster_id,
+  app_name,
+}: ApplicationPathParams = {}): string {
+  const queryParams = getAppBaseOpenPitrixPath({
+    workspace,
+    namespace,
+    cluster,
+  });
+  let url = `${defaultUrl}/apps`;
+  if (cluster_id || app_name) {
+    url = `${url}/${cluster_id || app_name}`;
+  }
+  if (queryParams) {
+    url = `${url}${queryParams}`;
+  }
+  return url;
+}
+
 export async function deleteOPApp({
   workspace,
   cluster,
@@ -70,6 +92,14 @@ export async function deleteOPApp({
   const url = getApplicationUrl({ namespace: zone, cluster, workspace, cluster_id });
 
   return request.delete(url);
+}
+
+export async function modifyCategoryOPApp(
+  { workspace, cluster, zone, app_name }: ApplicationPathParams,
+  params: any,
+): Promise<any> {
+  const url = getAppUrl({ namespace: zone, cluster, workspace, app_name });
+  return request.patch(url, params);
 }
 
 export async function deleteApplication(applicationName: string): Promise<any> {
@@ -109,6 +139,19 @@ export async function upgradeOPApp(
   params: any,
 ) {
   return request.post(getApplicationUrl({ workspace, namespace, cluster, cluster_id }), params);
+}
+
+export function useAppModifyCateGoryMutation(options?: { onSuccess?: () => void }) {
+  const onSuccess = options?.onSuccess;
+  return useMutation(
+    data => {
+      const { baseMutateData = [], param } = data as any;
+      return Promise.allSettled(baseMutateData?.map(item => modifyCategoryOPApp(item, param)));
+    },
+    {
+      onSuccess,
+    },
+  );
 }
 
 export function useAppDeleteMutation(options?: { onSuccess?: () => void }) {

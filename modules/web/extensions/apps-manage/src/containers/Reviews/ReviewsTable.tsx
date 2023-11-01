@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { pick } from 'lodash';
+import { pick, get } from 'lodash';
 import { notify } from '@kubed/components';
 
-import { Icon, TableRef } from '@ks-console/shared';
+import { Icon, TableRef, getBrowserLang } from '@ks-console/shared';
 import {
   Image,
   Column,
@@ -13,6 +13,7 @@ import {
   openpitrixStore,
   useListQueryParams,
 } from '@ks-console/shared';
+import { getReviewsUrl } from '../../stores';
 
 import store from './store';
 import DetailDrawer from './DetailDrawer';
@@ -32,6 +33,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedRow, setSelectedRow] = useState<any>();
+  const userLang = (get(globals.user, 'lang') || getBrowserLang()) as 'zh';
   const queryParams: Record<string, any> = {
     order: 'status_time',
     status: REVIEW_QUERY_STATUS[type],
@@ -45,7 +47,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         text: t('VIEW_DETAILS'),
         action: 'view',
         onClick: (_, record) => {
-          showReview(record)
+          showReview(record);
         },
       },
     ],
@@ -60,9 +62,15 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <TableItemField
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           onClick={() => showReview(item)}
-          avatar={<Image src={item.icon} iconSize={40} iconLetter={item.app_name} />}
-          value={item.app_name}
-          label={item.version_name || '-'}
+          avatar={
+            <Image
+              src={item.spec.icon}
+              iconSize={40}
+              iconLetter={item.spec.description?.[userLang] || '-'}
+            />
+          }
+          value={item.metadata.name}
+          label={item.spec.description?.[userLang] || '-'}
         />
       ),
     },
@@ -71,13 +79,14 @@ function ReviewsTable({ type }: Props): JSX.Element {
       field: 'app_id',
       canHide: true,
       width: '15%',
-      render: (_, item) => item.isv || '-',
+      render: (_, item) => item?.metadata?.labels?.['kubesphere.io/workspace'] || '-',
     },
     {
       title: t('OPERATOR'),
       field: 'reviewer',
       canHide: true,
       width: '15%',
+      render: (_, item) => item?.metadata?.annotations?.['kubesphere.io/creator'] || '-',
     },
     {
       title: t('STATUS'),
@@ -85,7 +94,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
       canHide: true,
       width: '15%',
       render: status => {
-        const transStatus = transferReviewStatus(status);
+        const transStatus = transferReviewStatus(status?.state);
 
         return (
           <StatusIndicator type={transStatus as any}>
@@ -99,7 +108,10 @@ function ReviewsTable({ type }: Props): JSX.Element {
       field: 'status_time',
       canHide: true,
       width: '15%',
-      render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
+      render: (_, item) => {
+        const time = item?.spec?.created || '';
+        return getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss');
+      },
     },
     {
       id: 'more',
@@ -166,8 +178,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         ref={tableRef}
         tableName="APP_REVIEW"
         rowKey="version_id"
-        // TODO reviews
-        url={getBaseUrl({}, 'apps')}
+        url={getReviewsUrl({})}
         parameters={queryParams}
         columns={columns}
         format={data => data}

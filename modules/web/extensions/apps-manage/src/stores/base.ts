@@ -91,6 +91,22 @@ export function getBaseOpenPitrixPath({ workspace, cluster, namespace }: PathPar
   return path;
 }
 
+export function getAppBaseOpenPitrixPath({ workspace, cluster, namespace }: PathParams): string {
+  const query = [];
+
+  if (isMultiCluster() && cluster) {
+    query.push(`clusters=${cluster}`);
+  }
+  if (workspace) {
+    query.push(`workspace=${workspace}`);
+  }
+  if (namespace) {
+    query.push(`namespace=${namespace}`);
+  }
+
+  return query.length ? `?${query.join('&')}` : '';
+}
+
 export function getBaseResourceUrl(params: PathParams, module: string): string {
   return `kapis/resources.kubesphere.io/v1alpha3${getPath(params)}/${module}`;
 }
