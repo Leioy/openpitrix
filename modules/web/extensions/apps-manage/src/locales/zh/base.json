@@ -14,5 +14,9 @@
   "VERSIONS": "版本",
   "APP_INFORMATION": "应用信息",
   "APP_REVIEW": "应用审核",
-  "APP_INSTANCES": "应用实例"
+  "APP_INSTANCES": "应用实例",
+  "MODIFY_CATEGORY": "更改分类",
+  "MODIFY_CATEGORY_HELP": "应用分类将决定该应用在应用商店中的分类。",
+  "MODIFY_CATEGORY_REQUIRED": "请选择一个分类",
+  "MODIFY_CATEGORY_SUCCESSFULLY": "更改分类操作成功"
 }

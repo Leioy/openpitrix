@@ -40,11 +40,14 @@ function DetailDrawer({
   const { data: appDetail } = useAppDetail({ app_name: detail.metadata.name });
   const { data: versionDetail } = useVersionDetail({
     app_name: detail.metadata.name,
-    version_id: detail.version_id,
+    version_id: detail.spec.version_id, //TODO: 参数问题
   });
+
+  console.log('versionDetail', detail, versionDetail);
+
   const { data: files = {} } = fileStore.useQueryFiles(
-    { name: detail.app_id, version_id: detail.version_id },
-    { enabled: !!detail.app_id && !!detail.version_id },
+    { name: detail.app_id, version_id: detail.spec.version_id },
+    { enabled: !!detail.app_id && !!detail.spec.version_id },
   );
   const readme = useMemo(() => {
     return files['README.md'];
@@ -82,7 +85,7 @@ function DetailDrawer({
           canEdit={false}
           fileStore={fileStore}
           appName={detail?.metadata.name}
-          versionId={detail?.version_id}
+          versionId={detail?.spec?.version_id}
           type={'MODIFY_VERSION'}
           packageName={getPackageName(versionDetail, appDetail?.metadata.name)}
           updateTime={detail?.update_time || detail?.status_time}
