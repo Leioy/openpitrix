@@ -2,8 +2,8 @@ apiVersion: v1
 name: frontend
 description: Frontend of edgewize extension.
 type: application
-version: 0.0.1
-appVersion: "0.0.1"
+version: 0.1.0
+appVersion: "0.1.0"
 home: https://kubesphere.io
 sources:
   - https://github.com/kubesphere
