@@ -13,3 +13,20 @@ client:
         - { name: repo, title: APP_REPOSITORY_PL, icon: safe-notice }
         - { name: deploy, title: DEPLOY_MANAGE, icon: safe-notice }
 
+  globalNavs:
+    name: platform
+    children:
+      #      []
+        - name: apps-manage
+          desc: CLUSTER_DESC
+          icon: cluster
+          roleTemplate: global_aaa_manager
+          # - name: access
+          #   title: ACCESS_CONTROL
+          #   icon: key
+          #   authKey: users|roles|workspaces
+          # - name: settings
+          #   title: PLATFORM_SETTINGS
+          #   icon: cogwheel
+          #   authKey: platform-settings
+          #   authAction: manage

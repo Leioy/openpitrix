@@ -9,7 +9,7 @@ import { CreateTemplateApp } from './CreateTemplateApp';
 
 type Props = {
   visible?: boolean;
-  onUpload?: () => void;
+  onOk?: () => void;
   onCancel?: () => void;
   tableRef: any;
 };
@@ -18,7 +18,7 @@ type ModalType = 'create_helm' | 'create_yaml' | 'create_template';
 
 const { createApp } = openpitrixStore;
 
-export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
+export function CreateApp({ visible, onCancel, tableRef, onOk }: Props): JSX.Element {
   const { url } = getWebsiteUrl();
   const { open, render: RenderTemplate } = useV3action('app.template.create.v2');
   // TODO: htmlLinkControl
@@ -46,6 +46,10 @@ export function CreateApp({ visible, onCancel, tableRef }: Props): JSX.Element {
   }
 
   async function handleCreate(fileData: any): Promise<void> {
+    if (onOk) {
+      onOk(fileData);
+      return;
+    }
     await createApp({}, fileData);
     notify.success(t('UPLOAD_SUCCESSFUL'));
     setModalVisible(false);

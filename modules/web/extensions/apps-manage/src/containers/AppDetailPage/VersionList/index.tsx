@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { VersionList } from '@ks-console/shared';
-import CreateHelmApp from '../../AppCreate/CreateHelmApp';
+import CreateApp from '../../AppCreate';
 import { updateVersion } from '../../../stores';
 
 function VersionLists() {
@@ -15,7 +15,12 @@ function VersionLists() {
   return (
     <>
       <VersionList onAddVersion={() => setVisible(true)} />
-      <CreateHelmApp visible={visible} onCancel={() => setVisible(false)} onOk={handleCreate} />
+      <CreateApp
+        visible={visible}
+        appName={appName}
+        onCancel={() => setVisible(false)}
+        onOk={handleCreate}
+      />
     </>
   );
 }
