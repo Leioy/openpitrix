@@ -1,7 +1,7 @@
 apiVersion: extensions.kubesphere.io/v1alpha1
 kind: JSBundle
 metadata:
-  name: v1alpha1.employee.kubesphere.io
+  name: apps-manage-frontend-js-bundle
 spec:
   rawFrom:
     url: http://apps-manage-frontend.default.svc/dist/apps-manage-frontend/index.js
