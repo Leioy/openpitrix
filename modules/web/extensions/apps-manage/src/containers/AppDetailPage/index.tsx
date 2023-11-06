@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { get } from 'lodash';
 import { useStore } from '@kubed/stook';
 import { notify } from '@kubed/components';
 import { useParams } from 'react-router-dom';
@@ -24,8 +23,8 @@ const PATH = '/apps-manage/store/:appName';
 const { HANDLE_TYPE_TO_SHOW, useAppDetail, handleApp } = openpitrixStore;
 
 function AppDetailPage(): JSX.Element {
-  const { appName = '' } = useParams();
-  const userLang = (get(globals.user, 'lang') || getBrowserLang()) as 'zh';
+  const { appName = '', workspace } = useParams();
+  const userLang = getBrowserLang();
 
   const [detail, setDetail] = useStore<AppDetail>('selectedApp');
   const [modalType, setModalType] = useState<string>('');
@@ -62,7 +61,7 @@ function AppDetailPage(): JSX.Element {
           type: 'control',
           icon: 'sort-descending',
           text: t('SUSPEND'),
-          onClick: () => setModalType('suspend'),
+          onClick: () => setModalType('suspended'),
           props: {
             color: 'secondary',
           },
@@ -76,7 +75,7 @@ function AppDetailPage(): JSX.Element {
         type: 'control',
         icon: 'sort-ascending',
         text: t('RELEASE'),
-        onClick: () => setModalType('recover'),
+        onClick: () => setModalType('active'),
         props: {
           color: 'secondary',
         },
@@ -84,10 +83,12 @@ function AppDetailPage(): JSX.Element {
     ];
   }, [detail?.status]);
   const { refetch: refetchAppDetails } = useAppDetail(
-    { name: appName },
+    { app_name: appName, workspace },
     {
       enabled: !detail && !!appName,
-      onSuccess: appDetails => setDetail({ ...appDetails, refetchAppDetails }),
+      onSuccess: appDetails => {
+        setDetail({ ...appDetails, refetchAppDetails });
+      },
     },
   );
   const attrs = [
@@ -97,7 +98,7 @@ function AppDetailPage(): JSX.Element {
     },
     {
       label: t('STATUS'),
-      value: transferAppStatus(detail?.status.state),
+      value: detail?.status?.state && transferAppStatus(detail?.status?.state),
     },
     {
       label: t('CATEGORY'),
@@ -114,11 +115,11 @@ function AppDetailPage(): JSX.Element {
     {
       label: t('WORKSPACE'),
       // TODO 缺少 isv
-      value: detail?.isv || '-',
+      value: detail?.metadata?.labels?.['kubesphere.io/workspace'] || '-',
     },
     {
       label: t('CREATION_TIME_TCAP'),
-      value: getLocalTime(detail?.metadata.creationTimestamp || new Date().toDateString()).format(
+      value: getLocalTime(detail?.metadata?.creationTimestamp || new Date().toDateString()).format(
         'YYYY-MM-DD HH:mm:ss',
       ),
     },
@@ -132,8 +133,8 @@ function AppDetailPage(): JSX.Element {
     await handleApp(
       { app_name: detail?.metadata.name },
       {
-        action: modalType,
-        // app_version_types: detail?.app_version_types,
+        state: modalType,
+        app_version_types: detail?.spec.appType,
       },
     );
     const type = HANDLE_TYPE_TO_SHOW[modalType] || modalType;

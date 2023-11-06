@@ -9,9 +9,9 @@ import { CreateTemplateApp } from './CreateTemplateApp';
 
 type Props = {
   visible?: boolean;
-  onOk?: () => void;
+  onOk?: (data: any) => void;
   onCancel?: () => void;
-  tableRef: any;
+  tableRef?: any;
 };
 
 type ModalType = 'create_helm' | 'create_yaml' | 'create_template';

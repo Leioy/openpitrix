@@ -19,8 +19,8 @@ import {
   useItemActions,
   Icon,
   DeleteConfirmModal,
-  openpitrixStore,
 } from '@ks-console/shared';
+import { deleteApp } from '../../stores';
 import { useDisclosure } from '@kubed/hooks';
 import CreateApp from '../AppCreate';
 import AppDataTable from '../../components/AppDataTable';
@@ -40,7 +40,13 @@ export const TableItemField = styled(Field)`
     max-width: 300px;
   }
 `;
-const { deleteApp } = openpitrixStore;
+
+enum AppType {
+  'helm' = 'helm 应用',
+  'yaml' = 'yaml 应用',
+  'edge' = '边缘模板应用',
+}
+
 function StoreManage(): JSX.Element {
   const userLang = get(globals.user, 'lang') || getBrowserLang();
   const tableRef = useRef();
@@ -96,23 +102,24 @@ function StoreManage(): JSX.Element {
     },
     {
       title: t('WORKSPACE'),
-      field: 'isv',
+      field: 'metadata.labels["kubesphere.io/workspace"]',
       canHide: true,
       width: '10%',
+      render: (_, record) => record?.metadata.labels['kubesphere.io/workspace'],
     },
     {
       title: t('LATEST_VERSION'),
       field: 'metadata.resourceVersion',
       canHide: true,
       width: '16%',
+      render: (_, record) => record?.metadata.annotations['app.kubesphere.io/latest-app-version'],
     },
     {
       title: t('CATEGORY'),
       field: 'category_set',
       canHide: true,
       width: '17%',
-      // TODO 此处后端未实现。接口未返回
-      // render: categories => getAppCategoryNames(categories),
+      render: (_, record) => record?.metadata.annotations['app.kubesphere.io/app-category-name'],
     },
     {
       title: t('App Templates'),
@@ -120,11 +127,12 @@ function StoreManage(): JSX.Element {
       canHide: true,
       width: '17%',
       // TODO 此处后端未实现。接口未返回
-      // render: categories => getAppCategoryNames(categories),
+      // @ts-ignore
+      render: types => AppType[types as typeof AppType],
     },
     {
       title: t('UPDATE_TIME_TCAP'),
-      field: 'status_time',
+      field: 'status.updateTime',
       canHide: true,
       width: '17%',
       render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
@@ -150,7 +158,7 @@ function StoreManage(): JSX.Element {
         title={t('APP_PL')}
         description={t('APP_STORE_DESC')}
       />
-      <AppDataTable tableRef={tableRef} columns={columns} toolbarRight={renderBtn} />
+      <AppDataTable filter tableRef={tableRef} columns={columns} toolbarRight={renderBtn} />
       <CreateApp visible={isOpen} onCancel={close} tableRef={tableRef} />
       <DeleteConfirmModal
         visible={delVisible}

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Banner, BannerTip, Button, Field, notify } from '@kubed/components';
 
 import {
@@ -71,7 +71,7 @@ function Repos(): JSX.Element {
         action: 'delete',
         onClick: () => {
           const selectedFlatRows = tableRef?.current?.getSelectedFlatRows() || [];
-          setSelectedRows(selectedFlatRows as unknown as RepoData);
+          setSelectedRows(selectedFlatRows as any);
           setModalType('delete');
         },
         props: { color: 'error' },
@@ -100,9 +100,10 @@ function Repos(): JSX.Element {
       field: 'spec.name',
       width: '25%',
       searchable: true,
-      render: (name, record) => (
+      render: name => (
         <Field
-          value={<Link to={record.metadata.name}>{name}</Link>}
+          value={name}
+          // value={<Link to={record.metadata.name}>{name}</Link>}
           label={name || '-'}
           avatar={<Icon name="catalog" size={40} />}
         />

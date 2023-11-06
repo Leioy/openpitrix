@@ -5,16 +5,19 @@ import { Drawer, NavItem, Navs } from '@kubed/components';
 
 import {
   Icon,
-  LabelText,
   TextPreview,
   PackageUpload,
   getPackageName,
   openpitrixStore,
+  LabelText,
+  getBrowserLang,
 } from '@ks-console/shared';
 
 import InfoDetail from './InfoDetail';
 
 import { CloseModal, Header, Content, Footer, StyledButton } from './styles';
+
+const { fileStore, useAppDetail, useVersionDetail } = openpitrixStore;
 
 type Props = {
   visible: boolean;
@@ -35,19 +38,18 @@ function DetailDrawer({
   isConfirming,
   showFooter,
 }: Props): JSX.Element {
-  const { fileStore, useAppDetail, useVersionDetail } = openpitrixStore;
   const [tabKey, setTabKey] = useState<string>('appInfo');
-  const { data: appDetail } = useAppDetail({ app_name: detail.metadata.name });
-  const { data: versionDetail } = useVersionDetail({
-    app_name: detail.metadata.name,
-    version_id: detail.spec.version_id, //TODO: 参数问题
+  const appName = detail.metadata.labels['app.kubesphere.io/app-id'];
+  const { data: appDetail } = useAppDetail({
+    app_name: appName,
   });
-
-  console.log('versionDetail', detail, versionDetail);
-
+  const { data: versionDetail } = useVersionDetail({
+    app_name: appName,
+    version_id: detail.metadata.name,
+  });
   const { data: files = {} } = fileStore.useQueryFiles(
-    { name: detail.app_id, version_id: detail.spec.version_id },
-    { enabled: !!detail.app_id && !!detail.spec.version_id },
+    { name: appName, version_id: detail.metadata.name },
+    { enabled: !!appName && !!detail.metadata.name },
   );
   const readme = useMemo(() => {
     return files['README.md'];
@@ -84,8 +86,8 @@ function DetailDrawer({
           className="mb12"
           canEdit={false}
           fileStore={fileStore}
-          appName={detail?.metadata.name}
-          versionId={detail?.spec?.version_id}
+          appName={appDetail?.metadata.name}
+          versionId={detail?.metadata.name}
           type={'MODIFY_VERSION'}
           packageName={getPackageName(versionDetail, appDetail?.metadata.name)}
           updateTime={detail?.update_time || detail?.status_time}
@@ -96,7 +98,7 @@ function DetailDrawer({
     updateLog: (
       <>
         <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{versionDetail?.spec.description || t('NO_UPDATE_LOG_DESC')}</pre>
+        <pre>{versionDetail?.spec.description[getBrowserLang()] || t('NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };

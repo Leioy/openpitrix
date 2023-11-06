@@ -39,7 +39,7 @@ export function useRepoMutation(workspace: string, options?: { onSuccess?: () =>
   return useMutation(
     ({ params, repo_name }: RepoMutateProps) => {
       const url = getRepoUrl({ workspace, repo_name });
-      const mutator = repo_name ? request.patch : request.post;
+      const mutator = request.post;
 
       return mutator(url, params);
     },

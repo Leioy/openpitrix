@@ -7,6 +7,7 @@ const { getBaseUrl, SORT_KEY } = openpitrixStore;
 
 type Props = {
   tableRef?: any;
+  filter?: boolean;
   columns: Column[];
   categoryId?: string;
   batchActions?: ReactNode[] | null;
@@ -19,23 +20,29 @@ function AppDataTable({
   batchActions,
   toolbarRight,
   tableRef,
+  filter,
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
       category_id: categoryId,
       order: SORT_KEY,
-      status: 'active',
-      repo_id: 'repo-helm',
+      status: 'active|rejected|passed|suspended|draft',
+      // repo_id: 'repo-helm',
     };
   }, [categoryId]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
-    const { parameters, pageIndex, filters } = params;
+    const { parameters, pageIndex, filters, pageSize } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
       page: pageIndex + 1,
     });
+    if (filter) {
+      formattedParams.page = pageIndex + 1;
+      formattedParams.limit = pageSize;
+      delete formattedParams.paging;
+    }
 
     if (!keyword) {
       return formattedParams;
@@ -44,6 +51,9 @@ function AppDataTable({
     return {
       ...formattedParams,
       conditions: formattedParams.conditions + `,keyword=${keyword}`,
+      // TODO 参数问题
+      // limit: 20,
+      // page: 1,
     };
   };
 

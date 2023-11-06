@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { get, set } from 'lodash';
 import { Modal, Steps, Button, TabStep } from '@kubed/components';
 import { Cluster, Enterprise, Appcenter } from '@kubed/icons';
 
@@ -15,7 +14,7 @@ import { isMultiCluster, WorkspaceFormValues } from '@ks-console/shared';
 interface CreateTemplateAppProps {
   visible: boolean;
   width?: number;
-  confirmLoading: boolean;
+  confirmLoading?: boolean;
   onOk: (data: WorkspaceFormValues) => void;
   onCancel: () => void;
 }
@@ -24,26 +23,13 @@ function CreateTemplateApp({
   visible,
   width = 691,
   confirmLoading,
-  onOk,
   onCancel,
 }: CreateTemplateAppProps) {
   // const manager = globals.user.username;
   const [active, setActive] = useState(0);
-  const [baseInfo, setBaseInfo] = useState<WorkspaceFormValues>({} as WorkspaceFormValues);
   const formRef = useRef<any>(null);
   const clusterFormRef = useRef<any>(null);
-  const nextStep = () => setActive(current => (current < 1 ? current + 1 : current));
   const prevStep = () => setActive(current => (current > 0 ? current - 1 : current));
-  const handleOk = (value: any) => {
-    const clusters = get(value, 'spec.placement.clusters');
-    set(baseInfo, 'spec.placement.clusters', clusters);
-    onOk?.(baseInfo);
-  };
-
-  const handleNext = (value: WorkspaceFormValues) => {
-    setBaseInfo(value);
-    nextStep();
-  };
 
   const renderStepsModalFooter = () => {
     if (!isMultiCluster()) {
@@ -128,12 +114,10 @@ function CreateTemplateApp({
             icon={<Cluster size={24} />}
           >
             <div>WorkspaceClusterSettingsForm</div>
-            {/*<WorkspaceClusterSettingsForm ref={clusterFormRef} onOk={handleOk} />*/}
           </TabStep>
         </Steps>
       ) : (
         <div>WorkspaceBasicInfoForm</div>
-        // <WorkspaceBasicInfoForm ref={formRef} manager={manager} onOk={onOk} />
       )}
     </Modal>
   );

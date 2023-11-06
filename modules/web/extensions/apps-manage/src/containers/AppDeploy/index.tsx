@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '@kubed/stook';
 import { Button, Loading } from '@kubed/components';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import type { AppConfigRefType, AppBaseInfoData, AppBaseInfoFormRef } from '@ks-console/shared';
 import { isRadonDB, safeBtoa } from '@ks-console/shared';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 function AppDeploy({ close, appName, versionId }: Props): JSX.Element {
-  const navigate = useNavigate();
+  const { workspace } = useParams();
   const baseInfoFormRef = useRef<AppBaseInfoFormRef>(null);
   const configRef = useRef<AppConfigRefType>(null);
   const [confirmedBaseInfoData, setConfirmedBaseInfoData] = useState<AppBaseInfoData>();
@@ -61,7 +61,6 @@ function AppDeploy({ close, appName, versionId }: Props): JSX.Element {
     baseInfoFormRef.current
       ?.validateFields()
       .then(baseInfoData => {
-        console.log(123, baseInfoData);
         setConfirmedBaseInfoData(baseInfoData);
         setCurrentStep(current => (current < steps.length - 1 ? current + 1 : current));
       })
@@ -69,8 +68,8 @@ function AppDeploy({ close, appName, versionId }: Props): JSX.Element {
   };
 
   const handleOk = async (): Promise<void> => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    console.log(confirmedBaseInfoData);
     const finalData = {
       // name: appName,
       ...confirmedBaseInfoData,
@@ -78,7 +77,7 @@ function AppDeploy({ close, appName, versionId }: Props): JSX.Element {
       app_type: 'helm',
       app_id: appName,
     };
-    const { cluster, namespace, workspace } = finalData;
+    const { cluster, namespace } = finalData;
     const params = {
       kind: 'ApplicationRelease',
       metadata: {

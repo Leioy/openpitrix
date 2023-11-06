@@ -52,7 +52,6 @@ function AppConfigForm(
 
   useEffect(() => {
     const value = Object.values(files || {});
-    console.log(44443, value);
     if (isLoading || isEmpty(files)) return;
 
     if (value.length) {

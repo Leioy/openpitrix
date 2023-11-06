@@ -8,19 +8,15 @@ import { updateVersion } from '../../../stores';
 function VersionLists() {
   const [visible, setVisible] = useState(false);
   const { appName = '' } = useParams();
+  const isAdmin = location.pathname.includes('apps-manage/store');
 
   function handleCreate(data: any) {
     updateVersion({ app_name: appName }, data);
   }
   return (
     <>
-      <VersionList onAddVersion={() => setVisible(true)} />
-      <CreateApp
-        visible={visible}
-        appName={appName}
-        onCancel={() => setVisible(false)}
-        onOk={handleCreate}
-      />
+      <VersionList onAddVersion={() => setVisible(true)} isAdmin={isAdmin} />
+      <CreateApp visible={visible} onCancel={() => setVisible(false)} onOk={handleCreate} />
     </>
   );
 }

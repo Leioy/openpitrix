@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { pick, get } from 'lodash';
 import { notify } from '@kubed/components';
 
 import { Icon, TableRef, getBrowserLang } from '@ks-console/shared';
@@ -20,20 +19,19 @@ import DetailDrawer from './DetailDrawer';
 import { TableItemField } from '../StoreManage';
 import { transferReviewStatus } from '../../utils';
 import ReviewRejectModal from './ReviewRejectModal';
-import type { RejectFormData } from './ReviewRejectModal';
 
 type Props = {
   type: string;
 };
 
 function ReviewsTable({ type }: Props): JSX.Element {
-  const { getBaseUrl, REVIEW_QUERY_STATUS } = openpitrixStore;
+  const { REVIEW_QUERY_STATUS } = openpitrixStore;
   const tableRef = useRef<TableRef<any>>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedRow, setSelectedRow] = useState<any>();
-  const userLang = (get(globals.user, 'lang') || getBrowserLang()) as 'zh';
+  const userLang = getBrowserLang();
   const queryParams: Record<string, any> = {
     order: 'status_time',
     status: REVIEW_QUERY_STATUS[type],
@@ -160,14 +158,19 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const closeRejectModal = () => setShowRejectModal(false);
 
-  const handleSubmit = async (action: string, data?: RejectFormData) => {
+  const handleSubmit = async (action: string, message?: string) => {
     setIsSubmitting(true);
-    const pathParams = pick(selectedRow, ['metadata']);
+    const appName = selectedRow.metadata.labels['app.kubesphere.io/app-id'];
 
+    await store.handleReview({
+      app_name: appName,
+      versionId: selectedRow.metadata.name,
+      action,
+      message,
+    });
     setIsSubmitting(false);
-    await store.handleReview({ app_name: pathParams.metadata.name, action, ...data });
     onCancel();
-    notify.success(t(action === 'pass' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
+    notify.success(t(action === 'passed' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
     tableRef.current?.refetch();
   };
 
@@ -195,17 +198,17 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <DetailDrawer
           visible={true}
           detail={selectedRow}
-          onOk={() => handleSubmit('pass')}
+          onOk={() => handleSubmit('passed')}
           onCancel={onCancel}
           onReject={showReject}
           isConfirming={isSubmitting}
-          showFooter={type !== 'unprocessed'}
+          showFooter={type === 'unprocessed'}
         />
       )}
       {showRejectModal && (
         <ReviewRejectModal
           visible={true}
-          onOk={data => handleSubmit('reject', data)}
+          onOk={data => handleSubmit('reject', data.message)}
           onCancel={closeRejectModal}
         />
       )}
