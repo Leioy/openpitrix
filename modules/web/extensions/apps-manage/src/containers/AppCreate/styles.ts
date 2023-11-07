@@ -51,3 +51,12 @@ export const Note = styled.div`
 export const Desc = styled.div`
   color: ${({ theme }) => theme.palette.accents_5};
 `;
+
+export const FieldItem = styled(Field)`
+  margin-bottom: 12px;
+  padding: 8px 10px 8px 12px;
+  border-radius: 4px;
+  background-color: ${({ theme }) => theme.palette.accents_0};
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+`;

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useStore } from '@kubed/stook';
 import { notify } from '@kubed/components';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 import {
   Image,
@@ -18,12 +18,18 @@ import {
   getBrowserLang,
 } from '@ks-console/shared';
 
-const PATH = '/apps-manage/store/:appName';
-
 const { HANDLE_TYPE_TO_SHOW, useAppDetail, handleApp } = openpitrixStore;
 
 function AppDetailPage(): JSX.Element {
   const { appName = '', workspace } = useParams();
+  const PATH = workspace ? '/workspaces/:workspace/store/:appName' : '/apps-manage/store/:appName';
+
+  const locations = useLocation();
+  useEffect(() => {
+    if (locations.search) {
+      sessionStorage.setItem('app_type', locations.search);
+    }
+  }, [locations.search]);
   const userLang = getBrowserLang();
 
   const [detail, setDetail] = useStore<AppDetail>('selectedApp');
@@ -37,10 +43,11 @@ function AppDetailPage(): JSX.Element {
       path: `${PATH}/app-information`,
       title: t('APP_INFORMATION'),
     },
-    {
-      path: `${PATH}/audit-records`,
-      title: t('APP_REVIEW'),
-    },
+    // TODO 临时注释
+    // {
+    //   path: `${PATH}/audit-records`,
+    //   title: t('APP_REVIEW'),
+    // },
     {
       path: `${PATH}/app-instances`,
       title: t('APP_INSTANCES'),

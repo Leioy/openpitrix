@@ -1,62 +1,93 @@
-import React, { useState } from 'react';
-import { Button, Collapse, Modal, notify } from '@kubed/components';
+import React, { useState, useEffect } from 'react';
+import cx from 'classnames';
+import { Button, Modal, notify } from '@kubed/components';
 
-import { getWebsiteUrl, showOutSiteLink, openpitrixStore, useV3action } from '@ks-console/shared';
-import { Desc, Header, HeaderFieldItem, Logo, Note, StyledCollapse } from './styles';
+import { openpitrixStore, useV3action, Icon } from '@ks-console/shared';
+import { Header, HeaderFieldItem, Logo, FieldItem } from './styles';
 import { CreateHelmApp } from './CreateHelmApp';
 import { CreateYamlApp } from './CreateYamlApp';
-import { CreateTemplateApp } from './CreateTemplateApp';
 
 type Props = {
   visible?: boolean;
-  onOk?: (data: any) => void;
+  onOk?: (data: any, params: any) => void;
   onCancel?: () => void;
   tableRef?: any;
+  workspace?: string;
+  isDetail?: boolean;
+  appName?: string;
 };
 
-type ModalType = 'create_helm' | 'create_yaml' | 'create_template';
+type ModalType = 'create_helm' | 'create_yaml' | 'create_edge';
 
 const { createApp } = openpitrixStore;
 
-export function CreateApp({ visible, onCancel, tableRef, onOk }: Props): JSX.Element {
-  const { url } = getWebsiteUrl();
+export function CreateApp({
+  visible,
+  onCancel,
+  tableRef,
+  onOk,
+  workspace,
+  isDetail,
+  appName,
+}: Props): JSX.Element {
   const { open, render: RenderTemplate } = useV3action('app.template.create.v2');
-  // TODO: htmlLinkControl
-  const htmlDesc = t('APP_CREATE_GUIDE', { docUrl: url });
   const [modalType, setModalType] = useState<ModalType>('create_helm');
   const [modalVisible, setModalVisible] = useState(false);
 
+  useEffect(() => {
+    console.log(123, isDetail, visible, workspace);
+    const appType = sessionStorage.getItem('app_type')?.split('=')?.[1];
+    if (workspace && visible && isDetail) {
+      hanldleBtn(`create_${appType}` as ModalType);
+    }
+  }, [workspace, visible, isDetail]);
+
   function hanldleBtn(type: ModalType) {
-    if (type === 'create_template') {
+    if (type === 'create_edge') {
       open({
         v3Module: 'edgeStore',
         module: 'apptemplates',
+        appName,
+        workspace,
         v3StoreParams: {
           module: 'edgeappsets',
         },
-        success: () => {
+        success: datas => {
+          console.log(123, datas);
           notify.success(t('UPDATE_SUCCESSFUL'));
+          setModalVisible(false);
           tableRef?.current?.refetch();
+        },
+        onCancel: () => {
+          onCancel?.();
+          setModalVisible(false);
         },
       });
       return;
     }
+
     setModalType(type);
     setModalVisible(!modalVisible);
   }
 
   async function handleCreate(fileData: any): Promise<void> {
     if (onOk) {
-      onOk(fileData);
+      onOk(fileData, { workspace });
+      notify.success(t('UPLOAD_SUCCESSFUL'));
+
+      setModalVisible(false);
+      onCancel?.();
+      tableRef.current?.refetch();
       return;
     }
-    await createApp({}, fileData);
+    sessionStorage.removeItem('app_type');
+    console.log(workspace);
+    await createApp({ workspace }, fileData);
     notify.success(t('UPLOAD_SUCCESSFUL'));
     setModalVisible(false);
     onCancel?.();
     tableRef.current?.refetch();
   }
-
   function renderModal() {
     if (modalType === 'create_helm') {
       return (
@@ -76,13 +107,7 @@ export function CreateApp({ visible, onCancel, tableRef, onOk }: Props): JSX.Ele
         />
       );
     }
-    return (
-      <CreateTemplateApp
-        visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onOk={handleCreate}
-      />
-    );
+    return <></>;
   }
 
   return (
@@ -90,7 +115,7 @@ export function CreateApp({ visible, onCancel, tableRef, onOk }: Props): JSX.Ele
       <Modal
         width={600}
         onCancel={onCancel}
-        visible={visible}
+        visible={visible && !isDetail}
         header={null}
         closable={false}
         footer={<Button onClick={onCancel}>{t('CANCEL')}</Button>}
@@ -99,47 +124,31 @@ export function CreateApp({ visible, onCancel, tableRef, onOk }: Props): JSX.Ele
           <Logo src="/assets/application.svg" alt="" />
           <HeaderFieldItem value={t('CREATE_APP')} label={t('CREATE_APP_DESC')} />
         </Header>
-        <StyledCollapse accordion defaultActiveKey="helm">
-          <Collapse.Panel key="helm" header={t('UPLOAD_HELM_TITLE')}>
-            <Desc>{t('HELM_CHART_FORMAT_DESC')}</Desc>
-            <Button onClick={() => hanldleBtn('create_helm')} color="secondary" className="mt12">
-              {t('UPLOAD')}
-            </Button>
-            {showOutSiteLink() && (
-              <Note>
-                💁‍♂️ <span dangerouslySetInnerHTML={{ __html: htmlDesc }} />
-              </Note>
-            )}
-          </Collapse.Panel>
-        </StyledCollapse>
-        <StyledCollapse accordion defaultActiveKey="yaml">
-          <Collapse.Panel key="helm" header={t('CREATE_YAML_APPS')}>
-            <Button onClick={() => hanldleBtn('create_yaml')} color="secondary" className="mt12">
-              {t('CREATE')}
-            </Button>
-            {showOutSiteLink() && (
-              <Note>
-                💁‍♂️ <span dangerouslySetInnerHTML={{ __html: htmlDesc }} />
-              </Note>
-            )}
-          </Collapse.Panel>
-        </StyledCollapse>
-        <StyledCollapse accordion defaultActiveKey="template">
-          <Collapse.Panel key="helm" header={t('CREATE_TEMPLATE_APPS')}>
-            <Button
-              onClick={() => hanldleBtn('create_template')}
-              color="secondary"
-              className="mt12"
-            >
-              {t('CREATE')}
-            </Button>
-            {showOutSiteLink() && (
-              <Note>
-                💁‍♂️ <span dangerouslySetInnerHTML={{ __html: htmlDesc }} />
-              </Note>
-            )}
-          </Collapse.Panel>
-        </StyledCollapse>
+        <div
+          style={{ marginTop: 100 }}
+          className={cx('item')}
+          onClick={() => hanldleBtn('create_helm')}
+        >
+          <FieldItem
+            value={t('UPLOAD_HELM_TITLE')}
+            label={t('HELM_CHART_FORMAT_DESC')}
+            avatar={<Icon name="templet" size={40} />}
+          />
+        </div>
+        <div className={cx('item')} onClick={() => hanldleBtn('create_yaml')}>
+          <FieldItem
+            value={t('CREATE_YAML_APPS')}
+            label={t('HELM_CHART_FORMAT_DESC')}
+            avatar={<Icon name="templet" size={40} />}
+          />
+        </div>
+        <div className={cx('item')} onClick={() => hanldleBtn('create_edge')}>
+          <FieldItem
+            value={t('create_edge_APPS')}
+            label={t('HELM_CHART_FORMAT_DESC')}
+            avatar={<Icon name="templet" size={40} />}
+          />
+        </div>
       </Modal>
       {renderModal()}
       {RenderTemplate?.()}

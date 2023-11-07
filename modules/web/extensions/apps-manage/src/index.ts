@@ -13,7 +13,7 @@ const menu = {
 
 const workspaceAppManageMenu = {
   parent: 'workspace',
-  name: 'apps',
+  name: 'appstemplate',
   title: 'APPS_MANAGEMENT',
   icon: 'appcenter',
   order: 3,
@@ -21,8 +21,32 @@ const workspaceAppManageMenu = {
   skipAuth: true,
   children: [
     {
-      name: 'apps',
+      name: 'store',
       title: 'APP_TEMPLATE_PL',
+      icon: 'appcenter',
+      skipAuth: true,
+    },
+    {
+      name: 'repo',
+      title: '应用仓库',
+      icon: 'appcenter',
+      skipAuth: true,
+    },
+  ],
+};
+
+const clusterAppManageMenu = {
+  parent: 'project',
+  name: 'apps',
+  title: 'APPS_MANAGEMENT',
+  icon: 'appcenter',
+  order: 4,
+  desc: 'APP_STORE_MANAGEMENT_DESC',
+  skipAuth: true,
+  children: [
+    {
+      name: 'deploy',
+      title: '应用部署管理',
       icon: 'appcenter',
       skipAuth: true,
     },
@@ -31,7 +55,7 @@ const workspaceAppManageMenu = {
 
 const extensionConfig = {
   routes,
-  menus: [menu, workspaceAppManageMenu],
+  menus: [menu, workspaceAppManageMenu, clusterAppManageMenu],
   locales,
 };
 

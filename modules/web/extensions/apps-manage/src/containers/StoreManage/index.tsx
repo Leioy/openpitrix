@@ -1,11 +1,11 @@
 import React, { ReactNode, useState, useRef } from 'react';
 import { get } from 'lodash';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useStore } from '@kubed/stook';
 import { Appcenter } from '@kubed/icons';
-import { Banner, Field, Button, notify } from '@kubed/components';
-
+import { Banner, Field, notify } from '@kubed/components';
 import {
   Image,
   Column,
@@ -18,6 +18,7 @@ import {
   getBrowserLang,
   useItemActions,
   Icon,
+  useTableActions,
   DeleteConfirmModal,
 } from '@ks-console/shared';
 import { deleteApp } from '../../stores';
@@ -48,6 +49,7 @@ enum AppType {
 }
 
 function StoreManage(): JSX.Element {
+  const { workspace } = useParams();
   const userLang = get(globals.user, 'lang') || getBrowserLang();
   const tableRef = useRef();
   const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
@@ -57,6 +59,7 @@ function StoreManage(): JSX.Element {
   async function handleDelete() {
     await deleteApp({ app_name: selectData.metadata.name });
     setDelVisible(false);
+    tableRef?.current?.refetch();
     notify.success(t('DELETED_SUCCESSFULLY'));
   }
   const renderItemActions = useItemActions<AppDetail>({
@@ -76,20 +79,22 @@ function StoreManage(): JSX.Element {
     ],
   });
 
-  const columns: Column[] = [
+  const columns: Column<AppDetail>[] = [
     {
       title: t('NAME'),
       field: 'metadata.name',
-      width: '30%',
+      width: '20%',
       searchable: true,
-      render: (name, app) => (
-        <TableItemField
-          onClick={() => setSelectedApp(app as AppDetail)}
-          label={app.spec.description[userLang]}
-          value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
-          avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
-        />
-      ),
+      render: (name, app) => {
+        return (
+          <TableItemField
+            onClick={() => setSelectedApp(app as AppDetail)}
+            label={app.spec.description[userLang]}
+            value={<Link to={`${app.metadata.name}?appType=${app.spec.appType}`}>{name}</Link>}
+            avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
+          />
+        );
+      },
     },
     {
       title: t('STATUS'),
@@ -134,7 +139,7 @@ function StoreManage(): JSX.Element {
       title: t('UPDATE_TIME_TCAP'),
       field: 'status.updateTime',
       canHide: true,
-      width: '17%',
+      width: '20%',
       render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
@@ -144,11 +149,22 @@ function StoreManage(): JSX.Element {
       render: renderItemActions as unknown as () => ReactNode,
     },
   ];
-  const renderBtn: ReactNode[] = [
-    <Button variant="text" radius="lg" onClick={open}>
-      创建应用
-    </Button>,
-  ];
+  const tableActions = useTableActions({
+    authKey: 'app-templates',
+    params: { workspace },
+    actions: [
+      {
+        key: 'create',
+        text: t('CREATE'),
+        action: 'create',
+        onClick: () => open(),
+        props: {
+          color: 'secondary',
+          shadow: true,
+        },
+      },
+    ],
+  });
 
   return (
     <>
@@ -158,8 +174,13 @@ function StoreManage(): JSX.Element {
         title={t('APP_PL')}
         description={t('APP_STORE_DESC')}
       />
-      <AppDataTable filter tableRef={tableRef} columns={columns} toolbarRight={renderBtn} />
-      <CreateApp visible={isOpen} onCancel={close} tableRef={tableRef} />
+      <AppDataTable
+        filter
+        tableRef={tableRef}
+        columns={columns}
+        toolbarRight={workspace && tableActions()}
+      />
+      <CreateApp visible={isOpen} workspace={workspace} onCancel={close} tableRef={tableRef} />
       <DeleteConfirmModal
         visible={delVisible}
         type="APP_REPOSITORY"

@@ -16,6 +16,56 @@ const PATH = '/apps-manage';
 
 export default [
   {
+    path: '/workspaces/:workspace',
+    element: <ListLayout />,
+    children: [
+      {
+        path: 'store',
+        element: <StoreManage />,
+      },
+      {
+        path: 'repo',
+        element: <RepoManage />,
+      },
+    ],
+  },
+  {
+    path: '/workspaces/:workspace/store/:appName',
+    element: <AppDetailPage />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="versions" replace />,
+      },
+      {
+        path: 'versions',
+        element: <VersionList />,
+      },
+      {
+        path: 'app-information',
+        element: <AppInformation />,
+      },
+      {
+        path: 'audit-records',
+        element: <AuditRecords />,
+      },
+      {
+        path: 'app-instances',
+        element: <InstanceList />,
+      },
+    ],
+  },
+  {
+    path: '/:workspace/clusters/:cluster/projects/:namespace',
+    element: <ListLayout />,
+    children: [
+      {
+        path: 'deploy',
+        element: <ApplicationManage />,
+      },
+    ],
+  },
+  {
     path: PATH,
     element: <ListLayout />,
     children: [

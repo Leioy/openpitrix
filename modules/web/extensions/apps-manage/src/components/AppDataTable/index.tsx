@@ -6,6 +6,7 @@ import { Column, DataTable, openpitrixStore, useListQueryParams } from '@ks-cons
 const { getBaseUrl, SORT_KEY } = openpitrixStore;
 
 type Props = {
+  workspace?: string;
   tableRef?: any;
   filter?: boolean;
   columns: Column[];
@@ -21,6 +22,7 @@ function AppDataTable({
   toolbarRight,
   tableRef,
   filter,
+  workspace,
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
@@ -70,7 +72,7 @@ function AppDataTable({
       simpleSearch
       tableName="APP"
       rowKey="metadata.name"
-      url={getBaseUrl({}, 'apps')}
+      url={getBaseUrl({ workspace }, 'apps')}
       columns={columns}
       parameters={queryParams}
       format={data => data}
