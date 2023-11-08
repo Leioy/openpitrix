@@ -147,7 +147,7 @@ export function CreateApp({
           />
         </div>
       </Modal>
-      {renderModal()}
+      {modalVisible && renderModal()}
       {RenderTemplate?.()}
     </>
   );

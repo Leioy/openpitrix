@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { parse } from 'qs';
+import { get } from 'lodash';
 import { Banner, LoadingOverlay, notify } from '@kubed/components';
 
 import {
@@ -53,15 +54,21 @@ function CategoriesManage(): JSX.Element {
     },
     {
       title: t('WORKSPACE'),
-      field: 'isv',
+      field: 'metadata.labels["kubesphere.io/workspace"]',
       canHide: true,
       width: '25%',
+      render: (_, app) => {
+        return get(app, 'metadata.labels["kubesphere.io/workspace"]', '-')
+      },
     },
     {
       title: t('LATEST_VERSION'),
-      field: 'latest_app_version.name',
+      field: 'metadata.annotations["app.kubesphere.io/latest-app-version"]',
       canHide: true,
       width: '25%',
+      render: (_, app) => {
+        return get(app, 'metadata.annotations["app.kubesphere.io/latest-app-version"]', '-')
+      },
     },
   ];
 

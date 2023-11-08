@@ -138,10 +138,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
   };
 
   const formatServerData = (serverData: Record<string, any>) => {
-    return {
-      ...serverData,
-      totalItems: serverData.total_count,
-    };
+    return serverData;
   };
 
   const onCancel = () => {

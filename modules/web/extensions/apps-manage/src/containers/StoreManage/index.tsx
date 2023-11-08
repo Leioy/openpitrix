@@ -90,7 +90,7 @@ function StoreManage(): JSX.Element {
           <TableItemField
             onClick={() => setSelectedApp(app as AppDetail)}
             label={app.spec.description[userLang]}
-            value={<Link to={`${app.metadata.name}?appType=${app.spec.appType}`}>{name}</Link>}
+            value={<Link to={`${name}?appType=${app.spec.appType}`}>{name}</Link>}
             avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
           />
         );

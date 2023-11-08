@@ -133,10 +133,7 @@ function Repos(): JSX.Element {
   ];
 
   function serverDataFormatter(serverData: any) {
-    return {
-      ...serverData,
-      totalItems: serverData.total_count,
-    };
+    return serverData;
   }
 
   function transformRequestParams(params: Record<string, any>): Record<string, any> {

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Openpitrix } from '@kubed/icons';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 
-import { NavMenu, NavTitle, useGlobalStore } from '@ks-console/shared';
+import { NavMenu, NavTitle, useGlobalStore, permissionStore } from '@ks-console/shared';
 
 const PageSide = styled.div`
   position: fixed;
@@ -21,40 +21,38 @@ const PageMain = styled.div`
 `;
 
 const NAV_KEY = 'MANAGE_APP_NAVS';
+const { getProjectNavs, getWorkspaceNavs } = permissionStore();
 
 function ListLayout(): JSX.Element {
   const location = useLocation();
   const { workspace, namespace, cluster } = useParams();
-  // const { getNav, setNav } = useGlobalStore();
-  // let navs = getNav(NAV_KEY);
+  const navKey = namespace ? 'PROJECT_NAV' : workspace? `WORKSPACE_NAV-${workspace}` : NAV_KEY;
+  const { getNav, setNav } = useGlobalStore();
+  let navs = getNav(navKey);
   const [prefix, setPrefix] = useState('/apps-manage');
   const [title, setTitle] = useState('APP_STORE_MANAGEMENT');
   const [subTitle, setSubTitle] = useState('');
-  const [menus, setMenus] = useState([]);
+  
   useEffect(() => {
     if (namespace) {
+      navs = getProjectNavs({ cluster, workspace, project: namespace });
+      setNav(navKey, navs);
       setPrefix(`/${workspace}/clusters/${cluster}/projects/${namespace}`);
-      setMenus(globals.config.projectNavs);
       setTitle(namespace);
-      setSubTitle('企业空间');
+      setSubTitle(t('PROJECT'));
     } else if (workspace) {
+      navs = getWorkspaceNavs(workspace);
+      setNav(navKey, navs);
       setPrefix(`/workspaces/${workspace}`);
-      setMenus(globals.config.workspaceNavs);
       setTitle(workspace);
-      setSubTitle('项目');
+      setSubTitle(t('WORKSPACE'));
     } else {
+      setNav(NAV_KEY, globals.config.manageAppNavs);
       setPrefix('/apps-manage');
-      setMenus(globals.config.manageAppNavs);
+      setTitle(t('APP_STORE_MANAGEMENT'));
+      setSubTitle(t('APP_STORE_MANAGEMENT_DESC'));
     }
   }, [workspace, namespace, cluster]);
-
-  console.log(123, workspace, namespace);
-  // useEffect(() => {
-  //   if (menus.length) {
-  //     setNav(NAV_KEY, menus);
-  //   }
-  // }, [menus]);
-  console.log(menus, prefix);
 
   return (
     <>
@@ -65,7 +63,7 @@ function ListLayout(): JSX.Element {
           subtitle={subTitle}
           style={{ marginBottom: '20px' }}
         />
-        {menus.length && <NavMenu navs={menus} prefix={prefix} pathname={location.pathname} />}
+        {navs && <NavMenu navs={navs} prefix={prefix} pathname={location.pathname} />}
       </PageSide>
       <PageMain>
         <Outlet />

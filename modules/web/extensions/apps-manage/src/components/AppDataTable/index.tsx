@@ -54,16 +54,13 @@ function AppDataTable({
       ...formattedParams,
       conditions: formattedParams.conditions + `,keyword=${keyword}`,
       // TODO 参数问题
-      // limit: 20,
-      // page: 1,
+      limit: 20,
+      page: pageIndex + 1,
     };
   };
 
   const formatServerData = (serverData: any) => {
-    return {
-      ...serverData,
-      totalItems: serverData.total_count,
-    };
+    return serverData;
   };
 
   return (
