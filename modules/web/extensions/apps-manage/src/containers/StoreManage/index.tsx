@@ -171,7 +171,7 @@ function StoreManage(): JSX.Element {
       <Banner
         className="mb12"
         icon={<Appcenter />}
-        title={t('APP_PL')}
+        title={t('App Templates')}
         description={t('APP_STORE_DESC')}
       />
       <AppDataTable

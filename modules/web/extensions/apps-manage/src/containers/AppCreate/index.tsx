@@ -33,16 +33,7 @@ export function CreateApp({
   const { open, render: RenderTemplate } = useV3action('app.template.create.v2');
   const [modalType, setModalType] = useState<ModalType>('create_helm');
   const [modalVisible, setModalVisible] = useState(false);
-
-  useEffect(() => {
-    console.log(123, isDetail, visible, workspace);
-    const appType = sessionStorage.getItem('app_type')?.split('=')?.[1];
-    if (workspace && visible && isDetail) {
-      hanldleBtn(`create_${appType}` as ModalType);
-    }
-  }, [workspace, visible, isDetail]);
-
-  function hanldleBtn(type: ModalType) {
+  function handleBtn(type: ModalType) {
     if (type === 'create_edge') {
       open({
         v3Module: 'edgeStore',
@@ -52,8 +43,7 @@ export function CreateApp({
         v3StoreParams: {
           module: 'edgeappsets',
         },
-        success: datas => {
-          console.log(123, datas);
+        success: () => {
           notify.success(t('UPDATE_SUCCESSFUL'));
           setModalVisible(false);
           tableRef?.current?.refetch();
@@ -70,6 +60,13 @@ export function CreateApp({
     setModalVisible(!modalVisible);
   }
 
+  useEffect(() => {
+    const appType = sessionStorage.getItem('app_type')?.split('=')?.[1];
+    if (workspace && visible && isDetail) {
+      handleBtn(`create_${appType}` as ModalType);
+    }
+  }, [workspace, visible, isDetail]);
+
   async function handleCreate(fileData: any): Promise<void> {
     if (onOk) {
       onOk(fileData, { workspace });
@@ -77,16 +74,15 @@ export function CreateApp({
 
       setModalVisible(false);
       onCancel?.();
-      tableRef.current?.refetch();
+      tableRef?.current?.refetch();
       return;
     }
     sessionStorage.removeItem('app_type');
-    console.log(workspace);
     await createApp({ workspace }, fileData);
     notify.success(t('UPLOAD_SUCCESSFUL'));
     setModalVisible(false);
     onCancel?.();
-    tableRef.current?.refetch();
+    tableRef?.current?.refetch();
   }
   function renderModal() {
     if (modalType === 'create_helm') {
@@ -101,6 +97,7 @@ export function CreateApp({
     if (modalType === 'create_yaml') {
       return (
         <CreateYamlApp
+          appName={isDetail ? appName : ''}
           visible={modalVisible}
           onCancel={() => setModalVisible(false)}
           onOk={handleCreate}
@@ -127,7 +124,7 @@ export function CreateApp({
         <div
           style={{ marginTop: 100 }}
           className={cx('item')}
-          onClick={() => hanldleBtn('create_helm')}
+          onClick={() => handleBtn('create_helm')}
         >
           <FieldItem
             value={t('UPLOAD_HELM_TITLE')}
@@ -135,14 +132,14 @@ export function CreateApp({
             avatar={<Icon name="templet" size={40} />}
           />
         </div>
-        <div className={cx('item')} onClick={() => hanldleBtn('create_yaml')}>
+        <div className={cx('item')} onClick={() => handleBtn('create_yaml')}>
           <FieldItem
             value={t('CREATE_YAML_APPS')}
             label={t('HELM_CHART_FORMAT_DESC')}
             avatar={<Icon name="templet" size={40} />}
           />
         </div>
-        <div className={cx('item')} onClick={() => hanldleBtn('create_edge')}>
+        <div className={cx('item')} onClick={() => handleBtn('create_edge')}>
           <FieldItem
             value={t('create_edge_APPS')}
             label={t('HELM_CHART_FORMAT_DESC')}

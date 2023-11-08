@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, FormItem, Input, useForm } from '@kubed/components';
 import { CodeEditor } from '@kubed/code-editor';
 import { Firewall } from '@kubed/icons';
@@ -10,15 +10,23 @@ interface Props {
   visible: boolean;
   onCancel: () => void;
   onOk?: (data: any) => void;
+  appName?: string;
 }
 export function CreateYamlApp(props: Props) {
-  const { visible, onCancel, onOk } = props;
+  const { visible, onCancel, onOk, appName } = props;
   const [form] = useForm();
   const initialValues = {
     app_type: 'yaml',
     package: '# 这里填写用 “---”分割的多个 yaml 文件',
   };
 
+  useEffect(() => {
+    form.setFieldsValue({
+      app_type: 'yaml',
+      package: '# 这里填写用 “---”分割的多个 yaml 文件',
+      name: appName,
+    });
+  }, [appName]);
   function handleChange(val: string) {
     console.log(val);
   }
@@ -64,7 +72,7 @@ export function CreateYamlApp(props: Props) {
                 // { validator: nameValidator },
               ]}
             >
-              <Input maxLength={63} />
+              <Input maxLength={63} defaultValue={appName} disabled={!!appName} />
             </FormItem>
             <FormItem
               label={t('VERSION_NUMBER')}
