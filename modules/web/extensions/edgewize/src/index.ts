@@ -11,9 +11,32 @@ const menu = {
   skipAuth: true,
 };
 
+const workspaceAppManageMenu = {
+  parent: 'workspace',
+  name: 'appstemplate',
+  title: '边缘设置',
+  icon: 'appcenter',
+  order: 2,
+  desc: '边缘项目设置',
+  skipAuth: true,
+  children: [
+    {
+      name: 'bind-edgewize',
+      title: '绑定边缘集群',
+      icon: 'appcenter',
+      skipAuth: true,
+    },
+    {
+      name: 'v2/edgewize',
+      title: '集群管理',
+      icon: 'appcenter',
+      skipAuth: true,
+    },
+  ],
+};
 const extensionConfig = {
   // routes,
-  menus: [menu],
+  menus: [menu, workspaceAppManageMenu],
   // locales,
 };
 
