@@ -154,6 +154,8 @@ function AppDetailPage(): JSX.Element {
     // TODO: set isAdmin is true;
   }, []);
 
+  const url = workspace ? `/workspaces/${workspace}/store` : '/apps-manage/store';
+
   return (
     <>
       <DetailPagee
@@ -176,7 +178,7 @@ function AppDetailPage(): JSX.Element {
           actions,
           breadcrumbs: {
             label: t('APPS'),
-            url: '/apps-manage/store',
+            url: url,
           },
         }}
       />
