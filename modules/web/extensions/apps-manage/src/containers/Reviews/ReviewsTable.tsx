@@ -162,7 +162,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
     await store.handleReview({
       app_name: appName,
       versionId: selectedRow.metadata.name,
-      action,
+      state: action,
+      user_name: globals.user.username,
       message,
     });
     setIsSubmitting(false);
@@ -205,7 +206,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
       {showRejectModal && (
         <ReviewRejectModal
           visible={true}
-          onOk={data => handleSubmit('reject', data.message)}
+          onOk={data => handleSubmit('rejected', data.message)}
           onCancel={closeRejectModal}
         />
       )}

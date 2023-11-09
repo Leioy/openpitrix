@@ -13,10 +13,10 @@ const menu = {
 
 const workspaceAppManageMenu = {
   parent: 'workspace',
-  name: 'appstemplate',
+  name: 'edgesetting',
   title: '边缘设置',
   icon: 'appcenter',
-  order: 2,
+  order: 3,
   desc: '边缘项目设置',
   skipAuth: true,
   children: [
@@ -27,8 +27,8 @@ const workspaceAppManageMenu = {
       skipAuth: true,
     },
     {
-      name: 'v2/edgewize',
-      title: '集群管理',
+      name: 'bind-project',
+      title: '边缘项目',
       icon: 'appcenter',
       skipAuth: true,
     },
