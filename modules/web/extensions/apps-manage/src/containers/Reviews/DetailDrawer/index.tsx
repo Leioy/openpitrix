@@ -25,6 +25,7 @@ type Props = {
   onOk: () => void;
   onCancel: () => void;
   onReject: () => void;
+  onDeploy: () => void;
   showFooter?: boolean;
   isConfirming?: boolean;
 };
@@ -37,6 +38,7 @@ function DetailDrawer({
   onReject,
   isConfirming,
   showFooter,
+  onDeploy,
 }: Props): JSX.Element {
   const [tabKey, setTabKey] = useState<string>('appInfo');
   const appName = detail.metadata.labels['app.kubesphere.io/app-id'];
@@ -119,8 +121,11 @@ function DetailDrawer({
           <StyledButton className="mr12" color="error" onClick={onReject}>
             {t('REJECT')}
           </StyledButton>
+          <StyledButton className="mr12" color="secondary" onClick={onDeploy}>
+            {t('DEPLOYMENT')}
+          </StyledButton>
           <StyledButton color="secondary" onClick={onOk} disabled={isConfirming}>
-            {t('APPROVE')}
+            {t('APPROVE_AND_RELEASE')}
           </StyledButton>
         </Footer>
       )}

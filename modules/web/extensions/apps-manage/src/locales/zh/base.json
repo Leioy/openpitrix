@@ -18,5 +18,7 @@
   "MODIFY_CATEGORY": "更改分类",
   "MODIFY_CATEGORY_HELP": "应用分类将决定该应用在应用商店中的分类。",
   "MODIFY_CATEGORY_REQUIRED": "请选择一个分类",
-  "MODIFY_CATEGORY_SUCCESSFULLY": "更改分类操作成功"
+  "MODIFY_CATEGORY_SUCCESSFULLY": "更改分类操作成功",
+  "NO_APP_REPO_FOUND": "未发现应用仓库",
+  "APPROVE_AND_RELEASE": "批准并发表"
 }

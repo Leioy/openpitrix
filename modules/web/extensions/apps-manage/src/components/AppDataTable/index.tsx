@@ -13,6 +13,7 @@ type Props = {
   categoryId?: string;
   batchActions?: ReactNode[] | null;
   toolbarRight?: ReactNode[] | null;
+  emptyOptions?: any;
 };
 
 function AppDataTable({
@@ -23,6 +24,7 @@ function AppDataTable({
   tableRef,
   filter,
   workspace,
+  emptyOptions,
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
@@ -77,12 +79,7 @@ function AppDataTable({
       toolbarRight={toolbarRight}
       serverDataFormat={formatServerData}
       transformRequestParams={requestParamsTransformer}
-      emptyOptions={{
-        withoutTable: true,
-        image: <Appcenter size={48} />,
-        title: t('NO_APP_DESC_FOUND'),
-        description: t('APP_CATEGORY_EMPTY_DESC'),
-      }}
+      emptyOptions={emptyOptions}
     />
   );
 }

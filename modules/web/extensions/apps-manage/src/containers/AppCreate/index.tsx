@@ -34,6 +34,7 @@ export function CreateApp({
   const [modalType, setModalType] = useState<ModalType>('create_helm');
   const [modalVisible, setModalVisible] = useState(false);
   function handleBtn(type: ModalType) {
+    onCancel?.();
     if (type === 'create_edge') {
       open({
         v3Module: 'edgeStore',

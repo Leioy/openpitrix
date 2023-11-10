@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useStore } from '@kubed/stook';
 import { Appcenter } from '@kubed/icons';
-import { Banner, Field, notify } from '@kubed/components';
+import { Banner, Button, Field, notify } from '@kubed/components';
 import {
   Image,
   Column,
@@ -25,6 +25,10 @@ import { deleteApp } from '../../stores';
 import { useDisclosure } from '@kubed/hooks';
 import CreateApp from '../AppCreate';
 import AppDataTable from '../../components/AppDataTable';
+
+const AddButton = styled(Button)`
+  min-width: 96px;
+`;
 
 export const TableItemField = styled(Field)`
   .field-avatar {
@@ -179,16 +183,29 @@ function StoreManage(): JSX.Element {
         tableRef={tableRef}
         columns={columns}
         toolbarRight={workspace && tableActions()}
+        emptyOptions={{
+          withoutTable: true,
+          image: <Appcenter size={48} />,
+          title: t('NO_APP_DESC_FOUND'),
+          description: t('APP_CATEGORY_EMPTY_DESC'),
+          createButton: (
+            <AddButton color="secondary" onClick={() => open()}>
+              {t('ADD')}
+            </AddButton>
+          ),
+        }}
       />
       <CreateApp visible={isOpen} workspace={workspace} onCancel={close} tableRef={tableRef} />
-      <DeleteConfirmModal
-        visible={delVisible}
-        type="APP_REPOSITORY"
-        resource={selectData?.metadata.name}
-        onOk={handleDelete}
-        onCancel={() => setDelVisible(false)}
-        confirmLoading={false}
-      />
+      {delVisible && (
+        <DeleteConfirmModal
+          visible={true}
+          type="APP_REPOSITORY"
+          resource={selectData?.metadata.name}
+          onOk={handleDelete}
+          onCancel={() => setDelVisible(false)}
+          confirmLoading={false}
+        />
+      )}
     </>
   );
 }

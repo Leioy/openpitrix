@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { notify } from '@kubed/components';
-
+import { omit } from 'lodash';
 import { Icon, TableRef, getBrowserLang } from '@ks-console/shared';
 import {
   Image,
@@ -11,6 +11,10 @@ import {
   StatusIndicator,
   openpitrixStore,
   useListQueryParams,
+  DeployVersionModal,
+  DeployYamlModal,
+  useV3action,
+  safeBtoa,
 } from '@ks-console/shared';
 import { getReviewsUrl } from '../../stores';
 
@@ -23,14 +27,25 @@ import ReviewRejectModal from './ReviewRejectModal';
 type Props = {
   type: string;
 };
+const { REVIEW_QUERY_STATUS, deployApp } = openpitrixStore;
 
 function ReviewsTable({ type }: Props): JSX.Element {
-  const { REVIEW_QUERY_STATUS } = openpitrixStore;
+  const dataParams = {
+    workspace: 'demo',
+    cluster: 'edge1',
+    namespace: 'demo',
+  };
+  const { open, render: renderEdgeModal } = useV3action('batch.deploy.app.create.v2');
+
   const tableRef = useRef<TableRef<any>>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isDeploy, setIsDeploy] = useState<boolean>(false);
   const [selectedRow, setSelectedRow] = useState<any>();
+  const selectedVersionId = selectedRow?.metadata.name;
+  const appName = selectedRow?.metadata?.labels['app.kubesphere.io/app-id'];
+
   const userLang = getBrowserLang();
   const queryParams: Record<string, any> = {
     order: 'status_time',
@@ -157,7 +172,6 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const handleSubmit = async (action: string, message?: string) => {
     setIsSubmitting(true);
-    const appName = selectedRow.metadata.labels['app.kubesphere.io/app-id'];
 
     await store.handleReview({
       app_name: appName,
@@ -171,6 +185,99 @@ function ReviewsTable({ type }: Props): JSX.Element {
     notify.success(t(action === 'passed' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
     tableRef.current?.refetch();
   };
+
+  const handleDeploy = async (data: any): Promise<void> => {
+    console.log(data);
+    const params = {
+      kind: 'ApplicationRelease',
+      metadata: {
+        name: data?.name,
+        annotations: {
+          ...data.annotations,
+          'app.kubesphere.io/description': data.description,
+          'app.kubesphere.io/app-displayName': data.displayName,
+          'app.kubesphere.io/app-versionName': data.versionName,
+        },
+        labels: {
+          // cluster = '', workspace = '', namespace
+          'kubesphere.io/namespace': dataParams.namespace,
+          'kubesphere.io/workspace': dataParams.workspace,
+          'kubesphere.io/cluster': dataParams.cluster,
+          'kubesphere.io/app-id': data.app_name,
+        },
+      },
+      spec: {
+        app_id: data.app_name,
+        app_type: data.app_type,
+        appVersion_id: data?.version_id,
+        values: safeBtoa(data.conf) || data.package,
+      },
+    };
+
+    // TODO 临时取消 cluster、workspace、namespace
+    await deployApp(omit(params, ['cluster', 'workspace', 'namespace']), {
+      // cluster,
+      // workspace,
+      // namespace,
+    });
+    tableRef.current?.refetch();
+    setIsDeploy(false);
+    notify.success(t('DEPLOYED_SUCCESSFUL'));
+  };
+
+  function onDeploy() {
+    setIsDeploy(true);
+    console.log(2, selectedRow);
+  }
+
+  function renderModal() {
+    const modalType = selectedRow?.spec.appType;
+
+    if (!isDeploy || !selectedRow) {
+      return null;
+    }
+    if (modalType === 'edge') {
+      open({
+        v3Module: 'edgeStore',
+        module: 'edgeappsets',
+        ...selectedRow,
+        ...dataParams,
+        versionId: selectedVersionId,
+        appName,
+        v3StoreParams: {
+          module: 'edgeappsets',
+        },
+        success: () => {
+          notify.success(t('UPDATE_SUCCESSFUL'));
+          tableRef?.current?.refetch();
+          setIsDeploy(false);
+        },
+      });
+      return null;
+    }
+    if (modalType === 'helm') {
+      return (
+        <DeployVersionModal
+          visible={true}
+          appName={appName}
+          detail={selectedRow}
+          onCancel={() => setIsDeploy(false)}
+          onOk={handleDeploy}
+        />
+      );
+    }
+    return (
+      <DeployYamlModal
+        visible={true}
+        // @ts-ignore TODO
+        namespace={data.namespace}
+        detail={selectedRow}
+        versionId={selectedVersionId}
+        onCancel={() => setIsDeploy(false)}
+        onOk={handleDeploy}
+      />
+    );
+  }
 
   return (
     <>
@@ -196,9 +303,10 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <DetailDrawer
           visible={true}
           detail={selectedRow}
-          onOk={() => handleSubmit('passed')}
+          onOk={() => handleSubmit('active')}
           onCancel={onCancel}
           onReject={showReject}
+          onDeploy={onDeploy}
           isConfirming={isSubmitting}
           showFooter={type === 'unprocessed'}
         />
@@ -210,6 +318,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
           onCancel={closeRejectModal}
         />
       )}
+      {renderModal()}
+      {renderEdgeModal?.()}
     </>
   );
 }
