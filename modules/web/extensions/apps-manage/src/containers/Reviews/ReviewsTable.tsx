@@ -231,12 +231,14 @@ function ReviewsTable({ type }: Props): JSX.Element {
       ...selectedRow,
       ...files,
     });
-    setIsChooseSpace(true);
-    // setIsDeploy(true);
+    if (selectedRow.spec.appType !== 'helm') {
+      setIsChooseSpace(true);
+    } else {
+      setIsDeploy(true);
+    }
   }
 
   function getSpaceData({ data: placementData }: {data: { namespace: string, workspace: string, cluster: string}}) {
-    console.log(123, placementData)
     setPlacementData(placementData)
     setIsChooseSpace(false);
     setIsDeploy(true);
