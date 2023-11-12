@@ -2,7 +2,7 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import ReactMarkdown from 'react-markdown';
 
-import { AppDetail, Image, LabelText } from '@ks-console/shared';
+import { AppDetail, getBrowserLang, Image, LabelText } from '@ks-console/shared';
 
 import BaseInfo from './BaseInfo';
 
@@ -36,7 +36,7 @@ function InfoDetail({ detail, versionName }: Props): JSX.Element {
           <BaseInfo
             name={detail.metadata.name}
             home={detail.spec.appHome}
-            isv={detail.isv}
+            isv={detail.metadata.labels?.['kubesphere.io/workspace']}
             versionName={versionName}
           />
         }
@@ -48,7 +48,7 @@ function InfoDetail({ detail, versionName }: Props): JSX.Element {
         }
       />
       <LabelText>{t('APP_DESCRIPTION')}</LabelText>
-      <ReactMarkdown>{detail.abstraction || t('NONE')}</ReactMarkdown>
+      <ReactMarkdown>{detail.spec.description[getBrowserLang()] || t('NONE')}</ReactMarkdown>
       <LabelText>{t('APP_SCREENSHOTS')}</LabelText>
       {isEmpty(screenshots) ? (
         <p>{t('NONE')}</p>

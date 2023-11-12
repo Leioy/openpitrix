@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { notify } from '@kubed/components';
 import { omit } from 'lodash';
 import { Icon, TableRef, getBrowserLang } from '@ks-console/shared';
@@ -23,6 +23,7 @@ import DetailDrawer from './DetailDrawer';
 import { TableItemField } from '../StoreManage';
 import { transferReviewStatus } from '../../utils';
 import ReviewRejectModal from './ReviewRejectModal';
+import ChooseSpaceModal from './ChooseSpaceModal';
 
 type Props = {
   type: string;
@@ -30,11 +31,7 @@ type Props = {
 const { REVIEW_QUERY_STATUS, deployApp } = openpitrixStore;
 
 function ReviewsTable({ type }: Props): JSX.Element {
-  const dataParams = {
-    workspace: 'demo',
-    cluster: 'edge1',
-    namespace: 'demo',
-  };
+
   const { open, render: renderEdgeModal } = useV3action('batch.deploy.app.create.v2');
 
   const tableRef = useRef<TableRef<any>>(null);
@@ -42,6 +39,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isDeploy, setIsDeploy] = useState<boolean>(false);
+  const [isChooseSpace, setIsChooseSpace] = useState<boolean>(false);
+  const [placement, setPlacementData] = useState<{namespace?: string, workspace?: string, cluster?: string}>({});
+
   const [selectedRow, setSelectedRow] = useState<any>();
   const selectedVersionId = selectedRow?.metadata.name;
   const appName = selectedRow?.metadata?.labels['app.kubesphere.io/app-id'];
@@ -176,6 +176,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
     await store.handleReview({
       app_name: appName,
       versionId: selectedRow.metadata.name,
+      // @ts-ignore TODO
       state: action,
       user_name: globals.user.username,
       message,
@@ -200,9 +201,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
         },
         labels: {
           // cluster = '', workspace = '', namespace
-          'kubesphere.io/namespace': dataParams.namespace,
-          'kubesphere.io/workspace': dataParams.workspace,
-          'kubesphere.io/cluster': dataParams.cluster,
+          'kubesphere.io/namespace': placement.namespace,
+          'kubesphere.io/workspace': placement.workspace,
+          'kubesphere.io/cluster': placement.cluster,
           'kubesphere.io/app-id': data.app_name,
         },
       },
@@ -220,14 +221,34 @@ function ReviewsTable({ type }: Props): JSX.Element {
       // workspace,
       // namespace,
     });
-    tableRef.current?.refetch();
+    tableRef?.current?.refetch();
     setIsDeploy(false);
     notify.success(t('DEPLOYED_SUCCESSFUL'));
   };
 
-  function onDeploy() {
+  function onDeploy(files: any) {
+    setSelectedRow({
+      ...selectedRow,
+      ...files,
+    });
+    setIsChooseSpace(true);
+    // setIsDeploy(true);
+  }
+
+  function getSpaceData({ data: placementData }: {data: { namespace: string, workspace: string, cluster: string}}) {
+    console.log(123, placementData)
+    setPlacementData(placementData)
+    setIsChooseSpace(false);
     setIsDeploy(true);
-    console.log(2, selectedRow);
+  }
+  function renderSpaceModal() {
+    if (!isChooseSpace) {
+      return null;
+    }
+    return (
+      // @ts-ignore TODO
+      <ChooseSpaceModal dafaultVal={{}} visible onOk={getSpaceData} onCancel={() => setIsChooseSpace(false)} />
+    );
   }
 
   function renderModal() {
@@ -241,7 +262,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         v3Module: 'edgeStore',
         module: 'edgeappsets',
         ...selectedRow,
-        ...dataParams,
+        ...placement,
         versionId: selectedVersionId,
         appName,
         v3StoreParams: {
@@ -270,7 +291,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
       <DeployYamlModal
         visible={true}
         // @ts-ignore TODO
-        namespace={data.namespace}
+        {...placement}
+        // @ts-ignore TODO
+        namespace={placement.namespace}
         detail={selectedRow}
         versionId={selectedVersionId}
         onCancel={() => setIsDeploy(false)}
@@ -318,6 +341,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
           onCancel={closeRejectModal}
         />
       )}
+      {renderSpaceModal()}
       {renderModal()}
       {renderEdgeModal?.()}
     </>

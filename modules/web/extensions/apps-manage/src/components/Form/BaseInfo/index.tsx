@@ -1,6 +1,6 @@
 import React from 'react';
 
-function BaseInfo(props) {
+function BaseInfo() {
   return <div>asdsadasd</div>;
 }
 

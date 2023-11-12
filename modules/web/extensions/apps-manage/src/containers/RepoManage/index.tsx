@@ -115,9 +115,8 @@ function Repos(): JSX.Element {
       canHide: true,
       width: '15%',
       render: (status = 'syncing') => (
-        <StatusIndicator type={status}>
-          {t(`APP_REPO_STATUS_${status.toUpperCase()}`)}
-        </StatusIndicator>
+        // @ts-ignore TODO
+        <StatusIndicator type={status}>{t(`APP_REPO_STATUS_${status.toUpperCase()}`)}</StatusIndicator>
       ),
     },
     {
@@ -128,6 +127,7 @@ function Repos(): JSX.Element {
       id: 'more',
       title: '',
       width: 20,
+      // @ts-ignore TODO
       render: renderItemActions,
     },
   ];
@@ -197,6 +197,7 @@ function Repos(): JSX.Element {
         placeholder={t('SEARCH_BY_NAME')}
         toolbarRight={renderTableActions()}
         batchActions={renderBatchActions()}
+        // @ts-ignore TODO
         format={item => ({ ...item, workspace })}
         serverDataFormat={serverDataFormatter}
         emptyOptions={{

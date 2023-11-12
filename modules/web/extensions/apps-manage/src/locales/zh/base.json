@@ -20,5 +20,6 @@
   "MODIFY_CATEGORY_REQUIRED": "请选择一个分类",
   "MODIFY_CATEGORY_SUCCESSFULLY": "更改分类操作成功",
   "NO_APP_REPO_FOUND": "未发现应用仓库",
-  "APPROVE_AND_RELEASE": "批准并发表"
+  "APPROVE_AND_RELEASE": "批准并发表",
+  "create_edge_APPS": "创建边缘模板"
 }

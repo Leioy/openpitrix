@@ -146,7 +146,7 @@ export function useAppModifyCateGoryMutation(options?: { onSuccess?: () => void 
   return useMutation(
     data => {
       const { baseMutateData = [], param } = data as any;
-      return Promise.allSettled(baseMutateData?.map(item => modifyCategoryOPApp(item, param)));
+      return Promise.allSettled(baseMutateData?.map((item: ApplicationPathParams) => modifyCategoryOPApp(item, param)));
     },
     {
       onSuccess,

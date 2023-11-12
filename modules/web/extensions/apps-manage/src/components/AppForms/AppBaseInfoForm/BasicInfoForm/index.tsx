@@ -62,6 +62,7 @@ export function BasicInfoForm({
         }
 
         setInitData({
+          // @ts-ignore TODO
           name: `${name.slice(0, 7).toLowerCase().replaceAll(' ', '-')}-${generateId()}`,
           // TODO latest_app_version.version_id?
           version_id: defaultVersionId || name,

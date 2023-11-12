@@ -1,5 +1,4 @@
 import React, { ReactNode, useState, useRef } from 'react';
-import { get } from 'lodash';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
@@ -54,7 +53,7 @@ enum AppType {
 
 function StoreManage(): JSX.Element {
   const { workspace } = useParams();
-  const userLang = get(globals.user, 'lang') || getBrowserLang();
+  const userLang = getBrowserLang();
   const tableRef = useRef();
   const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
   const { isOpen, open, close } = useDisclosure(false);
@@ -63,6 +62,7 @@ function StoreManage(): JSX.Element {
   async function handleDelete() {
     await deleteApp({ app_name: selectData.metadata.name });
     setDelVisible(false);
+    // @ts-ignore TODO
     tableRef?.current?.refetch();
     notify.success(t('DELETED_SUCCESSFULLY'));
   }
@@ -95,6 +95,7 @@ function StoreManage(): JSX.Element {
             onClick={() => setSelectedApp(app as AppDetail)}
             label={app.spec.description[userLang]}
             value={<Link to={`${name}?appType=${app.spec.appType}`}>{name}</Link>}
+            // @ts-ignore TODO
             avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
           />
         );
@@ -106,6 +107,7 @@ function StoreManage(): JSX.Element {
       canHide: true,
       width: '10%',
       render: status => (
+        // @ts-ignore TODO
         <StatusIndicator type={status}>{transferAppStatus(status)}</StatusIndicator>
       ),
     },
@@ -121,13 +123,15 @@ function StoreManage(): JSX.Element {
       field: 'metadata.resourceVersion',
       canHide: true,
       width: '16%',
-      render: (_, record) => record?.metadata.annotations['app.kubesphere.io/latest-app-version'],
+      // @ts-ignore TODO
+      render: (_, record) => record?.metadata.annotations?.['app.kubesphere.io/latest-app-version'],
     },
     {
       title: t('CATEGORY'),
       field: 'category_set',
       canHide: true,
       width: '17%',
+      // @ts-ignore TODO
       render: (_, record) => record?.metadata.annotations['app.kubesphere.io/app-category-name'],
     },
     {
@@ -144,7 +148,7 @@ function StoreManage(): JSX.Element {
       field: 'status.updateTime',
       canHide: true,
       width: '20%',
-      render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
+      render: time => getLocalTime(time as string || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       id: 'more',
@@ -181,7 +185,9 @@ function StoreManage(): JSX.Element {
       <AppDataTable
         filter
         tableRef={tableRef}
+        // @ts-ignore TODO
         columns={columns}
+        // @ts-ignore TODO
         toolbarRight={workspace && tableActions()}
         emptyOptions={{
           withoutTable: true,

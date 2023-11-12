@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import cx from 'classnames';
 
-import { CategoryDetail, Icon, isUnCategorizedCtg } from '@ks-console/shared';
+import { CategoryDetail, getBrowserLang, Icon, isUnCategorizedCtg } from '@ks-console/shared';
 
 import { Actions, Category, Others } from './styles';
 
@@ -21,7 +21,7 @@ function CategoryItem({
   onDeleteCategory,
 }: Props): JSX.Element {
   const iconName = useMemo(() => {
-    if (['uncategorized', ''].includes(detail?.description || '')) {
+    if (['uncategorized', ''].includes(detail?.spec?.description?.[getBrowserLang()] || '')) {
       return 'tag';
     }
 

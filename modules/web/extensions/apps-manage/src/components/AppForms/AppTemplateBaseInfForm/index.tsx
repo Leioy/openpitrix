@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
-import { Col, FormInstance, FormItem, Input, Row, Select, Tag, Textarea } from '@kubed/components';
-import { Pattern, compareVersion, generateId, isRadonDB } from '@ks-console/shared';
-import type { AppDetail } from '@ks-console/shared';
-import { useAppDetail, useAppVersionList, fileStore } from '../../../stores';
+import { Col, FormInstance, FormItem, Input, Row, Textarea } from '@kubed/components';
+import { Pattern } from '@ks-console/shared';
 import { Title } from '../styles';
-import { BasicForm, OptionWrapper } from './styles';
+import { BasicForm } from './styles';
 
 export type AppAppTemplateBaseInfFormData = {
   name: string;

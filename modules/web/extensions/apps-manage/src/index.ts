@@ -13,7 +13,7 @@ const menu = {
 
 const workspaceAppManageMenu = {
   parent: 'workspace',
-  name: 'appstemplate',
+  name: 'apps',
   title: 'APPS_MANAGEMENT',
   icon: 'appcenter',
   order: 3,

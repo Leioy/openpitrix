@@ -25,7 +25,7 @@ type Props = {
   onOk: () => void;
   onCancel: () => void;
   onReject: () => void;
-  onDeploy: () => void;
+  onDeploy: (data: any) => void;
   showFooter?: boolean;
   isConfirming?: boolean;
 };
@@ -121,7 +121,7 @@ function DetailDrawer({
           <StyledButton className="mr12" color="error" onClick={onReject}>
             {t('REJECT')}
           </StyledButton>
-          <StyledButton className="mr12" color="secondary" onClick={onDeploy}>
+          <StyledButton className="mr12" color="secondary" onClick={() => onDeploy(files)}>
             {t('DEPLOYMENT')}
           </StyledButton>
           <StyledButton color="secondary" onClick={onOk} disabled={isConfirming}>
