@@ -15,6 +15,7 @@ import {
   DeployYamlModal,
   useV3action,
   safeBtoa,
+  ChooseSpaceModal,
 } from '@ks-console/shared';
 import { getReviewsUrl } from '../../stores';
 
@@ -23,7 +24,6 @@ import DetailDrawer from './DetailDrawer';
 import { TableItemField } from '../StoreManage';
 import { transferReviewStatus } from '../../utils';
 import ReviewRejectModal from './ReviewRejectModal';
-import ChooseSpaceModal from './ChooseSpaceModal';
 
 type Props = {
   type: string;
