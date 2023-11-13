@@ -31,7 +31,6 @@ type Props = {
 const { REVIEW_QUERY_STATUS, deployApp } = openpitrixStore;
 
 function ReviewsTable({ type }: Props): JSX.Element {
-
   const { open, render: renderEdgeModal } = useV3action('batch.deploy.app.create.v2');
 
   const tableRef = useRef<TableRef<any>>(null);
@@ -40,7 +39,11 @@ function ReviewsTable({ type }: Props): JSX.Element {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isDeploy, setIsDeploy] = useState<boolean>(false);
   const [isChooseSpace, setIsChooseSpace] = useState<boolean>(false);
-  const [placement, setPlacementData] = useState<{namespace?: string, workspace?: string, cluster?: string}>({});
+  const [placement, setPlacementData] = useState<{
+    namespace?: string;
+    workspace?: string;
+    cluster?: string;
+  }>({});
 
   const [selectedRow, setSelectedRow] = useState<any>();
   const selectedVersionId = selectedRow?.metadata.name;
@@ -238,8 +241,12 @@ function ReviewsTable({ type }: Props): JSX.Element {
     }
   }
 
-  function getSpaceData({ data: placementData }: {data: { namespace: string, workspace: string, cluster: string}}) {
-    setPlacementData(placementData)
+  function getSpaceData({
+    data: placementData,
+  }: {
+    data: { namespace: string; workspace: string; cluster: string };
+  }) {
+    setPlacementData(placementData);
     setIsChooseSpace(false);
     setIsDeploy(true);
   }
@@ -249,7 +256,13 @@ function ReviewsTable({ type }: Props): JSX.Element {
     }
     return (
       // @ts-ignore TODO
-      <ChooseSpaceModal dafaultVal={{}} visible onOk={getSpaceData} onCancel={() => setIsChooseSpace(false)} />
+      <ChooseSpaceModal
+        dafaultVal={{}}
+        visible
+        // @ts-ignore TODO
+        onOk={getSpaceData}
+        onCancel={() => setIsChooseSpace(false)}
+      />
     );
   }
 
@@ -328,7 +341,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <DetailDrawer
           visible={true}
           detail={selectedRow}
-          onOk={() => handleSubmit('active')}
+          onOk={() => handleSubmit('passed')}
           onCancel={onCancel}
           onReject={showReject}
           onDeploy={onDeploy}

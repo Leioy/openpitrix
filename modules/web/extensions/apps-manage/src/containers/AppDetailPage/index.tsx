@@ -74,6 +74,8 @@ function AppDetailPage(): JSX.Element {
           },
         },
       ];
+    } else if (detail?.status?.state !== 'suspended') {
+      return [];
     }
 
     return [
