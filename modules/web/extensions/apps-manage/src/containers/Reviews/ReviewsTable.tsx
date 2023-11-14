@@ -341,7 +341,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <DetailDrawer
           visible={true}
           detail={selectedRow}
-          onOk={() => handleSubmit('passed')}
+          onOk={() => handleSubmit('active')}
           onCancel={onCancel}
           onReject={showReject}
           onDeploy={onDeploy}
