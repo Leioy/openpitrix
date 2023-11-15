@@ -27,6 +27,7 @@ import ModifyCategoryModal from './ModifyCategoryModal';
 import AppDataTable from '../../components/AppDataTable';
 
 import { Categories, Columns, FirstColumn, Head, SecondColumn } from './styles';
+import { getAuthKey} from "../../utils";
 
 function CategoriesManage(): JSX.Element {
   const {
@@ -84,9 +85,10 @@ function CategoriesManage(): JSX.Element {
   const handleOpenChangeCategoryModal = () => {
     setModalType('modify');
   };
+  const authKey = getAuthKey();
 
   const renderBatchActions = useBatchActions({
-    authKey: 'apps',
+    authKey,
     actions: [
       {
         key: 'adjust',

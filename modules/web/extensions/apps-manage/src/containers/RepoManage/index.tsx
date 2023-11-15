@@ -19,6 +19,7 @@ import {
 import RepoManagementModal from './RepoManagementModal';
 import { getRepoUrl, useReposDeleteMutation } from '../../stores';
 import type { RepoData } from '../../types/repo';
+import {getAuthKey} from "../../utils";
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -35,8 +36,10 @@ function Repos(): JSX.Element {
     order: 'create_time',
     status: 'active',
   };
+  const authKey = getAuthKey('app-repos');
+
   const renderItemActions = useItemActions<RepoData>({
-    authKey: 'app-repos',
+    authKey,
     params: { workspace },
     actions: [
       {
@@ -61,8 +64,9 @@ function Repos(): JSX.Element {
       },
     ],
   });
+
   const renderBatchActions = useBatchActions({
-    authKey: 'app-repos',
+    authKey,
     params: { workspace },
     actions: [
       {
@@ -79,7 +83,7 @@ function Repos(): JSX.Element {
     ],
   });
   const renderTableActions = useTableActions({
-    authKey: 'app-repos',
+    authKey,
     params: { workspace },
     actions: [
       {

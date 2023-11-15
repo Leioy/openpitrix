@@ -95,3 +95,7 @@ export function generateMarks(min: number, max: number): number[] {
 
   return o.filter(k => !!k);
 }
+
+export function getAuthKey(key: string = 'app-templates') {
+  return location.href.includes('/apps-manage') ? 'manage-app' : key;
+}

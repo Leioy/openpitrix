@@ -4,16 +4,18 @@ import { defaultUrl, useBaseList } from './base';
 
 type RepoPathParams = PathParams & { repo_name?: string; app_name?: string; version_id?: string };
 
-export function getRepoUrl({ workspace, repo_name }: RepoPathParams): string {
-  let prefix = defaultUrl + '/repos';
-  if (repo_name) {
-    prefix += `/${repo_name}`;
-  }
+export function getRepoUrl({ workspace, repo_name, name }: RepoPathParams): string {
+  let prefix = defaultUrl;
 
   if (workspace) {
-    prefix += `?workspaces=${workspace}`;
+    prefix += `/workspaces/${workspace}`;
   }
-  return `${prefix}`;
+
+  if (repo_name) {
+    return `${prefix}/repos/${repo_name}/${name || ''}`;
+  }
+
+  return `${prefix}/repos`;
 }
 
 export function useRepoList(

@@ -55,7 +55,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
     status: REVIEW_QUERY_STATUS[type],
   };
   const renderItemActions = useItemActions({
-    authKey: 'apps',
+    authKey: 'manage-app',
     actions: [
       {
         key: 'detail',

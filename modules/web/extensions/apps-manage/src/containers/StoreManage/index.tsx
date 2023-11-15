@@ -24,6 +24,7 @@ import { deleteApp } from '../../stores';
 import { useDisclosure } from '@kubed/hooks';
 import CreateApp from '../AppCreate';
 import AppDataTable from '../../components/AppDataTable';
+import { getAuthKey } from '../../utils';
 
 const AddButton = styled(Button)`
   min-width: 96px;
@@ -58,6 +59,7 @@ function StoreManage(): JSX.Element {
   const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
   const { isOpen, open, close } = useDisclosure(false);
   const [delVisible, setDelVisible] = useState(false);
+  const authKey = getAuthKey();
 
   async function handleDelete() {
     await deleteApp({ app_name: selectData.metadata.name });
@@ -67,8 +69,8 @@ function StoreManage(): JSX.Element {
     notify.success(t('DELETED_SUCCESSFULLY'));
   }
   const renderItemActions = useItemActions<AppDetail>({
-    authKey: 'app-repos',
     params: {},
+    authKey,
     actions: [
       {
         key: 'delete',
@@ -90,6 +92,10 @@ function StoreManage(): JSX.Element {
       width: '20%',
       searchable: true,
       render: (name, app) => {
+        // const getName = app.spec.displayName[userLang]
+        //   ? `${app.spec.displayName[userLang]}（${name}）`
+        //   : name;
+        // console.log(app, name);
         return (
           <TableItemField
             onClick={() => setSelectedApp(app as AppDetail)}
@@ -148,7 +154,8 @@ function StoreManage(): JSX.Element {
       field: 'status.updateTime',
       canHide: true,
       width: '20%',
-      render: time => getLocalTime(time as string || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
+      render: time =>
+        getLocalTime((time as string) || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       id: 'more',
@@ -158,7 +165,7 @@ function StoreManage(): JSX.Element {
     },
   ];
   const tableActions = useTableActions({
-    authKey: 'app-templates',
+    authKey,
     params: { workspace },
     actions: [
       {
@@ -187,6 +194,7 @@ function StoreManage(): JSX.Element {
         tableRef={tableRef}
         // @ts-ignore TODO
         columns={columns}
+        workspace={workspace}
         // @ts-ignore TODO
         toolbarRight={workspace && tableActions()}
         emptyOptions={{

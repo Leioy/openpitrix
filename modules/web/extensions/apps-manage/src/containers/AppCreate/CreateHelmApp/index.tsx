@@ -61,6 +61,7 @@ export function CreateHelmApp({
   async function submitData(): Promise<void> {
     const data: Record<string, unknown> = {
       app_type: 'helm',
+      workspace,
       package: checkedFileInfo?.base64Str,
     };
     await fileStore.uploadPackage('CREATE_APP', data, onOk);
@@ -95,6 +96,7 @@ export function CreateHelmApp({
         appName={appName}
         fileStore={fileStore}
         canCreate={canCreate}
+        workspace={workspace}
         onCheckStatusChange={setCheckedFileInfo}
       />
       {!canCreate ? (

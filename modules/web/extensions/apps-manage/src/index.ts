@@ -8,7 +8,9 @@ const menu = {
   icon: 'openpitrix',
   order: 2,
   desc: 'APP_STORE_MANAGEMENT_DESC',
-  skipAuth: true,
+  ksModule: 'openpitrix',
+  authKey: 'manage-app',
+  authAction: 'manage',
 };
 
 const workspaceAppManageMenu = {
@@ -18,19 +20,22 @@ const workspaceAppManageMenu = {
   icon: 'appcenter',
   order: 3,
   desc: 'APP_STORE_MANAGEMENT_DESC',
-  skipAuth: true,
+  authKey: 'app-templates',
+  authAction: 'view',
   children: [
     {
       name: 'store',
       title: 'APP_TEMPLATE_PL',
       icon: 'appcenter',
-      skipAuth: true,
+      authKey: 'app-templates',
+      authAction: 'view',
     },
     {
       name: 'repo',
       title: '应用仓库',
       icon: 'appcenter',
-      skipAuth: true,
+      authKey: 'app-repos',
+      authAction: 'view',
     },
   ],
 };
@@ -42,13 +47,13 @@ const clusterAppManageMenu = {
   icon: 'appcenter',
   order: 4,
   desc: 'APP_STORE_MANAGEMENT_DESC',
-  skipAuth: true,
+  // authAction: '',
+  // skipAuth: true,
   children: [
     {
       name: 'deploy',
       title: '应用部署管理',
       icon: 'appcenter',
-      skipAuth: true,
     },
   ],
 };

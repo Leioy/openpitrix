@@ -17,6 +17,7 @@ import {
   // getAppCategoryNames,
   getBrowserLang,
 } from '@ks-console/shared';
+import {getAuthKey} from "../../utils";
 
 const { HANDLE_TYPE_TO_SHOW, useAppDetail, handleApp } = openpitrixStore;
 
@@ -157,6 +158,7 @@ function AppDetailPage(): JSX.Element {
   }, []);
 
   const url = workspace ? `/workspaces/${workspace}/store` : '/apps-manage/store';
+  const authKey = getAuthKey();
 
   return (
     <>
@@ -174,7 +176,7 @@ function AppDetailPage(): JSX.Element {
               iconLetter={detail?.metadata.name}
             />
           ),
-          authKey: 'apps',
+          authKey,
           actionOptions: { limit: 2, theme: 'dark' },
           attrs,
           actions,
