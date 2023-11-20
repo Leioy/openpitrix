@@ -16,8 +16,8 @@ import {
   // getVersionTypesName,
   // getAppCategoryNames,
   getBrowserLang,
+  getAuthKey,
 } from '@ks-console/shared';
-import {getAuthKey} from "../../utils";
 
 const { HANDLE_TYPE_TO_SHOW, useAppDetail, handleApp } = openpitrixStore;
 

@@ -36,7 +36,7 @@ const workspaceAppManageMenu = {
 };
 const extensionConfig = {
   // routes,
-  menus: [menu, workspaceAppManageMenu],
+  menus: [menu],
   // locales,
 };
 

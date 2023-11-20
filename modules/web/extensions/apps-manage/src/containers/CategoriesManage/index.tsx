@@ -21,13 +21,12 @@ import {
   useAppModifyCateGoryMutation,
 } from '../../stores';
 import CategoryList from './CategoryList';
-import { TableItemField } from '../StoreManage';
 import ManageCategoryModal from './ManageCategoryModal';
 import ModifyCategoryModal from './ModifyCategoryModal';
 import AppDataTable from '../../components/AppDataTable';
 
-import { Categories, Columns, FirstColumn, Head, SecondColumn } from './styles';
-import { getAuthKey} from "../../utils";
+import { Categories, Columns, FirstColumn, Head, SecondColumn, TableItemField } from './styles';
+import { getAuthKey } from '../../utils';
 
 function CategoriesManage(): JSX.Element {
   const {
@@ -60,7 +59,7 @@ function CategoriesManage(): JSX.Element {
       canHide: true,
       width: '25%',
       render: (_, app) => {
-        return get(app, 'metadata.labels["kubesphere.io/workspace"]', '-')
+        return get(app, 'metadata.labels["kubesphere.io/workspace"]', '-');
       },
     },
     {
@@ -69,7 +68,7 @@ function CategoriesManage(): JSX.Element {
       canHide: true,
       width: '25%',
       render: (_, app) => {
-        return get(app, 'metadata.annotations["app.kubesphere.io/latest-app-version"]', '-')
+        return get(app, 'metadata.annotations["app.kubesphere.io/latest-app-version"]', '-');
       },
     },
   ];

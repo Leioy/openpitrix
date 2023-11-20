@@ -21,7 +21,7 @@ import { getReviewsUrl } from '../../stores';
 
 import store from './store';
 import DetailDrawer from './DetailDrawer';
-import { TableItemField } from '../StoreManage';
+import { TableItemField } from '../CategoriesManage/styles';
 import { transferReviewStatus } from '../../utils';
 import ReviewRejectModal from './ReviewRejectModal';
 

@@ -1,5 +1,4 @@
 import React, { ReactNode, useMemo } from 'react';
-import { Appcenter } from '@kubed/icons';
 
 import { Column, DataTable, openpitrixStore, useListQueryParams } from '@ks-console/shared';
 
