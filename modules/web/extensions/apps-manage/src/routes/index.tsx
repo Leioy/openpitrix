@@ -7,7 +7,7 @@ import ListLayout from '../containers/Base/ListLayout';
 import Reviews from '../containers/Reviews';
 import RepoManage from '../containers/RepoManage';
 
-// import CategoriesManage from '../containers/CategoriesManage';
+import CategoriesManage from '../containers/CategoriesManage';
 import ApplicationManage from '../containers/AppInstanceManage';
 import StoreManage from '../containers/StoreManage';
 import AppDetailPage from '../containers/AppDetailPage';
@@ -28,10 +28,10 @@ export default [
         path: 'store',
         element: <StoreManage />,
       },
-      // {
-      //   path: 'categories',
-      //   element: <CategoriesManage />,
-      // },
+      {
+        path: 'categories',
+        element: <CategoriesManage />,
+      },
       {
         path: 'reviews',
         element: <Reviews />,

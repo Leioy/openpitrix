@@ -138,13 +138,13 @@ function ReviewsTable({ type }: Props): JSX.Element {
   ];
 
   const transformRequestParams = (params: Record<string, any>): Record<string, any> => {
-    const { parameters, pageIndex, filters } = params;
+    const { parameters, pageIndex, pageSize, filters } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
-      page: pageIndex + 1,
     });
-
+    formattedParams.page = pageIndex + 1;
+    formattedParams.limit = pageSize;
     if (!keyword) {
       return formattedParams;
     }
@@ -316,6 +316,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
       />
     );
   }
+
+  console.log(queryParams, 999);
 
   return (
     <>

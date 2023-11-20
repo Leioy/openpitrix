@@ -21,7 +21,6 @@ function AppDataTable({
   batchActions,
   toolbarRight,
   tableRef,
-  filter,
   workspace,
   emptyOptions,
 }: Props): JSX.Element {
@@ -29,39 +28,39 @@ function AppDataTable({
     return {
       category_id: categoryId,
       order: SORT_KEY,
-      status: 'active|rejected|passed|suspended|draft',
+      status: 'active',
       // repo_id: 'repo-helm',
     };
   }, [categoryId]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
-    const { parameters, pageIndex, filters, pageSize } = params;
+    const { parameters, pageIndex, pageSize, filters } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
-      page: pageIndex + 1,
     });
-    if (filter) {
-      formattedParams.page = pageIndex + 1;
-      formattedParams.limit = pageSize;
-      delete formattedParams.paging;
-    }
-
-    if (!keyword) {
-      return formattedParams;
-    }
-
-    return {
+    const querys: Record<string, string | number> = {
       ...formattedParams,
-      conditions: formattedParams.conditions + `,keyword=${keyword}`,
-      // TODO 参数问题
-      limit: 20,
       page: pageIndex + 1,
+      limit: pageSize,
+      conditions: `status=${parameters.status}`,
     };
+    if (categoryId) {
+      querys.label = `app.kubesphere.io/app-category-id=${categoryId}`;
+    }
+
+    if (keyword) {
+      querys.conditions += `,keyword=${keyword}`;
+    }
+
+    return querys;
   };
 
   const formatServerData = (serverData: any) => {
-    return serverData;
+    return {
+      ...serverData,
+      totalItems: serverData.total_count,
+    };
   };
 
   return (

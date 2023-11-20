@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { parse } from 'qs';
 import { get } from 'lodash';
 import { Banner, LoadingOverlay, notify } from '@kubed/components';
 
@@ -46,7 +45,6 @@ function CategoriesManage(): JSX.Element {
       render: (name, app) => (
         <TableItemField
           label={app.spec.displayName.zh}
-          // TODO 此处跳转地址有问题
           value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
           // @ts-ignore TODO
           avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
@@ -140,15 +138,12 @@ function CategoriesManage(): JSX.Element {
     if (currentTable) {
       const selectedRows = currentTable.getSelectedFlatRows();
 
-      const { workspace, cluster, zone } = parse(window.location.search, {
-        ignoreQueryPrefix: true,
-      });
       // @ts-ignore TODO
       const baseMutateData = selectedRows?.map(({ metadata }) => {
         return {
-          workspace,
-          cluster,
-          zone,
+          workspace: metadata.labels?.['kubesphere.io/workspace'],
+          cluster: metadata.labels?.['kubesphere.io/cluster'],
+          // zone,
           app_name: metadata.name,
         };
       });
@@ -194,8 +189,7 @@ function CategoriesManage(): JSX.Element {
           {selectedCategory?.metadata?.name && (
             <AppDataTable
               tableRef={tableRef}
-              // @ts-ignore TODO
-              columns={columns}
+              columns={columns as any}
               batchActions={renderBatchActions()}
               categoryId={selectedCategory.metadata?.name}
             />

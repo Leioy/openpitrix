@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import cx from 'classnames';
 
 import { CategoryDetail, getBrowserLang, Icon, isUnCategorizedCtg } from '@ks-console/shared';
 
@@ -20,19 +19,20 @@ function CategoryItem({
   onEditCategory,
   onDeleteCategory,
 }: Props): JSX.Element {
+  const displayName = detail?.spec?.displayName?.[getBrowserLang()];
   const iconName = useMemo(() => {
     if (['uncategorized', ''].includes(detail?.spec?.description?.[getBrowserLang()] || '')) {
       return 'tag';
     }
 
-    return detail?.spec.displayName.zh;
-  }, [detail?.spec.displayName.zh]);
+    return displayName;
+  }, [displayName]);
 
   return (
-    <Category onClick={() => onSelectCategory(detail)} className={cx({ active: isActive })}>
+    <Category onClick={() => onSelectCategory(detail)} className={`${isActive && 'active'}`}>
       {iconName && <Icon size={16} className="mr12" name={iconName} />}
-      {t(`APP_CATE_${detail?.spec.displayName.zh?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-        defaultValue: detail?.spec.displayName.zh,
+      {t(`APP_CATE_${displayName?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
+        defaultValue: displayName,
       })}
       <Others>
         <span className="total_count">{detail?.status.total || 0}</span>

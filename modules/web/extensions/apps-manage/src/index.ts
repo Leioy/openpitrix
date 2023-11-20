@@ -3,7 +3,7 @@ import locales from './locales';
 
 const menu = {
   parent: 'global',
-  name: 'manage-app',
+  name: 'apps-manage',
   title: 'APP_STORE_MANAGEMENT',
   icon: 'openpitrix',
   order: 2,

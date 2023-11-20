@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { VersionList } from '@ks-console/shared';
-import CreateApp from '../../AppCreate';
+import { VersionList, CreateApp } from '@ks-console/shared';
 import { updateVersion } from '../../../stores';
 
 function VersionLists() {
