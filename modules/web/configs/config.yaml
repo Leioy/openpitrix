@@ -2,7 +2,7 @@ client:
   title: KubeSphere
   description: ""
   encryptKey: kubesphere
-  disableAuthorization: true
+  disableAuthorization: false
   # apps manage page navigations
   manageAppNavs:
     - name: "apps"

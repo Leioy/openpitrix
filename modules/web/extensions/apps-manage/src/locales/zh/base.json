@@ -22,5 +22,6 @@
   "NO_APP_REPO_FOUND": "未发现应用仓库",
   "APPROVE_AND_RELEASE": "批准并发表",
   "create_edge_APPS": "创建边缘模板",
-  "SUBMITTED_SUCCESSFUL": "提交成功"
+  "SUBMITTED_SUCCESSFUL": "提交成功",
+  "DELETED_SUCCESSFUL": "删除成功"
 }

@@ -20,13 +20,14 @@ function CategoryItem({
   onDeleteCategory,
 }: Props): JSX.Element {
   const displayName = detail?.spec?.displayName?.[getBrowserLang()];
+  // @ts-ignore
+  const icons = detail?.spec?.icon;
   const iconName = useMemo(() => {
-    if (['uncategorized', ''].includes(detail?.spec?.description?.[getBrowserLang()] || '')) {
+    if (['uncategorized', ''].includes(icons || '')) {
       return 'tag';
     }
-
-    return displayName;
-  }, [displayName]);
+    return icons;
+  }, [icons]);
 
   return (
     <Category onClick={() => onSelectCategory(detail)} className={`${isActive && 'active'}`}>
