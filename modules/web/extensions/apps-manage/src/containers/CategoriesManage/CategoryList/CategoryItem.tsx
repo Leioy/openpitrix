@@ -1,11 +1,6 @@
 import React, { useMemo } from 'react';
 
-import {
-  CategoryDetail,
-  Icon,
-  isUnCategorizedCtg,
-  getAnnotationsAliasName,
-} from '@ks-console/shared';
+import { CategoryDetail, Icon, isUnCategorizedCtg } from '@ks-console/shared';
 
 import { Actions, Category, Others } from './styles';
 
@@ -24,7 +19,7 @@ function CategoryItem({
   onEditCategory,
   onDeleteCategory,
 }: Props): JSX.Element {
-  const displayName = getAnnotationsAliasName(detail);
+  const displayName = detail?.metadata?.name;
   // @ts-ignore
   const icons = detail?.spec?.icon;
   const iconName = useMemo(() => {
@@ -34,12 +29,23 @@ function CategoryItem({
     return icons;
   }, [icons]);
 
+  function getName(name: string) {
+    if (name === 'kubesphere-app-uncategorized') {
+      return 'UNCATEGORIZED';
+    }
+    return name;
+  }
   return (
     <Category onClick={() => onSelectCategory(detail)} className={`${isActive && 'active'}`}>
       {iconName && <Icon size={16} className="mr12" name={iconName} />}
-      {t(`APP_CATE_${displayName?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-        defaultValue: displayName,
-      })}
+      {t(
+        `APP_CATE_${getName(displayName)
+          ?.toUpperCase()
+          .replace(/[^A-Z]+/g, '_')}`,
+        {
+          defaultValue: getName(displayName),
+        },
+      )}
       <Others>
         <span className="total_count">{detail?.status.total || 0}</span>
         {!isUnCategorizedCtg(detail?.metadata.name) && (

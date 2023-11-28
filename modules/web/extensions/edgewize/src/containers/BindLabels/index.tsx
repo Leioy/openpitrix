@@ -1,7 +1,6 @@
 import React from 'react';
 import { Banner } from '@kubed/components';
 import { Dashboard } from '@kubed/icons';
-import { useParams } from 'react-router-dom';
 
 import ClusterBaseInfo from './Clusters';
 

@@ -27,7 +27,6 @@ function ManageCategoryModal({
   const defaultVal = {
     name: getAnnotationsAliasName(detail),
   };
-
   const nameValidator = (rule: RuleObject, value: string, callback: any) => {
     if (!value) {
       return callback();

@@ -12,6 +12,8 @@ import {
   useBatchActions,
   DeleteConfirmModal,
   getAnnotationsAliasName,
+  StatusIndicator,
+  transferAppStatus,
 } from '@ks-console/shared';
 import {
   useCategoryList,
@@ -41,7 +43,6 @@ function CategoriesManage(): JSX.Element {
     {
       title: t('NAME'),
       field: 'metadata.name',
-      width: '50%',
       searchable: true,
       render: (name, app) => (
         <TableItemField
@@ -50,6 +51,16 @@ function CategoriesManage(): JSX.Element {
           // @ts-ignore TODO
           avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
         />
+      ),
+    },
+    {
+      title: t('STATUS'),
+      field: 'status.state',
+      canHide: true,
+      width: '20%',
+      render: status => (
+        // @ts-ignore TODO
+        <StatusIndicator type={status}>{transferAppStatus(status)}</StatusIndicator>
       ),
     },
     {

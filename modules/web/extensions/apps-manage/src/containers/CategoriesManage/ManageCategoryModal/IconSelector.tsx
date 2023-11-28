@@ -47,7 +47,7 @@ function IconSelector({ value, onChange }: Props): JSX.Element {
       {CATEGORY_ICONS.map(icon => (
         <StyledIcon
           key={icon}
-          className={`${icon === value} && 'active'`}
+          className={`${icon === value && 'active'}`}
           name={icon}
           size={20}
           onClick={() => changeIcon(icon)}

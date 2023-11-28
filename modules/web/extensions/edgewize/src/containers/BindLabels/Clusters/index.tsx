@@ -13,12 +13,11 @@ function Clusters() {
   const { workspace } = useParams<{ workspace: string }>();
   const [clusters] = useStore('clusters');
   const [workspaces] = useStore('workspaces');
-  console.log(123, workspaces);
 
   const edgeClusters = clusters?.filter(
     (item: { provider: string }) => item.provider === 'EdgeWize',
   );
-  const labels = edgeClusters?.[0]?.labels?.['cluster-role.kubesphere.io/edge'];
+  const labels = workspaces?.metadata?.labels?.['cluster-role.kubesphere.io/edge'];
   const [isEdgewize, setIsEdgewize] = useState(!!labels);
 
   function handleModeChange(val: boolean) {

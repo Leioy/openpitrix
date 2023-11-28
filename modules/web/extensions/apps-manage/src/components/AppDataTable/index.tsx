@@ -28,7 +28,7 @@ function AppDataTable({
     return {
       category_id: categoryId,
       order: SORT_KEY,
-      status: 'active',
+      status: 'active|rejected|passed|suspended|draft',
       // repo_id: 'repo-helm',
     };
   }, [categoryId]);
@@ -46,7 +46,7 @@ function AppDataTable({
       conditions: `status=${parameters.status}`,
     };
     if (categoryId) {
-      querys.label = `app.kubesphere.io/app-category-id=${categoryId}`;
+      querys.label = `app.kubesphere.io/app-category-name=${categoryId}`;
     }
 
     if (keyword) {
@@ -59,7 +59,7 @@ function AppDataTable({
   const formatServerData = (serverData: any) => {
     return {
       ...serverData,
-      totalItems: serverData.total_count,
+      totalItems: serverData.totalItems,
     };
   };
 
