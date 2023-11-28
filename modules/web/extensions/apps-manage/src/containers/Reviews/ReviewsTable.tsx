@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { notify } from '@kubed/components';
 import { omit } from 'lodash';
-import { Icon, TableRef, getBrowserLang } from '@ks-console/shared';
+import { Icon, TableRef, getAnnotationsDescription } from '@ks-console/shared';
 import {
   Image,
   Column,
@@ -49,7 +49,6 @@ function ReviewsTable({ type }: Props): JSX.Element {
   const selectedVersionId = selectedRow?.metadata.name;
   const appName = selectedRow?.metadata?.labels['app.kubesphere.io/app-id'];
 
-  const userLang = getBrowserLang();
   const queryParams: Record<string, any> = {
     order: 'status_time',
     status: REVIEW_QUERY_STATUS[type],
@@ -82,11 +81,11 @@ function ReviewsTable({ type }: Props): JSX.Element {
             <Image
               src={item.spec.icon}
               iconSize={40}
-              iconLetter={item.spec.description?.[userLang] || '-'}
+              iconLetter={getAnnotationsDescription(item) || '-'}
             />
           }
           value={item.metadata.name}
-          label={item.spec.description?.[userLang] || '-'}
+          label={getAnnotationsDescription(item) || '-'}
         />
       ),
     },
@@ -98,11 +97,11 @@ function ReviewsTable({ type }: Props): JSX.Element {
       render: (_, item) => item?.metadata?.labels?.['kubesphere.io/workspace'] || '-',
     },
     {
-      title: t('OPERATOR'),
+      title: t('Submitter'),
       field: 'reviewer',
       canHide: true,
       width: '15%',
-      render: (_, item) => item?.metadata?.annotations?.['kubesphere.io/creator'] || '-',
+      render: (_, item) => item?.status?.userName || '-',
     },
     {
       title: t('STATUS'),
@@ -177,16 +176,16 @@ function ReviewsTable({ type }: Props): JSX.Element {
     setIsSubmitting(true);
 
     await store.handleReview({
-      app_name: appName,
-      versionId: selectedRow.metadata.name,
+      appName,
+      versionID: selectedRow.metadata.name,
       // @ts-ignore TODO
       state: action,
-      user_name: globals.user.username,
+      userName: globals.user.username,
       message,
     });
     setIsSubmitting(false);
     onCancel();
-    notify.success(t(action === 'passed' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
+    notify.success(t(action === 'active' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
     tableRef.current?.refetch();
   };
 
@@ -207,13 +206,13 @@ function ReviewsTable({ type }: Props): JSX.Element {
           'kubesphere.io/namespace': placement.namespace,
           'kubesphere.io/workspace': placement.workspace,
           'kubesphere.io/cluster': placement.cluster,
-          'kubesphere.io/app-id': data.app_name,
+          'kubesphere.io/app-id': data.appName,
         },
       },
       spec: {
-        app_id: data.app_name,
-        app_type: data.app_type,
-        appVersion_id: data?.version_id,
+        appID: data.appName,
+        appType: data.appType,
+        appVersionID: data?.versionID,
         values: safeBtoa(data.conf) || data.package,
       },
     };
@@ -278,7 +277,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         module: 'edgeappsets',
         ...selectedRow,
         ...placement,
-        versionId: selectedVersionId,
+        versionID: selectedVersionId,
         appName,
         v3StoreParams: {
           module: 'edgeappsets',
@@ -310,7 +309,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         // @ts-ignore TODO
         namespace={placement.namespace}
         detail={selectedRow}
-        versionId={selectedVersionId}
+        versionID={selectedVersionId}
         onCancel={() => setIsDeploy(false)}
         onOk={handleDeploy}
       />
@@ -325,7 +324,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
         simpleSearch
         ref={tableRef}
         tableName="APP_REVIEW"
-        rowKey="version_id"
+        rowKey="versionID"
         url={getReviewsUrl({})}
         parameters={queryParams}
         columns={columns}

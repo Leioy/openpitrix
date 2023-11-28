@@ -7,11 +7,8 @@ import { BaseUrlParams, getBaseUrl } from './base';
 
 const resourceName = 'files';
 
-export function fetchAppFiles({
-  name,
-  version_id,
-}: BaseUrlParams): Promise<Record<string, string>> {
-  const url = getBaseUrl({ app_name: name, version_id }, resourceName);
+export function fetchAppFiles({ name, versionID }: BaseUrlParams): Promise<Record<string, string>> {
+  const url = getBaseUrl({ appName: name, versionID }, resourceName);
 
   return request.get(url).then((res: any) => {
     return Object.entries(res).reduce((acc: Record<string, string>, [key, value]) => {
@@ -56,18 +53,18 @@ type ValidatePackageResponse = Partial<ValidateResponse> & {
 
 export async function validatePackage(
   base64Str: string,
-  app_name: string,
+  appName: string,
   name?: string,
   version_name?: string,
 ): Promise<ValidatePackageResponse> {
   const data: Record<string, string | undefined> = {
-    [`${!app_name ? 'app_' : ''}type`]: 'helm',
+    [`${!appName ? 'app_' : ''}type`]: 'helm',
     package: base64Str,
     name,
     version_name,
   };
   const result: ValidateResponse | undefined = await request.post(
-    `${getBaseUrl({ app_name, name: app_name ? 'versions' : 'apps' }, resourceName)}?validate=true`,
+    `${getBaseUrl({ appName, name: appName ? 'versions' : 'apps' }, resourceName)}?validate=true`,
     data,
   );
   const response: ValidatePackageResponse = result ? { ...result } : {};
@@ -146,29 +143,29 @@ export function validateImageSize(base64Str: string): Promise<any> {
 }
 
 export async function downloadPackage(
-  { app_name, version_id }: BaseUrlParams,
+  { appName, versionID }: BaseUrlParams,
   packageName: string,
 ): Promise<void> {
-  const url = getBaseUrl({ app_name, version_id, name: 'package' }, 'versions');
+  const url = getBaseUrl({ appName, versionID, name: 'package' }, 'versions');
   const result: any = await request.get(url);
   downloadFileFromBase64(result.package, packageName);
 }
 
 type FilesDetail = Record<string, string> | undefined;
 
-type QueryFilesInput = Pick<BaseUrlParams, 'name' | 'version_id'>;
+type QueryFilesInput = Pick<BaseUrlParams, 'name' | 'versionID'>;
 
 export function useQueryFiles(
-  { name, version_id }: QueryFilesInput,
+  { name, versionID }: QueryFilesInput,
   options?: UseQueryOptions<FilesDetail, Error>,
 ): UseQueryResult<FilesDetail, Error> {
   return useQuery<FilesDetail, Error>(
-    ['files', name, version_id],
+    ['files', name, versionID],
     (): Promise<FilesDetail> => {
       if (options?.enabled === false) {
         return Promise.resolve(undefined);
       }
-      return fetchAppFiles({ name, version_id });
+      return fetchAppFiles({ name, versionID });
     },
     options,
   );

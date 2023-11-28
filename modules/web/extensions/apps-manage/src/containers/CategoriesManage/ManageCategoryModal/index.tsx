@@ -2,7 +2,7 @@ import React from 'react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import { Form, FormItem, Input, Modal, useForm } from '@kubed/components';
 
-import { CategoryDetail, Icon } from '@ks-console/shared';
+import { CategoryDetail, Icon, getAnnotationsAliasName } from '@ks-console/shared';
 
 import IconSelector from './IconSelector';
 import { Body } from './styles';
@@ -25,7 +25,7 @@ function ManageCategoryModal({
   const [form] = useForm();
 
   const defaultVal = {
-    name: detail?.spec.displayName.zh,
+    name: getAnnotationsAliasName(detail),
   };
 
   const nameValidator = (rule: RuleObject, value: string, callback: any) => {
@@ -47,16 +47,11 @@ function ManageCategoryModal({
         kind: 'Category',
         metadata: {
           name: detail?.metadata.name || res.name,
+          annotations: {
+            'kubesphere.io/alias-name': res.name,
+          },
         },
         spec: {
-          // description: {
-          //   en: 'database1',
-          //   zh: 'database1',
-          // },
-          displayName: {
-            en: res.name,
-            zh: res.name,
-          },
           icon: res.icon,
         },
       } as unknown as Pick<CategoryDetail, 'metadata' | 'spec'>;

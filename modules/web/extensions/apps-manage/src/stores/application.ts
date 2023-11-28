@@ -13,7 +13,7 @@ import { defaultUrl, getBaseOpenPitrixPath, getAppBaseOpenPitrixPath } from './b
 export type ApplicationPathParams = PathParams & {
   cluster_id?: string;
   zone?: string;
-  app_name?: string;
+  appName?: string;
 };
 
 export const CLUSTER_QUERY_STATUS = 'creating|active|failed|deleting|upgrading|created|upgraded';
@@ -46,7 +46,7 @@ export function getApplicationUrl({
   namespace,
   cluster,
   cluster_id,
-  app_name,
+  appName,
 }: ApplicationPathParams = {}): string {
   const url = `${defaultUrl}${getBaseOpenPitrixPath({
     workspace,
@@ -54,8 +54,8 @@ export function getApplicationUrl({
     cluster,
   })}/applications`;
 
-  if (cluster_id || app_name) {
-    return `${url}/${cluster_id || app_name}`;
+  if (cluster_id || appName) {
+    return `${url}/${cluster_id || appName}`;
   }
 
   return url;
@@ -66,7 +66,7 @@ export function getAppUrl({
   namespace,
   cluster,
   cluster_id,
-  app_name,
+  appName,
 }: ApplicationPathParams = {}): string {
   const queryParams = getAppBaseOpenPitrixPath({
     workspace,
@@ -74,8 +74,8 @@ export function getAppUrl({
     cluster,
   });
   let url = `${defaultUrl}/apps`;
-  if (cluster_id || app_name) {
-    url = `${url}/${cluster_id || app_name}`;
+  if (cluster_id || appName) {
+    url = `${url}/${cluster_id || appName}`;
   }
   if (queryParams) {
     url = `${url}${queryParams}`;
@@ -95,15 +95,15 @@ export async function deleteOPApp({
 }
 
 export async function modifyCategoryOPApp(
-  { workspace, cluster, zone, app_name }: ApplicationPathParams,
+  { workspace, cluster, zone, appName }: ApplicationPathParams,
   params: any,
 ): Promise<any> {
-  const url = getAppUrl({ namespace: zone, cluster, workspace, app_name });
+  const url = getAppUrl({ namespace: zone, cluster, workspace, appName });
   return request.patch(url, params);
 }
 
 export async function deleteApplication(applicationName: string): Promise<any> {
-  const url = getApplicationUrl({ app_name: applicationName });
+  const url = getApplicationUrl({ appName: applicationName });
 
   return request.delete(url);
 }
@@ -146,7 +146,9 @@ export function useAppModifyCateGoryMutation(options?: { onSuccess?: () => void 
   return useMutation(
     data => {
       const { baseMutateData = [], param } = data as any;
-      return Promise.allSettled(baseMutateData?.map((item: ApplicationPathParams) => modifyCategoryOPApp(item, param)));
+      return Promise.allSettled(
+        baseMutateData?.map((item: ApplicationPathParams) => modifyCategoryOPApp(item, param)),
+      );
     },
     {
       onSuccess,
@@ -172,9 +174,9 @@ export function fetchApplicationDetail({
   workspace,
   namespace,
   cluster,
-  app_name,
+  appName,
 }: ApplicationPathParams): any {
-  const url = getApplicationUrl({ workspace, namespace, cluster, app_name });
+  const url = getApplicationUrl({ workspace, namespace, cluster, appName });
 
   return request.get(url).then(dataItemFormatter);
 }
@@ -193,12 +195,12 @@ export function useApplicationsList(
   return useList({
     url,
     params: formattedParams,
-    paramsFormatFn: ({ app_name, keyword, ...rest }) => {
+    paramsFormatFn: ({ appName, keyword, ...rest }) => {
       const requestParams = useListQueryParams(rest as UseQueryParamsOption);
       let conditions = requestParams.conditions;
 
-      if (params.app_name) {
-        conditions += `,app_name=${params.app_name}`;
+      if (params.appName) {
+        conditions += `,appName=${params.appName}`;
       }
 
       if (params.keyword) {

@@ -15,19 +15,19 @@ export type AppConfigRefType = {
 
 type Props = {
   appName?: string;
-  versionId?: string;
+  versionID?: string;
   className?: string;
 };
 
 function AppConfigForm(
-  { appName, versionId, className }: Props,
+  { appName, versionID, className }: Props,
   ref?: Ref<AppConfigRefType>,
 ): JSX.Element {
   const [form] = useForm();
   const [isCodeMode, setIsCodeMode] = useState(false);
   const { data: files, isLoading } = useQueryFiles(
-    { name: appName, version_id: versionId },
-    { enabled: !!appName && !!versionId },
+    { name: appName, versionID: versionID },
+    { enabled: !!appName && !!versionID },
   );
   const [config, setConfig] = useState<AppConfigDetail>({
     valuesYaml: '',

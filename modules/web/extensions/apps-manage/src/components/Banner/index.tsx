@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { Return } from '@kubed/icons';
 import { useStore } from '@kubed/stook';
 
-import { AppDetail, Image } from '@ks-console/shared';
+import { AppDetail, Image, getAnnotationsDescription } from '@ks-console/shared';
 
 import { isAppsPageExact } from '../../utils';
 
@@ -60,7 +60,7 @@ function Banner({ onBack }: Props): JSX.Element {
                         alt=""
                       />
                     }
-                    label={appDetail.spec.description.zh || '-'}
+                    label={getAnnotationsDescription(appDetail) || '-'}
                     value={appDetail.metadata.name || '-'}
                   />
                 )}

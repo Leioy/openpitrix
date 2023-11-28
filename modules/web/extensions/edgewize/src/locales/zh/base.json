@@ -1,0 +1,7 @@
+{
+  "EDGEWIZE_LABELS": "边缘标签",
+  "EDGEWIZE_WORKSPACE": "边缘空间",
+  "EDGEWIZE_LABELS_DESC": "绑定边缘标签后，开发者可以在边缘空间和边缘项目下开发边缘应用",
+  "NO_EDGEWIZE_CLUSTER_AVAILABLE": "没有可用的边缘集群",
+  "SETTING_OK": "设置成功"
+}

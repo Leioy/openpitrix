@@ -10,7 +10,7 @@ function VersionLists() {
   const isAdmin = location.pathname.includes('apps-manage/store');
 
   function handleCreate(data: any) {
-    updateVersion({ app_name: appName }, data);
+    updateVersion({ appName: appName }, data);
   }
   return (
     <>

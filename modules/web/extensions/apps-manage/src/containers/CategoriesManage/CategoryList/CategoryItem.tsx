@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 
-import { CategoryDetail, getBrowserLang, Icon, isUnCategorizedCtg } from '@ks-console/shared';
+import {
+  CategoryDetail,
+  Icon,
+  isUnCategorizedCtg,
+  getAnnotationsAliasName,
+} from '@ks-console/shared';
 
 import { Actions, Category, Others } from './styles';
 
@@ -19,7 +24,7 @@ function CategoryItem({
   onEditCategory,
   onDeleteCategory,
 }: Props): JSX.Element {
-  const displayName = detail?.spec?.displayName?.[getBrowserLang()];
+  const displayName = getAnnotationsAliasName(detail);
   // @ts-ignore
   const icons = detail?.spec?.icon;
   const iconName = useMemo(() => {

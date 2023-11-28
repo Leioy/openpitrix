@@ -1,5 +1,5 @@
-// import routes from './routes';
-// import locales from './locales';
+import routes from './routes';
+import locales from './locales';
 
 const menu = {
   parent: 'global',
@@ -21,23 +21,17 @@ const workspaceAppManageMenu = {
   skipAuth: true,
   children: [
     {
-      name: 'bind-edgewize',
-      title: '绑定边缘集群',
-      icon: 'appcenter',
-      skipAuth: true,
-    },
-    {
-      name: 'bind-project',
-      title: '边缘项目',
+      name: 'edgewize/bind-labels',
+      title: '设置边缘标签',
       icon: 'appcenter',
       skipAuth: true,
     },
   ],
 };
 const extensionConfig = {
-  // routes,
-  menus: [menu],
-  // locales,
+  routes,
+  menus: [menu, workspaceAppManageMenu],
+  locales,
 };
 
 globals.context.registerExtension(extensionConfig);

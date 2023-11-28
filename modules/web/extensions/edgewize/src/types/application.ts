@@ -1,4 +1,4 @@
-export interface RepoData {
+export interface Application {
   apiVersion: string;
   kind: string;
   metadata: {
@@ -10,6 +10,7 @@ export interface RepoData {
   };
   spec: {
     name: string;
+    description?: Record<'zh' | 'en', string>;
     credential?: Record<string, unknown>;
     syncPeriod?: number | string;
     url?: string;

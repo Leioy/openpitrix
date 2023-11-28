@@ -34,23 +34,23 @@ export const defaultUrl = 'kapis/application.kubesphere.io/v2';
 export type BaseUrlParams = {
   workspace?: string;
   app_id?: string;
-  version_id?: string;
-  app_name?: string;
+  versionID?: string;
+  appName?: string;
   name?: string;
 };
 
 export function getBaseUrl(
-  { workspace, app_id, version_id, app_name, name }: BaseUrlParams,
+  { workspace, app_id, versionID, appName, name }: BaseUrlParams,
   resourceName: string,
 ): string {
   let prefix = defaultUrl;
-  if (version_id) {
+  if (versionID) {
     const suffix = resourceName === 'versions' ? '' : resourceName;
-    return `${prefix}/apps/${app_name}/versions/${version_id}/${name || suffix}`;
+    return `${prefix}/apps/${appName}/versions/${versionID}/${name || suffix}`;
   }
-  if (app_name) {
+  if (appName) {
     const suffix = (name && `/${name}`) || resourceName === 'apps' ? '' : `/${resourceName}`;
-    return `${prefix}/apps/${app_name}${suffix}`;
+    return `${prefix}/apps/${appName}${suffix}`;
   }
   let query = [];
 
@@ -61,8 +61,8 @@ export function getBaseUrl(
   if (app_id) {
     query.push(`app_id=${app_id}`);
   }
-  if (version_id) {
-    query.push(`version_id=${version_id}`);
+  if (versionID) {
+    query.push(`versionID=${versionID}`);
   }
   if (workspace) {
     query.push(`workspace=${workspace}`);

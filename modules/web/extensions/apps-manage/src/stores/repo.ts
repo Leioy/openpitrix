@@ -2,7 +2,7 @@ import { useMutation, useQuery } from 'react-query';
 import { request, UseListOptions, PathParams } from '@ks-console/shared';
 import { defaultUrl, useBaseList } from './base';
 
-type RepoPathParams = PathParams & { repo_name?: string; app_name?: string; version_id?: string };
+type RepoPathParams = PathParams & { repo_name?: string; appName?: string; versionID?: string };
 
 export function getRepoUrl({ workspace, repo_name, name }: RepoPathParams): string {
   let prefix = defaultUrl;
@@ -19,10 +19,10 @@ export function getRepoUrl({ workspace, repo_name, name }: RepoPathParams): stri
 }
 
 export function useRepoList(
-  { workspace, app_name, version_id }: RepoPathParams,
+  { workspace, appName, versionID }: RepoPathParams,
   options?: Partial<UseListOptions<any>>,
 ) {
-  const url = getRepoUrl({ workspace, app_name, version_id });
+  const url = getRepoUrl({ workspace, appName, versionID });
 
   return useBaseList(url, { format: data => data, ...options }, workspace, 'repos');
 }
@@ -64,8 +64,8 @@ export function useReposDeleteMutation(workspace: string, options?: { onSuccess?
   );
 }
 
-export function fetchRepoDetail(workspace: string, app_name: string): Record<string, any> {
-  const url = getRepoUrl({ workspace, app_name });
+export function fetchRepoDetail(workspace: string, appName: string): Record<string, any> {
+  const url = getRepoUrl({ workspace, appName });
 
   return request.get(url);
 }

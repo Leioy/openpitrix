@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { get } from 'lodash';
 import { Form, FormItem, Modal, useForm, Select } from '@kubed/components';
 
-import { CategoryDetail, Icon, getBrowserLang } from '@ks-console/shared';
+import { CategoryDetail, Icon, getAnnotationsAliasName } from '@ks-console/shared';
 
 import { Body } from './styles';
 
@@ -23,13 +22,11 @@ function ModifyCategoryModal({
 }: Props): JSX.Element {
   const [form] = useForm();
 
-  const userLang = (get(globals.user, 'lang') || getBrowserLang()) as 'en' | 'zh';
-
   const [category, setCategoryId] = useState<string>(categoryId || '');
 
   const options =
-    categories?.map(({ metadata, spec }) => ({
-      label: spec?.displayName?.[userLang],
+    categories?.map(({ metadata }) => ({
+      label: getAnnotationsAliasName({ metadata }),
       value: metadata.name,
     })) ?? [];
 

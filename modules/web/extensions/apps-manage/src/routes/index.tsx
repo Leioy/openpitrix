@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { AppInformation, AuditRecords, InstanceList } from '@ks-console/shared';
+// @ts-ignore
+import { AppInformation, AuditRecords, InstanceList, AppsDashBoard } from '@ks-console/shared';
 
 import ListLayout from '../containers/Base/ListLayout';
 
@@ -27,6 +28,10 @@ export default [
       {
         path: 'store',
         element: <StoreManage />,
+      },
+      {
+        path: 'store/apps',
+        element: <AppsDashBoard />,
       },
       {
         path: 'categories',

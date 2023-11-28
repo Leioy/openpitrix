@@ -7,13 +7,13 @@ import { BasicForm } from './styles';
 
 export type AppAppTemplateBaseInfFormData = {
   name: string;
-  version_id: string;
+  versionID: string;
   description?: string;
 };
 
 type Props = {
   appName: string;
-  versionId?: string;
+  versionID?: string;
   form: FormInstance<AppAppTemplateBaseInfFormData>;
   versionStatus?: string;
   confirmedBasicData?: Partial<AppAppTemplateBaseInfFormData>;
@@ -55,7 +55,7 @@ export function AppTemplateBaseInfForm({ form, confirmedBasicData }: Props): JSX
         <Col span={6}>
           <FormItem
             label={t('VERSION')}
-            name="version_id"
+            name="versionID"
             rules={[{ required: true, message: t('VERSION_EMPTY_DESC') }]}
           >
             <Input maxLength={53} />

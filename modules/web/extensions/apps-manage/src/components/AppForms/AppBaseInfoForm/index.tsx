@@ -18,13 +18,13 @@ export type AppBaseInfoFormRef = {
 
 interface Props {
   appName: string;
-  versionId?: string;
+  versionID?: string;
   versionStatus?: string;
   confirmedData?: AppBaseInfoData;
 }
 
 function AppBaseInfoForm(
-  { appName, versionStatus, confirmedData, versionId }: Props,
+  { appName, versionStatus, confirmedData, versionID }: Props,
   ref?: Ref<AppBaseInfoFormRef>,
 ): JSX.Element {
   const [basicInfoForm] = useForm<AppBasicInfoFormData>();
@@ -45,9 +45,9 @@ function AppBaseInfoForm(
   return (
     <>
       <BasicInfoForm
-        confirmedBasicData={pick(confirmedData, ['name', 'version_id', 'description'])}
+        confirmedBasicData={pick(confirmedData, ['name', 'versionID', 'description'])}
         appName={appName}
-        versionId={versionId}
+        versionID={versionID}
         form={basicInfoForm}
         versionStatus={versionStatus}
       />

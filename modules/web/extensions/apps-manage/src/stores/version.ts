@@ -5,7 +5,7 @@ import type { AppVersion } from '@ks-console/shared';
 
 import { BaseUrlParams, getBaseUrl, useBaseList } from './base';
 
-type VersionPathParams = { workspace?: string; app_name?: string };
+type VersionPathParams = { workspace?: string; appName?: string };
 
 const resourceName = 'versions';
 
@@ -19,11 +19,11 @@ export const DEFAULT_QUERY_VERSION_STATUS =
   'draft|submitted|rejected|in-review|passed|active|suspended';
 
 export function useAppVersionList(
-  { workspace, app_name }: VersionPathParams,
+  { workspace, appName }: VersionPathParams,
   params?: Record<string, any>,
   options?: any,
 ): UseListInstance<AppVersion> {
-  const url = getBaseUrl({ workspace, app_name }, resourceName);
+  const url = getBaseUrl({ workspace, appName }, resourceName);
   const formattedParams = {
     ...params,
     status: params?.status || DEFAULT_QUERY_VERSION_STATUS,
@@ -34,7 +34,7 @@ export function useAppVersionList(
     url,
     {
       params: formattedParams,
-      autoFetch: !!app_name,
+      autoFetch: !!appName,
       ...options,
     },
     resourceName,
@@ -42,41 +42,41 @@ export function useAppVersionList(
 }
 
 export function useVersionDetail(
-  { app_name, version_id }: BaseUrlParams,
+  { appName, versionID }: BaseUrlParams,
   options?: UseQueryOptions<any, Error>,
 ): UseQueryResult<AppVersion> {
-  const url = getBaseUrl({ app_name, version_id }, resourceName);
+  const url = getBaseUrl({ appName, versionID }, resourceName);
 
-  return useQuery(['apps', 'detail', app_name, version_id], () => request.get(url), {
-    enabled: !!version_id && !!app_name,
+  return useQuery(['apps', 'detail', appName, versionID], () => request.get(url), {
+    enabled: !!versionID && !!appName,
     onSuccess: options?.onSuccess,
   });
 }
 
-export function createVersion({ app_name }: BaseUrlParams, data: any): Promise<any> {
-  const url = getBaseUrl({ app_name }, resourceName);
+export function createVersion({ appName }: BaseUrlParams, data: any): Promise<any> {
+  const url = getBaseUrl({ appName }, resourceName);
 
   return request.post(url, data);
 }
 
 export function deleteVersion({
   workspace,
-  app_name,
-  version_id,
+  appName,
+  versionID,
 }: Omit<BaseUrlParams, 'name'>): Promise<any> {
-  const url = getBaseUrl({ workspace, app_name, version_id }, resourceName);
+  const url = getBaseUrl({ workspace, appName, versionID }, resourceName);
 
   return request.delete(url);
 }
 
-export function updateVersion<T>({ app_name, version_id }: BaseUrlParams, data: T): Promise<any> {
-  const url = getBaseUrl({ app_name, version_id }, resourceName);
+export function updateVersion<T>({ appName, versionID }: BaseUrlParams, data: T): Promise<any> {
+  const url = getBaseUrl({ appName, versionID }, resourceName);
 
   return request.post(url, data);
 }
 
-export function handleVersion({ app_name, version_id }: BaseUrlParams, data: any): Promise<any> {
-  const url = getBaseUrl({ app_name, version_id, name: 'action' }, resourceName);
+export function handleVersion({ appName, versionID }: BaseUrlParams, data: any): Promise<any> {
+  const url = getBaseUrl({ appName, versionID, name: 'action' }, resourceName);
 
   return request.post(url, data);
 }

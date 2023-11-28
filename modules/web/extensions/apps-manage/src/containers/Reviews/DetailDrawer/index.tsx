@@ -11,6 +11,7 @@ import {
   openpitrixStore,
   LabelText,
   getBrowserLang,
+  getAnnotationsDescription,
 } from '@ks-console/shared';
 
 import InfoDetail from './InfoDetail';
@@ -43,14 +44,14 @@ function DetailDrawer({
   const [tabKey, setTabKey] = useState<string>('appInfo');
   const appName = detail.metadata.labels['app.kubesphere.io/app-id'];
   const { data: appDetail } = useAppDetail({
-    app_name: appName,
+    appName,
   });
   const { data: versionDetail } = useVersionDetail({
-    app_name: appName,
-    version_id: detail.metadata.name,
+    appName,
+    versionID: detail.metadata.name,
   });
   const { data: files = {} } = fileStore.useQueryFiles(
-    { name: appName, version_id: detail.metadata.name },
+    { name: appName, versionID: detail.metadata.name },
     { enabled: !!appName && !!detail.metadata.name },
   );
   const readme = useMemo(() => {
@@ -89,7 +90,7 @@ function DetailDrawer({
           canEdit={false}
           fileStore={fileStore}
           appName={appDetail?.metadata.name}
-          versionId={detail?.metadata.name}
+          versionID={detail?.metadata.name}
           type={'MODIFY_VERSION'}
           packageName={getPackageName(versionDetail, appDetail?.metadata.name)}
           updateTime={detail?.update_time || detail?.status_time}
@@ -100,7 +101,7 @@ function DetailDrawer({
     updateLog: (
       <>
         <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{versionDetail?.spec.description[getBrowserLang()] || t('NO_UPDATE_LOG_DESC')}</pre>
+        <pre>{getAnnotationsDescription(versionDetail) || t('NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };

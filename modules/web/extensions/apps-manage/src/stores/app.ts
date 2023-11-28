@@ -40,8 +40,8 @@ export function useAppList(
   return useBaseList<AppDetail>(url, { format: data => data, ...options }, workspace, resourceName);
 }
 
-export function fetchAppDetail({ workspace, app_name }: BaseUrlParams): Promise<AppDetail> {
-  const url = getBaseUrl({ workspace, app_name }, resourceName);
+export function fetchAppDetail({ workspace, appName }: BaseUrlParams): Promise<AppDetail> {
+  const url = getBaseUrl({ workspace, appName }, resourceName);
 
   return request.get(url);
 }
@@ -53,7 +53,7 @@ export function useAppDetail(
   return useQuery(
     ['apps', 'detail', name],
     () => {
-      return fetchAppDetail({ workspace, app_name: name }).then((result: Record<string, any>) => {
+      return fetchAppDetail({ workspace, appName: name }).then((result: Record<string, any>) => {
         // multi-languages
         const userLang = get(globals.user, 'lang') || getBrowserLang();
 
@@ -78,17 +78,17 @@ export function createApp({ workspace }: BaseUrlParams, data: any): Promise<any>
   return request.post(url, data);
 }
 
-export function deleteApp({ workspace, app_name }: BaseUrlParams): Promise<void> {
-  const url = getBaseUrl({ workspace, app_name }, resourceName);
+export function deleteApp({ workspace, appName }: BaseUrlParams): Promise<void> {
+  const url = getBaseUrl({ workspace, appName }, resourceName);
 
   return request.delete(url);
 }
 
 export function updateApp(
-  { workspace, app_name }: BaseUrlParams,
+  { workspace, appName }: BaseUrlParams,
   data: Partial<AppDetail>,
 ): Promise<void> {
-  const url = getBaseUrl({ workspace, app_name }, resourceName);
+  const url = getBaseUrl({ workspace, appName }, resourceName);
 
   return request.patch(url, data);
 }
@@ -114,8 +114,8 @@ export async function deployApp(
 
 type UploadData = { type: string; attachment_content: string; sequence: number };
 
-export function upload({ app_name, workspace }: BaseUrlParams, data: UploadData): Promise<any> {
-  const url = getBaseUrl({ app_name, workspace }, resourceName);
+export function upload({ appName, workspace }: BaseUrlParams, data: UploadData): Promise<any> {
+  const url = getBaseUrl({ appName, workspace }, resourceName);
 
   return request.patch(url, data);
 }
@@ -154,8 +154,8 @@ export function useScreenShotsMutation(
   );
 }
 
-export function handleApp({ app_name, workspace }: BaseUrlParams, data: any): Promise<any> {
-  const url = getBaseUrl({ app_name, workspace, name: 'action' }, resourceName);
+export function handleApp({ appName, workspace }: BaseUrlParams, data: any): Promise<any> {
+  const url = getBaseUrl({ appName, workspace, name: 'action' }, resourceName);
 
   return request.post(url, data);
 }

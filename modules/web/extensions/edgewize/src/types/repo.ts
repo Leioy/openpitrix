@@ -10,6 +10,7 @@ export interface RepoData {
   };
   spec: {
     name: string;
+    description?: Record<'zh' | 'en', string>;
     credential?: Record<string, unknown>;
     syncPeriod?: number | string;
     url?: string;

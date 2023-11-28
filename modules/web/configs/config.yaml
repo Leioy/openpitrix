@@ -2,12 +2,13 @@ client:
   title: KubeSphere
   description: ""
   encryptKey: kubesphere
-  disableAuthorization: false
+  disableAuthorization: true
   # apps manage page navigations
   manageAppNavs:
     - name: "apps"
       children:
         - { name: store, title: APPS, icon: appcenter }
+        - { name: store/apps, title: APP_STORE, icon: appcenter }
         - { name: categories, title: APP_CATEGORY_PL, icon: tag }
         - { name: reviews, title: APP_REVIEW, icon: safe-notice }
         - { name: repo, title: APP_REPOSITORY_PL, icon: safe-notice }

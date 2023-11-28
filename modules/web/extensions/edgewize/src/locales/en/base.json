@@ -1,0 +1,7 @@
+{
+  "name": "Name",
+  "MODIFY_CATEGORY": "Modify category",
+  "MODIFY_CATEGORY_HELP": "The app category will determine the app's category in the Store.",
+  "MODIFY_CATEGORY_REQUIRED": "Please select a category",
+  "MODIFY_CATEGORY_SUCCESSFULLY": "The change classification operation succeeded"
+}

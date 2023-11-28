@@ -11,6 +11,7 @@ import {
   AppDetail,
   useBatchActions,
   DeleteConfirmModal,
+  getAnnotationsAliasName,
 } from '@ks-console/shared';
 import {
   useCategoryList,
@@ -44,7 +45,7 @@ function CategoriesManage(): JSX.Element {
       searchable: true,
       render: (name, app) => (
         <TableItemField
-          label={app.spec.displayName.zh}
+          label={getAnnotationsAliasName(app)}
           value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
           // @ts-ignore TODO
           avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
@@ -144,7 +145,7 @@ function CategoriesManage(): JSX.Element {
           workspace: metadata.labels?.['kubesphere.io/workspace'],
           cluster: metadata.labels?.['kubesphere.io/cluster'],
           // zone,
-          app_name: metadata.name,
+          appName: metadata.name,
         };
       });
 

@@ -17,13 +17,13 @@ const { fileStore } = openpitrixStore;
 
 export type AppBasicInfoFormData = {
   name: string;
-  version_id: string;
+  versionID: string;
   description?: string;
 };
 
 type Props = {
   appName: string;
-  versionId?: string;
+  versionID?: string;
   form: FormInstance<AppBasicInfoFormData>;
   versionStatus?: string;
   confirmedBasicData?: Partial<AppBasicInfoFormData>;
@@ -31,18 +31,18 @@ type Props = {
 
 export function BasicInfoForm({
   appName,
-  versionId: defaultVersionId,
+  versionID: defaultVersionId,
   form,
   versionStatus,
   confirmedBasicData,
 }: Props): JSX.Element {
   const [initData, setInitData] = useState<Partial<AppBasicInfoFormData>>();
-  const { data: versions } = useAppVersionList({ app_name: appName }, { status: versionStatus });
+  const { data: versions } = useAppVersionList({ appName }, { status: versionStatus });
   const sortedVersions = useMemo(
     () =>
       (versions || [])
         .map(version => ({
-          label: version.spec.version,
+          label: version.spec.versionName,
           value: isRadonDB(appName) ? version.metadata.name : version.metadata.name,
         }))
         .sort((v1, v2) => compareVersion(v2.value, v1.value)),
@@ -64,16 +64,16 @@ export function BasicInfoForm({
         setInitData({
           // @ts-ignore TODO
           name: `${name.slice(0, 7).toLowerCase().replaceAll(' ', '-')}-${generateId()}`,
-          // TODO latest_app_version.version_id?
-          version_id: defaultVersionId || name,
+          // TODO latest_app_version.versionID?
+          versionID: defaultVersionId || name,
         });
       },
     },
   );
 
-  function handleVersionChange(versionId: string): void {
+  function handleVersionChange(versionID: string): void {
     fileStore
-      .fetchAppFiles({ name: appName, version_id: versionId })
+      .fetchAppFiles({ name: appName, versionID })
       .then(fileDetails => console.log(fileDetails));
   }
 
@@ -110,7 +110,7 @@ export function BasicInfoForm({
         <Col span={6}>
           <FormItem
             label={t('VERSION')}
-            name="version_id"
+            name="versionID"
             rules={[{ required: true, message: t('VERSION_EMPTY_DESC') }]}
           >
             <Select style={{ width: '100%' }} onChange={handleVersionChange}>

@@ -2,7 +2,13 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import ReactMarkdown from 'react-markdown';
 
-import { AppDetail, getBrowserLang, Image, LabelText } from '@ks-console/shared';
+import {
+  AppDetail,
+  getAnnotationsAliasName,
+  Image,
+  LabelText,
+  getAnnotationsDescription,
+} from '@ks-console/shared';
 
 import BaseInfo from './BaseInfo';
 
@@ -42,13 +48,13 @@ function InfoDetail({ detail, versionName }: Props): JSX.Element {
         }
         label={
           <PreField
-            value={<pre>{detail.spec.description.zh || '-'}</pre>}
+            value={<pre>{getAnnotationsAliasName(detail) || '-'}</pre>}
             label={t('INTRODUCTION')}
           />
         }
       />
       <LabelText>{t('APP_DESCRIPTION')}</LabelText>
-      <ReactMarkdown>{detail.spec.description[getBrowserLang()] || t('NONE')}</ReactMarkdown>
+      <ReactMarkdown>{getAnnotationsDescription(detail) || t('NONE')}</ReactMarkdown>
       <LabelText>{t('APP_SCREENSHOTS')}</LabelText>
       {isEmpty(screenshots) ? (
         <p>{t('NONE')}</p>
