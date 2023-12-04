@@ -9,7 +9,7 @@ type Props = {
   tableRef?: any;
   filter?: boolean;
   columns: Column[];
-  categoryId?: string;
+  categoryName?: string;
   batchActions?: ReactNode[] | null;
   toolbarRight?: ReactNode[] | null;
   emptyOptions?: any;
@@ -17,7 +17,7 @@ type Props = {
 
 function AppDataTable({
   columns,
-  categoryId,
+  categoryName,
   batchActions,
   toolbarRight,
   tableRef,
@@ -26,12 +26,12 @@ function AppDataTable({
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
-      category_id: categoryId,
+      category_id: categoryName,
       order: SORT_KEY,
       status: 'active|rejected|passed|suspended|draft',
       // repo_id: 'repo-helm',
     };
-  }, [categoryId]);
+  }, [categoryName]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
     const { parameters, pageIndex, pageSize, filters } = params;
@@ -45,8 +45,8 @@ function AppDataTable({
       limit: pageSize,
       conditions: `status=${parameters.status}`,
     };
-    if (categoryId) {
-      querys.label = `app.kubesphere.io/app-category-name=${categoryId}`;
+    if (categoryName) {
+      querys.label = `app.kubesphere.io/app-category-name=${categoryName}`;
     }
 
     if (keyword) {

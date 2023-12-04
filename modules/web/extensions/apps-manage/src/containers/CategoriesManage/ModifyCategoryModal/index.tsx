@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Form, FormItem, Modal, useForm, Select } from '@kubed/components';
 
-import { CategoryDetail, Icon, getAnnotationsAliasName } from '@ks-console/shared';
+import { CategoryDetail, Icon, getAnnotationsName } from '@ks-console/shared';
 
 import { Body } from './styles';
 
 type Props = {
   visible: boolean;
-  categoryId: string;
+  categoryName: string;
   categories: CategoryDetail[];
   onOk?: (data: string) => void;
   onCancel: () => void;
@@ -15,18 +15,27 @@ type Props = {
 
 function ModifyCategoryModal({
   visible,
-  categoryId,
+  categoryName,
   categories,
   onOk,
   onCancel,
 }: Props): JSX.Element {
   const [form] = useForm();
 
-  const [category, setCategoryId] = useState<string>(categoryId || '');
+  const [category, setcategoryName] = useState<string>(categoryName || '');
 
   const options =
     categories?.map(({ metadata }) => ({
-      label: getAnnotationsAliasName({ metadata }),
+      label: t(
+        `APP_CATE_${getAnnotationsName({ metadata }, 'kubesphere.io/alias-name')
+          ?.toUpperCase()
+          .replace(/[^A-Z]+/g, '_')}`,
+        {
+          defaultValue:
+            getAnnotationsName({ metadata }, 'kubesphere.io/alias-name') ||
+            (metadata.name === 'kubesphere-app-uncategorized' ? '未分类' : metadata.name),
+        },
+      ),
       value: metadata.name,
     })) ?? [];
 
@@ -54,7 +63,7 @@ function ModifyCategoryModal({
             help={t('MODIFY_CATEGORY_HELP')}
             rules={[{ required: true, message: t('MODIFY_CATEGORY_REQUIRED') }]}
           >
-            <Select value={category} options={options} onChange={setCategoryId} />
+            <Select value={category} options={options} onChange={setcategoryName} />
           </FormItem>
         </Form>
       </Body>

@@ -1,7 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-// @ts-ignore
-import { AppInformation, AuditRecords, InstanceList, AppsDashBoard } from '@ks-console/shared';
+import {
+  AppInformation,
+  AuditRecords,
+  InstanceList,
+  AppsDashBoard,
+  AppBaseLayout,
+  NewVersionList as VersionList,
+} from '@ks-console/shared';
 
 import ListLayout from '../containers/Base/ListLayout';
 
@@ -12,11 +18,20 @@ import CategoriesManage from '../containers/CategoriesManage';
 import ApplicationManage from '../containers/AppInstanceManage';
 import StoreManage from '../containers/StoreManage';
 import AppDetailPage from '../containers/AppDetailPage';
-import VersionList from '../containers/AppDetailPage/VersionList';
 
 const PATH = '/apps-manage';
 
 export default [
+  {
+    path: '/jsjk-apps',
+    element: <AppBaseLayout />,
+    children: [
+      {
+        index: true,
+        element: <AppsDashBoard />,
+      },
+    ],
+  },
   {
     path: PATH,
     element: <ListLayout />,
@@ -28,10 +43,6 @@ export default [
       {
         path: 'store',
         element: <StoreManage />,
-      },
-      {
-        path: 'store/apps',
-        element: <AppsDashBoard />,
       },
       {
         path: 'categories',

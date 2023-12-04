@@ -41,17 +41,19 @@ function ManageCategoryModal({
 
   function handleOK(): void {
     form.validateFields().then(res => {
+      const name = res.metadata.annotations?.['kubesphere.io/alias-name'] || res.name;
       const params = {
         apiVersion: 'application.kubesphere.io/v2',
         kind: 'Category',
         metadata: {
           name: detail?.metadata.name || res.name,
+          ...res.metadata,
           annotations: {
-            'kubesphere.io/alias-name': res.name,
+            'kubesphere.io/alias-name': name,
           },
         },
         spec: {
-          icon: res.icon,
+          icon: res.spec.icon,
         },
       } as unknown as Pick<CategoryDetail, 'metadata' | 'spec'>;
       if (onOk) {
@@ -81,7 +83,14 @@ function ManageCategoryModal({
           >
             <Input autoComplete="off" maxLength={20} />
           </FormItem>
-          <FormItem name={['icon']} label={t('ICON')}>
+          <FormItem
+            label={t('ALIAS')}
+            help={t('ALIAS_DESC')}
+            name={['metadata', 'annotations', 'kubesphere.io/alias-name']}
+          >
+            <Input maxLength={63} />
+          </FormItem>
+          <FormItem name={['spec', 'icon']} label={t('ICON')}>
             <IconSelector />
           </FormItem>
         </Form>

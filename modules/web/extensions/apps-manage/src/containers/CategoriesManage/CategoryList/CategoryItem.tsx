@@ -30,6 +30,10 @@ function CategoryItem({
   }, [icons]);
 
   function getName(name: string) {
+    const aliasName = detail.metadata?.annotations?.['kubesphere.io/alias-name'];
+    if (aliasName) {
+      return aliasName;
+    }
     if (name === 'kubesphere-app-uncategorized') {
       return 'UNCATEGORIZED';
     }

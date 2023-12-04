@@ -134,15 +134,15 @@ function CategoriesManage(): JSX.Element {
   const handleOk = async (
     data: Pick<CategoryDetail, 'metadata' | 'spec'>,
   ): Promise<Promise<void>> => {
-    const categoryId = currentManageCategory?.metadata?.name;
+    const categoryName = currentManageCategory?.metadata?.name;
 
-    if (!categoryId) {
+    if (!categoryName) {
       await createCategory(data);
     } else {
-      await updateCategory(categoryId, data);
+      await updateCategory(categoryName, data);
     }
 
-    mutateSuccess(t(categoryId ? 'MODIFY_SUCCESSFUL' : 'CREATE_SUCCESSFUL'));
+    mutateSuccess(t(categoryName ? 'MODIFY_SUCCESSFUL' : 'CREATE_SUCCESSFUL'));
   };
 
   const handleModifyCategoryOk = async (category: string): Promise<Promise<void>> => {
@@ -163,7 +163,7 @@ function CategoriesManage(): JSX.Element {
       try {
         await modifyCategoryMutation.mutateAsync({
           baseMutateData,
-          param: { category_id: category },
+          param: { categoryName: category },
         } as any);
       } catch (error) {
         console.error('Mutation failed:', error);
@@ -203,7 +203,7 @@ function CategoriesManage(): JSX.Element {
               tableRef={tableRef}
               columns={columns as any}
               batchActions={renderBatchActions()}
-              categoryId={selectedCategory.metadata?.name}
+              categoryName={selectedCategory.metadata?.name}
             />
           )}
         </SecondColumn>
@@ -228,7 +228,7 @@ function CategoriesManage(): JSX.Element {
       {modalType === 'modify' && selectedCategory?.metadata?.name && (
         <ModifyCategoryModal
           visible={true}
-          categoryId={selectedCategory.metadata?.name}
+          categoryName={selectedCategory.metadata?.name}
           onCancel={closeModal}
           onOk={handleModifyCategoryOk}
           categories={categories}

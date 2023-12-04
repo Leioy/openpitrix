@@ -101,7 +101,7 @@ function DetailDrawer({
     updateLog: (
       <>
         <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{getAnnotationsDescription(versionDetail) || t('NO_UPDATE_LOG_DESC')}</pre>
+        <pre>{versionDetail?.status.message || t('NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };

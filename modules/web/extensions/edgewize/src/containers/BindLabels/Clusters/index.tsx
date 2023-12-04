@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { isEmpty } from 'lodash';
 import { Cluster } from '@kubed/icons';
 import { Card, Switch, notify } from '@kubed/components';
 import { useStore } from '@kubed/stook';
-import { FormattedCluster, isMultiCluster } from '@ks-console/shared';
+import { FormattedCluster, isMultiCluster, workspaceStore } from '@ks-console/shared';
 import ClusterCard from './Card';
 import { editWorkspaceLabels } from '../../../stores';
 import { EmptyWrapper } from './styles';
 
+const { getListUrl } = workspaceStore;
 function Clusters() {
   const { workspace } = useParams<{ workspace: string }>();
   const [clusters] = useStore('clusters');
-  const [workspaces] = useStore('workspaces');
+  const [workspaces, setWorkspace] = useStore('workspaces');
 
   const edgeClusters = clusters?.filter(
     (item: { provider: string }) => item.provider === 'EdgeWize',
   );
-  const labels = workspaces?.metadata?.labels?.['cluster-role.kubesphere.io/edge'];
-  const [isEdgewize, setIsEdgewize] = useState(!!labels);
+  const [isEdgewize, setIsEdgewize] = useState(false);
+
+  useEffect(async () => {
+    const data = await getListUrl({ name: workspace });
+    setWorkspace(data);
+    const labels = data?.metadata?.labels?.['cluster-role.kubesphere.io/edge'];
+    setIsEdgewize(!!labels);
+  }, []);
 
   function handleModeChange(val: boolean) {
     setIsEdgewize(val);
@@ -55,6 +62,7 @@ function Clusters() {
     );
   }
 
+  console.log(123, isEdgewize, workspaces);
   return (
     <>
       <div>

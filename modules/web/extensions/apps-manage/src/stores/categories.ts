@@ -65,7 +65,7 @@ export function deleteCategory(category_id: string) {
 }
 
 export function updateCategory(category_id: string, data: any) {
-  return request.patch(getCategoriesUrl(category_id), data);
+  return request.post(getCategoriesUrl(category_id), data);
 }
 
 export function createCategory(data: Pick<CategoryDetail, 'metadata' | 'spec'>) {
