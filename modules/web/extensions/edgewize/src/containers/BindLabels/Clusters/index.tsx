@@ -9,23 +9,29 @@ import ClusterCard from './Card';
 import { editWorkspaceLabels } from '../../../stores';
 import { EmptyWrapper } from './styles';
 
-const { getListUrl } = workspaceStore;
+const { useFetchWorkspaceQuery } = workspaceStore;
 function Clusters() {
-  const { workspace } = useParams<{ workspace: string }>();
+  const { workspace = '' } = useParams<{ workspace: string }>();
   const [clusters] = useStore('clusters');
-  const [workspaces, setWorkspace] = useStore('workspaces');
 
   const edgeClusters = clusters?.filter(
     (item: { provider: string }) => item.provider === 'EdgeWize',
   );
   const [isEdgewize, setIsEdgewize] = useState(false);
+  const { data: workspaces } = useFetchWorkspaceQuery({
+    workspace,
+  });
 
-  useEffect(async () => {
-    const data = await getListUrl({ name: workspace });
-    setWorkspace(data);
-    const labels = data?.metadata?.labels?.['cluster-role.kubesphere.io/edge'];
+  async function fetch() {
+    const labels = workspaces?.metadata?.labels?.['cluster-role.kubesphere.io/edge'];
     setIsEdgewize(!!labels);
-  }, []);
+  }
+
+  useEffect(() => {
+    if (workspaces) {
+      fetch();
+    }
+  }, [workspaces]);
 
   function handleModeChange(val: boolean) {
     setIsEdgewize(val);
@@ -62,7 +68,6 @@ function Clusters() {
     );
   }
 
-  console.log(123, isEdgewize, workspaces);
   return (
     <>
       <div>
