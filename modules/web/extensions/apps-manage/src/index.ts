@@ -11,38 +11,6 @@ const menu = {
   ksModule: 'openpitrix',
   authKey: 'manage-app',
   authAction: 'manage',
-  children: [
-    {
-      name: 'store',
-      title: 'APPS',
-      icon: 'appcenter',
-    },
-    {
-      name: 'categories',
-      title: 'APP_CATEGORY_PL',
-      icon: 'tag',
-    },
-    {
-      name: 'reviews',
-      title: 'APP_REVIEW',
-      icon: 'safe-notice',
-    },
-    {
-      name: 'store',
-      title: 'APPS',
-      icon: 'appcenter',
-    },
-    {
-      name: 'repo',
-      title: 'APP_REPOSITORY_PL',
-      icon: 'safe-notice',
-    },
-    {
-      name: 'deploy',
-      title: 'DEPLOY_MANAGE',
-      icon: 'safe-notice',
-    },
-  ],
 };
 
 const globalApps = {

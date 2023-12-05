@@ -150,7 +150,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
     return {
       ...formattedParams,
-      conditions: formattedParams.conditions + `,keyword=${keyword}`,
+      name: keyword,
+      conditions: formattedParams.conditions,
     };
   };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Openpitrix } from '@kubed/icons';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
-
+import { navs as navMenus } from './contants';
 import { NavMenu, NavTitle, useGlobalStore, permissionStore } from '@ks-console/shared';
 
 const PageSide = styled.div`
@@ -26,13 +26,13 @@ const { getProjectNavs, getWorkspaceNavs } = permissionStore();
 function ListLayout(): JSX.Element {
   const location = useLocation();
   const { workspace, namespace, cluster } = useParams();
-  const navKey = namespace ? 'PROJECT_NAV' : workspace? `WORKSPACE_NAV-${workspace}` : NAV_KEY;
+  const navKey = namespace ? 'PROJECT_NAV' : workspace ? `WORKSPACE_NAV-${workspace}` : NAV_KEY;
   const { getNav, setNav } = useGlobalStore();
   let navs = getNav(navKey);
   const [prefix, setPrefix] = useState('/apps-manage');
   const [title, setTitle] = useState('APP_STORE_MANAGEMENT');
   const [subTitle, setSubTitle] = useState('');
-  
+
   useEffect(() => {
     if (namespace) {
       navs = getProjectNavs({ cluster, workspace, project: namespace });
@@ -47,7 +47,7 @@ function ListLayout(): JSX.Element {
       setTitle(workspace);
       setSubTitle(t('WORKSPACE'));
     } else {
-      setNav(NAV_KEY, globals.config.manageAppNavs);
+      setNav(NAV_KEY, navMenus);
       setPrefix('/apps-manage');
       setTitle(t('APP_STORE_MANAGEMENT'));
       setSubTitle(t('APP_STORE_MANAGEMENT_DESC'));

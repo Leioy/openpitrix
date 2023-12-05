@@ -6,6 +6,7 @@ import {
   InstanceList,
   AppsDashBoard,
   AppBaseLayout,
+  AppStoreDetails,
   NewVersionList as VersionList,
 } from '@ks-console/shared';
 
@@ -30,6 +31,8 @@ export default [
         index: true,
         element: <AppsDashBoard />,
       },
+      { path: ':appName', element: <AppStoreDetails /> },
+      { path: ':appName/deploy', element: <AppStoreDetails /> },
     ],
   },
   {

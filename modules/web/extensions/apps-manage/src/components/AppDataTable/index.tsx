@@ -50,7 +50,7 @@ function AppDataTable({
     }
 
     if (keyword) {
-      querys.conditions += `,keyword=${keyword}`;
+      querys.name = keyword;
     }
 
     return querys;

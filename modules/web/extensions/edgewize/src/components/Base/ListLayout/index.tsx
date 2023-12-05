@@ -1,15 +1,20 @@
 import React, { useEffect } from 'react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Enterprise } from '@kubed/icons';
-import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { useModal } from '@kubed/components';
 
+import type { FormattedWorkspace } from '@ks-console/shared';
 import {
   NavMenu,
   NavTitle,
   useGlobalStore,
-  permissionStore,
   workspaceStore,
+  permissionStore,
 } from '@ks-console/shared';
+import WorkspaceSelectorModal from '../../WorkspaceSelectorModal';
+
+const { useFetchWorkspaceQuery } = workspaceStore;
 
 const PageSide = styled.div`
   position: fixed;
@@ -26,41 +31,70 @@ const PageMain = styled.div`
   overflow-x: hidden;
 `;
 
-const NAV_KEY = 'WORKSPACE_NAV';
+const navKey = 'WORKSPACE_NAV';
 
-const { useFetchWorkspaceQuery } = workspaceStore;
 function ListLayout(): JSX.Element {
   const location = useLocation();
-  const { workspace = '', cluster } = useParams();
-  const { getWorkspaceNavs } = permissionStore();
-  const keys = `${NAV_KEY}-${workspace}`;
+  const navigate = useNavigate();
+  const params = useParams<'workspace' | 'cluster'>();
+  const { workspace: workspaceName = '', cluster } = params;
   const { getNav, setNav } = useGlobalStore();
-  let navs = getNav(keys);
+  const { getWorkspaceNavs } = permissionStore();
+  let navs = getNav(`${navKey}-${workspaceName}`);
+  const modal = useModal();
 
   const { workspaceDetail } = useFetchWorkspaceQuery({
-    workspace,
+    workspace: workspaceName,
     cluster,
-    enabled: Boolean(workspace),
+    enabled: Boolean(workspaceName),
   });
+
+  // TODO 临时添加。为了应用商店获取边缘标签的 等后期应用商店内部自己调用接口查询则可以取消
+  useEffect(() => {
+    sessionStorage.setItem(
+      'edgewize-workspace',
+      workspaceDetail?.metadata?.labels?.['cluster-role.kubesphere.io/edge'] || '',
+    );
+  }, [workspaceDetail]);
+
+  const handleSelect = (modalId: string, formattedWorkspace: FormattedWorkspace) => {
+    navigate(`/workspaces/${formattedWorkspace.name}/overview`);
+    modal.close(modalId);
+  };
+
+  const openWorkspaceSelector = () => {
+    const modalId = modal.open({
+      titleIcon: <Enterprise size={40} />,
+      title: t('WORKSPACE_PL'),
+      description: t('WORKSPACE_DESC'),
+      footer: null,
+      width: 960,
+      content: (
+        <WorkspaceSelectorModal
+          onSelect={formattedWorkspace => handleSelect(modalId, formattedWorkspace)}
+        />
+      ),
+    });
+  };
 
   useEffect(() => {
     if (!navs) {
-      navs = getWorkspaceNavs(workspace);
-      setNav(keys, navs);
+      navs = getWorkspaceNavs(workspaceName);
+      setNav(`${navKey}-${workspaceName}`, navs);
     }
   }, []);
+
   return (
     <>
       <PageSide>
         <NavTitle
           icon={<Enterprise variant="light" size={40} />}
-          title={workspace}
+          title={workspaceName}
           subtitle={workspaceDetail?.description || t('WORKSPACE')}
           style={{ marginBottom: '20px' }}
+          onClick={openWorkspaceSelector}
         />
-        {navs && (
-          <NavMenu navs={navs} prefix={`/workspaces/${workspace}`} pathname={location.pathname} />
-        )}
+        <NavMenu navs={navs} prefix={`/workspaces/${workspaceName}`} pathname={location.pathname} />
       </PageSide>
       <PageMain>
         <Outlet />
