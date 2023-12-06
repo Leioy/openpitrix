@@ -49,14 +49,6 @@ function ListLayout(): JSX.Element {
     enabled: Boolean(workspaceName),
   });
 
-  // TODO 临时添加。为了应用商店获取边缘标签的 等后期应用商店内部自己调用接口查询则可以取消
-  useEffect(() => {
-    sessionStorage.setItem(
-      'edgewize-workspace',
-      workspaceDetail?.metadata?.labels?.['cluster-role.kubesphere.io/edge'] || '',
-    );
-  }, [workspaceDetail]);
-
   const handleSelect = (modalId: string, formattedWorkspace: FormattedWorkspace) => {
     navigate(`/workspaces/${formattedWorkspace.name}/overview`);
     modal.close(modalId);

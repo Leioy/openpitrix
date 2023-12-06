@@ -20,9 +20,10 @@
   "MODIFY_CATEGORY_REQUIRED": "请选择一个分类",
   "MODIFY_CATEGORY_SUCCESSFULLY": "更改分类操作成功",
   "NO_APP_REPO_FOUND": "未发现应用仓库",
-  "APPROVE_AND_RELEASE": "批准并发表",
+  "APPROVE_AND_RELEASE": "批准",
   "create_edge_APPS": "创建边缘模板",
   "SUBMITTED_SUCCESSFUL": "提交成功",
   "DELETED_SUCCESSFUL": "删除成功",
-  "Submitter": "提交者"
+  "Submitter": "提交者",
+  "RELEASE_SUCCESSFUL": "审核通过"
 }

@@ -181,7 +181,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
       versionID: selectedRow.metadata.name,
       // @ts-ignore TODO
       state: action,
-      userName: globals.user.username,
+      // userName: globals.user.username,
       message,
     });
     setIsSubmitting(false);

@@ -21,7 +21,7 @@ const workspaceAppManageMenu = {
   skipAuth: true,
   children: [
     {
-      name: 'edgewize/bind-labels',
+      name: 'edgesetting',
       title: '设置边缘标签',
       icon: 'appcenter',
       skipAuth: true,
