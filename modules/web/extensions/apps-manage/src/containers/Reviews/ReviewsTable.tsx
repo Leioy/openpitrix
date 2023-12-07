@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { notify } from '@kubed/components';
-import { omit } from 'lodash';
 import { Icon, TableRef, getAnnotationsDescription } from '@ks-console/shared';
 import {
   Image,
@@ -11,11 +10,7 @@ import {
   StatusIndicator,
   openpitrixStore,
   useListQueryParams,
-  DeployVersionModal,
-  DeployYamlModal,
-  useV3action,
-  safeBtoa,
-  ChooseSpaceModal,
+  AppsDeploySpaceModal,
 } from '@ks-console/shared';
 import { getReviewsUrl } from '../../stores';
 
@@ -28,22 +23,14 @@ import ReviewRejectModal from './ReviewRejectModal';
 type Props = {
   type: string;
 };
-const { REVIEW_QUERY_STATUS, deployApp } = openpitrixStore;
+const { REVIEW_QUERY_STATUS } = openpitrixStore;
 
 function ReviewsTable({ type }: Props): JSX.Element {
-  const { open, render: renderEdgeModal } = useV3action('batch.deploy.app.create.v2');
-
   const tableRef = useRef<TableRef<any>>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isDeploy, setIsDeploy] = useState<boolean>(false);
-  const [isChooseSpace, setIsChooseSpace] = useState<boolean>(false);
-  const [placement, setPlacementData] = useState<{
-    namespace?: string;
-    workspace?: string;
-    cluster?: string;
-  }>({});
 
   const [selectedRow, setSelectedRow] = useState<any>();
   const selectedVersionId = selectedRow?.metadata.name;
@@ -78,11 +65,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           onClick={() => showReview(item)}
           avatar={
-            <Image
-              src={item.spec.icon}
-              iconSize={40}
-              iconLetter={getAnnotationsDescription(item) || '-'}
-            />
+            <Image src={item.spec.icon} iconSize={40} iconLetter={item.spec.appType || '-'} />
           }
           value={item.metadata.name}
           label={getAnnotationsDescription(item) || '-'}
@@ -113,7 +96,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
         return (
           <StatusIndicator type={transStatus as any}>
-            {t(`APP_STATUS_${transStatus.toUpperCase().replace(/-/g, '_')}`)}
+            {t(`APP_VERSION_STATUS_${transStatus.toUpperCase().replace(/-/g, '_')}`)}
           </StatusIndicator>
         );
       },
@@ -190,135 +173,6 @@ function ReviewsTable({ type }: Props): JSX.Element {
     tableRef.current?.refetch();
   };
 
-  const handleDeploy = async (data: any): Promise<void> => {
-    console.log(data);
-    const params = {
-      kind: 'ApplicationRelease',
-      metadata: {
-        name: data?.name,
-        annotations: {
-          ...data.annotations,
-          'application.kubesphere.io/description': data.description,
-          'application.kubesphere.io/app-displayName': data.displayName,
-          'application.kubesphere.io/app-versionName': data.versionName,
-        },
-        labels: {
-          // cluster = '', workspace = '', namespace
-          'kubesphere.io/namespace': placement.namespace,
-          'kubesphere.io/workspace': placement.workspace,
-          'kubesphere.io/cluster': placement.cluster,
-          'kubesphere.io/app-id': data.appName,
-        },
-      },
-      spec: {
-        appID: data.appName,
-        appType: data.appType,
-        appVersionID: data?.versionID,
-        values: safeBtoa(data.conf) || data.package,
-      },
-    };
-
-    // TODO 临时取消 cluster、workspace、namespace
-    await deployApp(omit(params, ['cluster', 'workspace', 'namespace']), {
-      // cluster,
-      // workspace,
-      // namespace,
-    });
-    tableRef?.current?.refetch();
-    setIsDeploy(false);
-    notify.success(t('DEPLOYED_SUCCESSFUL'));
-  };
-
-  function onDeploy(files: any) {
-    setSelectedRow({
-      ...selectedRow,
-      ...files,
-    });
-    if (selectedRow.spec.appType !== 'helm') {
-      setIsChooseSpace(true);
-    } else {
-      setIsDeploy(true);
-    }
-  }
-
-  function getSpaceData({
-    data: placementData,
-  }: {
-    data: { namespace: string; workspace: string; cluster: string };
-  }) {
-    setPlacementData(placementData);
-    setIsChooseSpace(false);
-    setIsDeploy(true);
-  }
-  function renderSpaceModal() {
-    if (!isChooseSpace) {
-      return null;
-    }
-    return (
-      // @ts-ignore TODO
-      <ChooseSpaceModal
-        dafaultVal={{}}
-        visible
-        // @ts-ignore TODO
-        onOk={getSpaceData}
-        onCancel={() => setIsChooseSpace(false)}
-      />
-    );
-  }
-
-  function renderModal() {
-    const modalType = selectedRow?.spec.appType;
-
-    if (!isDeploy || !selectedRow) {
-      return null;
-    }
-    if (modalType === 'edge') {
-      open({
-        v3Module: 'edgeStore',
-        module: 'edgeappsets',
-        ...selectedRow,
-        ...placement,
-        versionID: selectedVersionId,
-        appName,
-        v3StoreParams: {
-          module: 'edgeappsets',
-        },
-        success: () => {
-          notify.success(t('UPDATE_SUCCESSFUL'));
-          tableRef?.current?.refetch();
-          setIsDeploy(false);
-        },
-      });
-      return null;
-    }
-    if (modalType === 'helm') {
-      return (
-        <DeployVersionModal
-          visible={true}
-          appName={appName}
-          detail={selectedRow}
-          onCancel={() => setIsDeploy(false)}
-          onOk={handleDeploy}
-        />
-      );
-    }
-    return (
-      <DeployYamlModal
-        visible={true}
-        // @ts-ignore TODO
-        {...placement}
-        // @ts-ignore TODO
-        namespace={placement.namespace}
-        detail={selectedRow}
-        versionID={selectedVersionId}
-        onCancel={() => setIsDeploy(false)}
-        onOk={handleDeploy}
-      />
-    );
-  }
-
-  console.log(queryParams, 999);
-
   return (
     <>
       <DataTable
@@ -346,7 +200,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
           onOk={() => handleSubmit('active')}
           onCancel={onCancel}
           onReject={showReject}
-          onDeploy={onDeploy}
+          onDeploy={() => setIsDeploy(true)}
           isConfirming={isSubmitting}
           showFooter={type === 'unprocessed'}
         />
@@ -358,9 +212,14 @@ function ReviewsTable({ type }: Props): JSX.Element {
           onCancel={closeRejectModal}
         />
       )}
-      {renderSpaceModal()}
-      {renderModal()}
-      {renderEdgeModal?.()}
+      <AppsDeploySpaceModal
+        onCancel={() => setIsDeploy(false)}
+        success={() => {}}
+        visible={isDeploy}
+        versionID={selectedVersionId}
+        appName={appName as string}
+        detail={selectedRow}
+      />
     </>
   );
 }

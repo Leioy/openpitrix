@@ -10,8 +10,6 @@ import {
   getPackageName,
   openpitrixStore,
   LabelText,
-  getBrowserLang,
-  getAnnotationsDescription,
 } from '@ks-console/shared';
 
 import InfoDetail from './InfoDetail';
