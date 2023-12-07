@@ -35,7 +35,7 @@ export function dataItemFormatter(item: any): any {
     ...item,
     ...item.metadata,
     selector: {
-      'app.kubesphere.io/instance': item.metadata.name,
+      'application.kubesphere.io/instance': item.metadata.name,
     },
     status: STATUSES[status],
   };

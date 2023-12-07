@@ -74,11 +74,11 @@ function CategoriesManage(): JSX.Element {
     },
     {
       title: t('LATEST_VERSION'),
-      field: 'metadata.annotations["app.kubesphere.io/latest-app-version"]',
+      field: 'metadata.annotations["application.kubesphere.io/latest-app-version"]',
       canHide: true,
       width: '25%',
       render: (_, app) => {
-        return get(app, 'metadata.annotations["app.kubesphere.io/latest-app-version"]', '-');
+        return get(app, 'metadata.annotations["application.kubesphere.io/latest-app-version"]', '-');
       },
     },
   ];

@@ -42,7 +42,7 @@ function DetailDrawer({
   onDeploy,
 }: Props): JSX.Element {
   const [tabKey, setTabKey] = useState<string>('appInfo');
-  const appName = detail.metadata.labels['app.kubesphere.io/app-id'];
+  const appName = detail.metadata.labels['application.kubesphere.io/app-id'];
   const { data: appDetail } = useAppDetail({
     appName,
   });

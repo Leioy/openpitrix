@@ -46,7 +46,7 @@ function AppDataTable({
       conditions: `status=${parameters.status}`,
     };
     if (categoryName) {
-      querys.label = `app.kubesphere.io/app-category-name=${categoryName}`;
+      querys.label = `application.kubesphere.io/app-category-name=${categoryName}`;
     }
 
     if (keyword) {

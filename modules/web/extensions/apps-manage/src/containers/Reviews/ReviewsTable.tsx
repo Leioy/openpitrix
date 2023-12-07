@@ -47,7 +47,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const [selectedRow, setSelectedRow] = useState<any>();
   const selectedVersionId = selectedRow?.metadata.name;
-  const appName = selectedRow?.metadata?.labels['app.kubesphere.io/app-id'];
+  const appName = selectedRow?.metadata?.labels['application.kubesphere.io/app-id'];
 
   const queryParams: Record<string, any> = {
     order: 'status_time',
@@ -198,9 +198,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
         name: data?.name,
         annotations: {
           ...data.annotations,
-          'app.kubesphere.io/description': data.description,
-          'app.kubesphere.io/app-displayName': data.displayName,
-          'app.kubesphere.io/app-versionName': data.versionName,
+          'application.kubesphere.io/description': data.description,
+          'application.kubesphere.io/app-displayName': data.displayName,
+          'application.kubesphere.io/app-versionName': data.versionName,
         },
         labels: {
           // cluster = '', workspace = '', namespace
