@@ -25,5 +25,6 @@
   "SUBMITTED_SUCCESSFUL": "提交成功",
   "DELETED_SUCCESSFUL": "删除成功",
   "Submitter": "提交者",
-  "RELEASE_SUCCESSFUL": "审核通过"
+  "RELEASE_SUCCESSFUL": "审核通过",
+  "APP_VERSION_STATUS_TO_BE_REVIEWED": "待审核"
 }

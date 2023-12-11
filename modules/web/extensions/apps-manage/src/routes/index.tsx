@@ -8,6 +8,7 @@ import {
   AppBaseLayout,
   AppStoreDetails,
   NewVersionList as VersionList,
+  AppDeployDetailRoute,
 } from '@ks-console/shared';
 
 import ListLayout from '../containers/Base/ListLayout';
@@ -101,4 +102,5 @@ export default [
       },
     ],
   },
+  ...AppDeployDetailRoute('/apps-manage/deploy'),
 ];
