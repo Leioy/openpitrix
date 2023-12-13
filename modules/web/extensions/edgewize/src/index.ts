@@ -8,7 +8,9 @@ const menu = {
   icon: 'cluster',
   order: 0,
   desc: '边缘计算',
-  skipAuth: true,
+  ksModule: 'openpitrix',
+  authKey: 'manage-app',
+  authAction: 'manage',
 };
 
 const workspaceAppManageMenu = {
