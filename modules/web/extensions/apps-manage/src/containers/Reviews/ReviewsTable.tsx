@@ -65,7 +65,12 @@ function ReviewsTable({ type }: Props): JSX.Element {
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           onClick={() => showReview(item)}
           avatar={
-            <Image src={item.spec.icon} iconSize={40} iconLetter={item.spec.appType || '-'} />
+            <Image
+              src={item.spec.icon}
+              isBase64Str={!!item.spec.icon}
+              iconSize={40}
+              iconLetter={item.spec.appType || '-'}
+            />
           }
           value={item.metadata.name}
           label={getAnnotationsDescription(item) || '-'}

@@ -48,8 +48,15 @@ function CategoriesManage(): JSX.Element {
         <TableItemField
           label={getAnnotationsAliasName(app)}
           value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
-          // @ts-ignore TODO
-          avatar={<Image iconSize={40} src={app.spec.icon} iconLetter={name} />}
+          avatar={
+            <Image
+              iconSize={40}
+              src={app.spec.icon}
+              isBase64Str={!!app.spec.icon}
+              // @ts-ignore TODO
+              iconLetter={name}
+            />
+          }
         />
       ),
     },
@@ -78,7 +85,11 @@ function CategoriesManage(): JSX.Element {
       canHide: true,
       width: '25%',
       render: (_, app) => {
-        return get(app, 'metadata.annotations["application.kubesphere.io/latest-app-version"]', '-');
+        return get(
+          app,
+          'metadata.annotations["application.kubesphere.io/latest-app-version"]',
+          '-',
+        );
       },
     },
   ];
