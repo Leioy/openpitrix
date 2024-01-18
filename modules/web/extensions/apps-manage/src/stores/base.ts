@@ -128,7 +128,7 @@ export function useBaseList<T>(
   options?: Partial<UseListOptions<any>>,
   workspace?: string,
   resourceName?: string,
-): UseListInstance<T> & { reverse: boolean } {
+): UseListInstance<T> & { ascending: boolean } {
   const formatParams: UseQueryParamsOption = {
     ...options?.params,
     order: options?.params?.order || SORT_KEY,
@@ -144,6 +144,6 @@ export function useBaseList<T>(
       params: formatParams,
       paramsFormatFn: params => useListQueryParams(params as UseQueryParamsOption, resourceName),
     }),
-    reverse: formatParams.reverse || true,
+    ascending: formatParams.reverse || true,
   };
 }

@@ -47,6 +47,7 @@ function ListLayout(): JSX.Element {
       setTitle(workspace);
       setSubTitle(t('WORKSPACE'));
     } else {
+      // @ts-ignore
       setNav(NAV_KEY, navMenus);
       setPrefix('/apps-manage');
       setTitle(t('APP_STORE_MANAGEMENT'));
