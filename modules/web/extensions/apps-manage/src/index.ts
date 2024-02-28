@@ -13,9 +13,18 @@ const menu = {
   authAction: 'manage',
 };
 
+const workspaceAppManage = {
+  parent: 'workspace.apps',
+  name: 'app-templates',
+  title: 'APP_TEMPLATE_PL',
+  icon: 'appcenter',
+  order: 0,
+  authKey: 'app-templates',
+};
+
 const extensionConfig = {
   routes,
-  menus: [menu],
+  menus: [menu, workspaceAppManage],
   locales,
 };
 
