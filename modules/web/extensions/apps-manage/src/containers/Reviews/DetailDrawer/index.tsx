@@ -90,7 +90,7 @@ function DetailDrawer({
           appName={appDetail?.metadata.name}
           versionID={detail?.metadata.name}
           type={'MODIFY_VERSION'}
-          packageName={getPackageName(versionDetail, appDetail?.metadata.name)}
+          packageName={getPackageName(versionDetail)}
           updateTime={detail?.update_time || detail?.status_time}
         />
         <TextPreview files={files} />

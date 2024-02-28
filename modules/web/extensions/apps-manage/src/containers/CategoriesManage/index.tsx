@@ -47,7 +47,7 @@ function CategoriesManage(): JSX.Element {
       render: (name, app) => (
         <TableItemField
           label={getAnnotationsAliasName(app)}
-          value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name}</Link>}
+          value={<Link to={`/apps-manage/store/${app.metadata.name}`}>{name as string}</Link>}
           avatar={
             <Image
               iconSize={40}
