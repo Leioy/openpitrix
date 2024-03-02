@@ -42,14 +42,14 @@ function CategoryItem({
   return (
     <Category onClick={() => onSelectCategory(detail)} className={`${isActive && 'active'}`}>
       {iconName && <Icon size={16} className="mr12" name={iconName} />}
-      {t(
+      {`${t(
         `APP_CATE_${getName(displayName)
           ?.toUpperCase()
           .replace(/[^A-Z]+/g, '_')}`,
         {
           defaultValue: getName(displayName),
         },
-      )}
+      )}（${displayName}）`}
       <Others>
         <span className="total_count">{detail?.status.total || 0}</span>
         {!isUnCategorizedCtg(detail?.metadata.name) && (
