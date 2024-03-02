@@ -2,7 +2,13 @@ import React from 'react';
 import { isEmpty } from 'lodash';
 import ReactMarkdown from 'react-markdown';
 
-import { AppDetail, Image, LabelText } from '@ks-console/shared';
+import {
+  AppDetail,
+  getAnnotationsAliasName,
+  Image,
+  LabelText,
+  getAnnotationsDescription,
+} from '@ks-console/shared';
 
 import BaseInfo from './BaseInfo';
 
@@ -24,21 +30,31 @@ function InfoDetail({ detail, versionName }: Props): JSX.Element {
     <>
       <LabelText>{t('BASIC_INFORMATION')}</LabelText>
       <StyledField
-        avatar={<Image src={detail.icon} iconLetter={detail.name} iconSize={100} canLoading />}
+        avatar={
+          <Image
+            src={detail.spec.icon}
+            iconLetter={detail.metadata.name}
+            iconSize={100}
+            canLoading
+          />
+        }
         value={
           <BaseInfo
-            name={detail.name}
-            home={detail.home}
-            isv={detail.isv}
+            name={detail.metadata.name}
+            home={detail.spec.appHome}
+            isv={detail.metadata.labels?.['kubesphere.io/workspace']}
             versionName={versionName}
           />
         }
         label={
-          <PreField value={<pre>{detail.description || '-'}</pre>} label={t('INTRODUCTION')} />
+          <PreField
+            value={<pre>{getAnnotationsAliasName(detail) || '-'}</pre>}
+            label={t('INTRODUCTION')}
+          />
         }
       />
       <LabelText>{t('APP_DESCRIPTION')}</LabelText>
-      <ReactMarkdown>{detail.abstraction || t('NONE')}</ReactMarkdown>
+      <ReactMarkdown>{getAnnotationsDescription(detail) || t('NONE')}</ReactMarkdown>
       <LabelText>{t('APP_SCREENSHOTS')}</LabelText>
       {isEmpty(screenshots) ? (
         <p>{t('NONE')}</p>

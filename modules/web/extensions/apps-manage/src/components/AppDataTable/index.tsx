@@ -1,69 +1,83 @@
 import React, { ReactNode, useMemo } from 'react';
-import { Appcenter } from '@kubed/icons';
 
 import { Column, DataTable, openpitrixStore, useListQueryParams } from '@ks-console/shared';
 
 const { getBaseUrl, SORT_KEY } = openpitrixStore;
 
 type Props = {
+  workspace?: string;
+  tableRef?: any;
+  filter?: boolean;
   columns: Column[];
-  categoryId?: string;
+  categoryName?: string;
   batchActions?: ReactNode[] | null;
+  toolbarRight?: ReactNode[] | null;
+  emptyOptions?: any;
 };
 
-function AppDataTable({ columns, categoryId, batchActions }: Props): JSX.Element {
+function AppDataTable({
+  columns,
+  categoryName,
+  batchActions,
+  toolbarRight,
+  tableRef,
+  workspace,
+  emptyOptions,
+}: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
     return {
-      category_id: categoryId,
+      category_id: categoryName,
       order: SORT_KEY,
-      status: 'active',
-      repo_id: 'repo-helm',
+      status: 'active|rejected|passed|suspended|draft',
+      // repo_id: 'repo-helm',
     };
-  }, [categoryId]);
+  }, [categoryName]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
-    const { parameters, pageIndex, filters } = params;
+    const { parameters, pageIndex, pageSize, filters } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
-      page: pageIndex + 1,
     });
-
-    if (!keyword) {
-      return formattedParams;
+    const querys: Record<string, string | number> = {
+      ...formattedParams,
+      page: pageIndex + 1,
+      limit: pageSize,
+      conditions: `status=${parameters.status}`,
+    };
+    if (categoryName) {
+      querys.label = `application.kubesphere.io/app-category-name=${categoryName}`;
     }
 
-    return {
-      ...formattedParams,
-      conditions: formattedParams.conditions + `,keyword=${keyword}`,
-    };
+    if (keyword) {
+      querys.name = keyword;
+    }
+
+    return querys;
   };
 
   const formatServerData = (serverData: any) => {
     return {
       ...serverData,
-      totalItems: serverData.total_count,
+      totalItems: serverData.totalItems,
     };
   };
 
   return (
     <DataTable
+      ref={tableRef}
       simpleSearch
       tableName="APP"
-      rowKey="app_id"
-      url={getBaseUrl({}, 'apps')}
+      rowKey="metadata.name"
+      url={getBaseUrl({ workspace }, 'apps')}
       columns={columns}
       parameters={queryParams}
       format={data => data}
       batchActions={batchActions}
+      toolbarRight={toolbarRight}
       serverDataFormat={formatServerData}
       transformRequestParams={requestParamsTransformer}
-      emptyOptions={{
-        withoutTable: true,
-        image: <Appcenter size={48} />,
-        title: t('NO_APP_DESC_FOUND'),
-        description: t('APP_CATEGORY_EMPTY_DESC'),
-      }}
+      emptyOptions={emptyOptions}
     />
   );
 }

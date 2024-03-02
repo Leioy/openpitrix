@@ -14,7 +14,7 @@ type Props = {
 
 function CategoryList({ categories, onSelectCategory, onManageCategory }: Props): JSX.Element {
   const unCategorizedItem = useMemo(() => {
-    return categories.find(({ category_id }) => isUnCategorizedCtg(category_id));
+    return categories.find(({ metadata }) => isUnCategorizedCtg(metadata.name));
   }, [categories]);
   const [selectedCategory, setSelectedCategory] = useState<CategoryDetail | undefined>(
     unCategorizedItem,
@@ -32,10 +32,10 @@ function CategoryList({ categories, onSelectCategory, onManageCategory }: Props)
     <CategoriesWrapper>
       {categories?.map(item => (
         <CategoryItem
-          key={item.category_id}
+          key={item.metadata.name}
           detail={item}
           onSelectCategory={setSelectedCategory}
-          isActive={item.category_id === selectedCategory?.category_id}
+          isActive={item.metadata.name === selectedCategory?.metadata.name}
           onEditCategory={data => onManageCategory(data, 'manage')}
           onDeleteCategory={data => onManageCategory(data, 'delete')}
         />

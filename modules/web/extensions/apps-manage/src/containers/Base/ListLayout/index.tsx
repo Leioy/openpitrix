@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Openpitrix } from '@kubed/icons';
-import { Outlet, useLocation } from 'react-router-dom';
-
-import { NavMenu, NavTitle, useGlobalStore } from '@ks-console/shared';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { navs as navMenus } from './contants';
+import { NavMenu, NavTitle, useGlobalStore, permissionStore } from '@ks-console/shared';
 
 const PageSide = styled.div`
   position: fixed;
@@ -21,27 +21,50 @@ const PageMain = styled.div`
 `;
 
 const NAV_KEY = 'MANAGE_APP_NAVS';
+const { getProjectNavs, getWorkspaceNavs } = permissionStore();
 
 function ListLayout(): JSX.Element {
   const location = useLocation();
+  const { workspace, namespace, cluster } = useParams();
+  const navKey = namespace ? 'PROJECT_NAV' : workspace ? `WORKSPACE_NAV-${workspace}` : NAV_KEY;
   const { getNav, setNav } = useGlobalStore();
-  let navs = getNav(NAV_KEY);
+  let navs = getNav(navKey);
+  const [prefix, setPrefix] = useState('/apps-manage');
+  const [title, setTitle] = useState('APP_STORE_MANAGEMENT');
+  const [subTitle, setSubTitle] = useState('');
 
   useEffect(() => {
-    if (!navs) {
-      setNav(NAV_KEY, globals.config.manageAppNavs);
+    if (namespace) {
+      navs = getProjectNavs({ cluster, workspace, project: namespace });
+      setNav(navKey, navs);
+      setPrefix(`/${workspace}/clusters/${cluster}/projects/${namespace}`);
+      setTitle(namespace);
+      setSubTitle(t('PROJECT'));
+    } else if (workspace) {
+      navs = getWorkspaceNavs(workspace);
+      setNav(navKey, navs);
+      setPrefix(`/workspaces/${workspace}`);
+      setTitle(workspace);
+      setSubTitle(t('WORKSPACE'));
+    } else {
+      // @ts-ignore
+      setNav(NAV_KEY, navMenus);
+      setPrefix('/apps-manage');
+      setTitle(t('APP_STORE_MANAGEMENT'));
+      setSubTitle(t('APP_STORE_MANAGEMENT_DESC'));
     }
-  }, []);
+  }, [workspace, namespace, cluster]);
 
   return (
     <>
       <PageSide>
         <NavTitle
           icon={<Openpitrix variant="light" size={40} />}
-          title={t('APP_STORE_MANAGEMENT')}
+          title={t(title)}
+          subtitle={subTitle}
           style={{ marginBottom: '20px' }}
         />
-        {navs && <NavMenu navs={navs} prefix="/apps-manage" pathname={location.pathname} />}
+        {navs && <NavMenu navs={navs} prefix={prefix} pathname={location.pathname} />}
       </PageSide>
       <PageMain>
         <Outlet />

@@ -1,17 +1,41 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import {
+  AppInformation,
+  AuditRecords,
+  InstanceList,
+  AppsDashBoard,
+  AppBaseLayout,
+  AppStoreDetails,
+  NewVersionList as VersionList,
+  AppDeployDetailRoute,
+} from '@ks-console/shared';
 
-import { AuditRecords, InstanceList, VersionList, AppInformation } from '@ks-console/shared';
+import ListLayout from '../containers/Base/ListLayout';
 
 import Reviews from '../containers/Reviews';
-import StoreManage from '../containers/StoreManage';
-import ListLayout from '../containers/Base/ListLayout';
-import AppDetailPage from '../containers/AppDetailPage';
+import RepoManage from '../containers/RepoManage';
+
 import CategoriesManage from '../containers/CategoriesManage';
+import ApplicationManage from '../containers/AppInstanceManage';
+import StoreManage from '../containers/StoreManage';
+import AppDetailPage from '../containers/AppDetailPage';
 
 const PATH = '/apps-manage';
 
 export default [
+  {
+    path: '/jsjk-apps',
+    element: <AppBaseLayout />,
+    children: [
+      {
+        index: true,
+        element: <AppsDashBoard />,
+      },
+      { path: ':appName', element: <AppStoreDetails /> },
+      { path: ':appName/deploy', element: <AppStoreDetails /> },
+    ],
+  },
   {
     path: PATH,
     element: <ListLayout />,
@@ -42,10 +66,18 @@ export default [
           },
         ],
       },
+      {
+        path: 'repo',
+        element: <RepoManage />,
+      },
+      {
+        path: 'deploy',
+        element: <ApplicationManage />,
+      },
     ],
   },
   {
-    path: '/apps-manage/store/:appId',
+    path: '/apps-manage/store/:appName',
     element: <AppDetailPage />,
     children: [
       {
@@ -70,4 +102,5 @@ export default [
       },
     ],
   },
+  ...AppDeployDetailRoute('/apps-manage/deploy'),
 ];

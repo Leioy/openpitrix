@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import { Return } from '@kubed/icons';
 import { useStore } from '@kubed/stook';
 
-import { AppDetail, Image } from '@ks-console/shared';
+import { AppDetail, Image, getAnnotationsDescription } from '@ks-console/shared';
 
 import { isAppsPageExact } from '../../utils';
 
@@ -55,13 +55,13 @@ function Banner({ onBack }: Props): JSX.Element {
                     avatar={
                       <Image
                         iconSize={48}
-                        src={appDetail.icon}
-                        iconLetter={appDetail.name}
+                        src={appDetail.spec.icon}
+                        iconLetter={appDetail.metadata.name}
                         alt=""
                       />
                     }
-                    label={appDetail.description || '-'}
-                    value={appDetail.name || '-'}
+                    label={getAnnotationsDescription(appDetail) || '-'}
+                    value={appDetail.metadata.name || '-'}
                   />
                 )}
               </AppOutLine>

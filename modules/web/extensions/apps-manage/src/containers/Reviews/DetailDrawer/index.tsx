@@ -5,16 +5,18 @@ import { Drawer, NavItem, Navs } from '@kubed/components';
 
 import {
   Icon,
-  LabelText,
   TextPreview,
   PackageUpload,
   getPackageName,
   openpitrixStore,
+  LabelText,
 } from '@ks-console/shared';
 
 import InfoDetail from './InfoDetail';
 
 import { CloseModal, Header, Content, Footer, StyledButton } from './styles';
+
+const { fileStore, useAppDetail, useVersionDetail } = openpitrixStore;
 
 type Props = {
   visible: boolean;
@@ -22,6 +24,7 @@ type Props = {
   onOk: () => void;
   onCancel: () => void;
   onReject: () => void;
+  onDeploy: (data: any) => void;
   showFooter?: boolean;
   isConfirming?: boolean;
 };
@@ -34,17 +37,20 @@ function DetailDrawer({
   onReject,
   isConfirming,
   showFooter,
+  onDeploy,
 }: Props): JSX.Element {
-  const { fileStore, useAppDetail, useVersionDetail } = openpitrixStore;
   const [tabKey, setTabKey] = useState<string>('appInfo');
-  const { data: appDetail } = useAppDetail({ app_id: detail.app_id });
+  const appName = detail.metadata.labels['application.kubesphere.io/app-id'];
+  const { data: appDetail } = useAppDetail({
+    appName,
+  });
   const { data: versionDetail } = useVersionDetail({
-    app_id: detail.app_id,
-    version_id: detail.version_id,
+    appName,
+    versionID: detail.metadata.name,
   });
   const { data: files = {} } = fileStore.useQueryFiles(
-    { app_id: detail.app_id, version_id: detail.version_id },
-    { enabled: !!detail.app_id && !!detail.version_id },
+    { name: appName, versionID: detail.metadata.name },
+    { enabled: !!appName && !!detail.metadata.name },
   );
   const readme = useMemo(() => {
     return files['README.md'];
@@ -68,7 +74,7 @@ function DetailDrawer({
     },
   ];
   const navContentMap: Record<string, ReactNode> = {
-    appInfo: <InfoDetail detail={appDetail} versionName={versionDetail?.name} />,
+    appInfo: <InfoDetail detail={appDetail} versionName={versionDetail?.metadata.name} />,
     readme: readme ? (
       <ReactMarkdown>{readme}</ReactMarkdown>
     ) : (
@@ -81,10 +87,10 @@ function DetailDrawer({
           className="mb12"
           canEdit={false}
           fileStore={fileStore}
-          appId={detail?.app_id}
-          versionId={detail?.version_id}
+          appName={appDetail?.metadata.name}
+          versionID={detail?.metadata.name}
           type={'MODIFY_VERSION'}
-          packageName={getPackageName(versionDetail, appDetail?.name)}
+          packageName={getPackageName(versionDetail)}
           updateTime={detail?.update_time || detail?.status_time}
         />
         <TextPreview files={files} />
@@ -93,7 +99,7 @@ function DetailDrawer({
     updateLog: (
       <>
         <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{versionDetail?.description || t('NO_UPDATE_LOG_DESC')}</pre>
+        <pre>{versionDetail?.status.message || t('NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };
@@ -114,8 +120,11 @@ function DetailDrawer({
           <StyledButton className="mr12" color="error" onClick={onReject}>
             {t('REJECT')}
           </StyledButton>
+          <StyledButton className="mr12" color="secondary" onClick={() => onDeploy(files)}>
+            {t('DEPLOYMENT')}
+          </StyledButton>
           <StyledButton color="secondary" onClick={onOk} disabled={isConfirming}>
-            {t('APPROVE')}
+            {t('APPROVE_AND_RELEASE')}
           </StyledButton>
         </Footer>
       )}

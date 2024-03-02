@@ -1,0 +1,12 @@
+{
+  "EDGEWIZE_COMPUTING": "邊緣計算",
+  "EDGEWIZE_LABELS": "邊緣標籤",
+  "EDGEWIZE_WORKSPACE": "邊緣空間",
+  "EDGEWIZE_LABELS_DESC": "綁定邊緣標籤後，開發者可以在邊緣空間和邊緣項目下開發邊緣應用",
+  "NO_EDGEWIZE_CLUSTER_AVAILABLE": "沒有可用的邊緣集群",
+  "SETTING_OK": "設定成功",
+  "EDGEWIZE_SETTING": "邊緣設定",
+  "EDGEWIZE_LABELS_SETTING": "設定邊緣標籤",
+  "EDGEWIZE_PROJECT_SETTING": "邊緣項目設定"
+
+}

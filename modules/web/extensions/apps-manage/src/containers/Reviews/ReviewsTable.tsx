@@ -1,8 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { pick } from 'lodash';
 import { notify } from '@kubed/components';
-
-import { Icon, TableRef } from '@ks-console/shared';
+import { Icon, TableRef, getAnnotationsDescription } from '@ks-console/shared';
 import {
   Image,
   Column,
@@ -12,39 +10,47 @@ import {
   StatusIndicator,
   openpitrixStore,
   useListQueryParams,
+  AppsDeploySpaceModal,
 } from '@ks-console/shared';
+import { getReviewsUrl } from '../../stores';
 
 import store from './store';
 import DetailDrawer from './DetailDrawer';
-import { TableItemField } from '../StoreManage';
+import { TableItemField } from '../CategoriesManage/styles';
 import { transferReviewStatus } from '../../utils';
 import ReviewRejectModal from './ReviewRejectModal';
-import type { RejectFormData } from './ReviewRejectModal';
 
 type Props = {
   type: string;
 };
+const { REVIEW_QUERY_STATUS } = openpitrixStore;
 
 function ReviewsTable({ type }: Props): JSX.Element {
-  const { getBaseUrl, REVIEW_QUERY_STATUS } = openpitrixStore;
   const tableRef = useRef<TableRef<any>>(null);
   const [visible, setVisible] = useState<boolean>(false);
   const [showRejectModal, setShowRejectModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isDeploy, setIsDeploy] = useState<boolean>(false);
+
   const [selectedRow, setSelectedRow] = useState<any>();
+  const selectedVersionId = selectedRow?.metadata.name;
+  const appName = selectedRow?.metadata?.labels['application.kubesphere.io/app-id'];
+
   const queryParams: Record<string, any> = {
     order: 'status_time',
     status: REVIEW_QUERY_STATUS[type],
   };
   const renderItemActions = useItemActions({
-    authKey: 'apps',
+    authKey: 'manage-app',
     actions: [
       {
         key: 'detail',
         icon: <Icon name="eye" />,
         text: t('VIEW_DETAILS'),
         action: 'view',
-        onClick: (_, record) => console.log(record),
+        onClick: (_, record) => {
+          showReview(record);
+        },
       },
     ],
   });
@@ -58,9 +64,16 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <TableItemField
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
           onClick={() => showReview(item)}
-          avatar={<Image src={item.icon} iconSize={40} iconLetter={item.app_name} />}
-          value={item.app_name}
-          label={item.version_name || '-'}
+          avatar={
+            <Image
+              src={item.spec.icon}
+              isBase64Str={!!item.spec.icon}
+              iconSize={40}
+              iconLetter={item.spec.appType || '-'}
+            />
+          }
+          value={item.metadata.name}
+          label={getAnnotationsDescription(item) || '-'}
         />
       ),
     },
@@ -69,13 +82,14 @@ function ReviewsTable({ type }: Props): JSX.Element {
       field: 'app_id',
       canHide: true,
       width: '15%',
-      render: (_, item) => item.isv || '-',
+      render: (_, item) => item?.metadata?.labels?.['kubesphere.io/workspace'] || '-',
     },
     {
-      title: t('OPERATOR'),
+      title: t('Submitter'),
       field: 'reviewer',
       canHide: true,
       width: '15%',
+      render: (_, item) => item?.status?.userName || '-',
     },
     {
       title: t('STATUS'),
@@ -83,11 +97,11 @@ function ReviewsTable({ type }: Props): JSX.Element {
       canHide: true,
       width: '15%',
       render: status => {
-        const transStatus = transferReviewStatus(status);
+        const transStatus = transferReviewStatus(status?.state);
 
         return (
           <StatusIndicator type={transStatus as any}>
-            {t(`APP_STATUS_${transStatus.toUpperCase().replace(/-/g, '_')}`)}
+            {t(`APP_VERSION_STATUS_${transStatus.toUpperCase().replace(/-/g, '_')}`)}
           </StatusIndicator>
         );
       },
@@ -97,7 +111,10 @@ function ReviewsTable({ type }: Props): JSX.Element {
       field: 'status_time',
       canHide: true,
       width: '15%',
-      render: time => getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss'),
+      render: (_, item) => {
+        const time = item?.spec?.created || '';
+        return getLocalTime(time || new Date().toDateString()).format('YYYY-MM-DD HH:mm:ss');
+      },
     },
     {
       id: 'more',
@@ -108,28 +125,26 @@ function ReviewsTable({ type }: Props): JSX.Element {
   ];
 
   const transformRequestParams = (params: Record<string, any>): Record<string, any> => {
-    const { parameters, pageIndex, filters } = params;
+    const { parameters, pageIndex, pageSize, filters } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
-      page: pageIndex + 1,
     });
-
+    formattedParams.page = pageIndex + 1;
+    formattedParams.limit = pageSize;
     if (!keyword) {
       return formattedParams;
     }
 
     return {
       ...formattedParams,
-      conditions: formattedParams.conditions + `,keyword=${keyword}`,
+      name: keyword,
+      conditions: formattedParams.conditions,
     };
   };
 
   const formatServerData = (serverData: Record<string, any>) => {
-    return {
-      ...serverData,
-      totalItems: serverData.total_count,
-    };
+    return serverData;
   };
 
   const onCancel = () => {
@@ -146,14 +161,20 @@ function ReviewsTable({ type }: Props): JSX.Element {
 
   const closeRejectModal = () => setShowRejectModal(false);
 
-  const handleSubmit = async (action: string, data?: RejectFormData) => {
+  const handleSubmit = async (action: string, message?: string) => {
     setIsSubmitting(true);
-    const pathParams = pick(selectedRow, ['app_id', 'version_id']);
 
+    await store.handleReview({
+      appName,
+      versionID: selectedRow.metadata.name,
+      // @ts-ignore TODO
+      state: action,
+      // userName: globals.user.username,
+      message,
+    });
     setIsSubmitting(false);
-    await store.handleReview({ ...pathParams, action, ...data });
     onCancel();
-    notify.success(t(action === 'pass' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
+    notify.success(t(action === 'active' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
     tableRef.current?.refetch();
   };
 
@@ -163,8 +184,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
         simpleSearch
         ref={tableRef}
         tableName="APP_REVIEW"
-        rowKey="version_id"
-        url={getBaseUrl({}, 'reviews')}
+        rowKey="versionID"
+        url={getReviewsUrl({})}
         parameters={queryParams}
         columns={columns}
         format={data => data}
@@ -181,20 +202,29 @@ function ReviewsTable({ type }: Props): JSX.Element {
         <DetailDrawer
           visible={true}
           detail={selectedRow}
-          onOk={() => handleSubmit('pass')}
+          onOk={() => handleSubmit('active')}
           onCancel={onCancel}
           onReject={showReject}
+          onDeploy={() => setIsDeploy(true)}
           isConfirming={isSubmitting}
-          showFooter={type !== 'unprocessed'}
+          showFooter={type === 'unprocessed'}
         />
       )}
       {showRejectModal && (
         <ReviewRejectModal
           visible={true}
-          onOk={data => handleSubmit('reject', data)}
+          onOk={data => handleSubmit('rejected', data.message)}
           onCancel={closeRejectModal}
         />
       )}
+      <AppsDeploySpaceModal
+        onCancel={() => setIsDeploy(false)}
+        success={() => {}}
+        visible={isDeploy}
+        versionID={selectedVersionId}
+        appName={appName as string}
+        detail={selectedRow}
+      />
     </>
   );
 }

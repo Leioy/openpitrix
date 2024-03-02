@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Card } from '@kubed/components';
+import { Card, Field } from '@kubed/components';
 
 export const Categories = styled(Card)`
   & > div {
@@ -7,6 +7,21 @@ export const Categories = styled(Card)`
     flex-direction: column;
     padding: 0;
     min-height: 300px;
+  }
+`;
+export const TableItemField = styled(Field)`
+  .field-avatar {
+    span {
+      margin-right: 0;
+    }
+  }
+
+  .field-value {
+    cursor: pointer;
+  }
+
+  .field-label {
+    max-width: 300px;
   }
 `;
 

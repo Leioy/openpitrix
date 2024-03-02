@@ -5,13 +5,14 @@ const { getBaseUrl } = openpitrixStore;
 const resourceName: string = 'reviews';
 
 type HandleParams = {
-  app_id: string;
-  version_id: string;
-  [key: string]: unknown;
+  appName: string;
+  versionID: string;
+  action: string;
+  message?: string;
 };
 
-const handleReview = async ({ app_id, version_id, ...data }: HandleParams) => {
-  const url = getBaseUrl({ app_id, version_id, name: 'action' }, resourceName);
+const handleReview = async ({ appName, versionID, ...data }: HandleParams) => {
+  const url = getBaseUrl({ appName, versionID: versionID, name: 'action' }, resourceName);
 
   await request.post(url, data);
 };

@@ -1,5 +1,4 @@
 import React from 'react';
-import cx from 'classnames';
 import styled from 'styled-components';
 
 import { Icon, openpitrixStore } from '@ks-console/shared';
@@ -48,7 +47,7 @@ function IconSelector({ value, onChange }: Props): JSX.Element {
       {CATEGORY_ICONS.map(icon => (
         <StyledIcon
           key={icon}
-          className={cx({ active: icon === value })}
+          className={`${icon === value && 'active'}`}
           name={icon}
           size={20}
           onClick={() => changeIcon(icon)}

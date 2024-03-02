@@ -2,12 +2,31 @@ client:
   title: KubeSphere
   description: ""
   encryptKey: kubesphere
-
+  disableAuthorization: true
   # apps manage page navigations
-  manageAppNavs:
-    - name: "apps"
-      children:
-        - { name: store, title: APPS, icon: appcenter }
-        - { name: categories, title: APP_CATEGORY_PL, icon: tag }
-        - { name: reviews, title: APP_REVIEW, icon: safe-notice }
+#  manageAppNavs:
+#    - name: "apps"
+#      children:
+#        - { name: store, title: APPS, icon: appcenter }
+#        - { name: categories, title: APP_CATEGORY_PL, icon: tag }
+#        - { name: reviews, title: APP_REVIEW, icon: safe-notice }
+#        - { name: repo, title: APP_REPOSITORY_PL, icon: safe-notice }
+#        - { name: deploy, title: DEPLOY_MANAGE, icon: safe-notice }
 
+  globalNavs:
+    name: platform
+    children:
+      #      []
+        - name: apps-manage
+          desc: CLUSTER_DESC
+          icon: cluster
+          roleTemplate: global_aaa_manager
+          # - name: access
+          #   title: ACCESS_CONTROL
+          #   icon: key
+          #   authKey: users|roles|workspaces
+          # - name: settings
+          #   title: PLATFORM_SETTINGS
+          #   icon: cogwheel
+          #   authKey: platform-settings
+          #   authAction: manage

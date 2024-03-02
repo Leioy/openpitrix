@@ -8,31 +8,24 @@ const menu = {
   icon: 'openpitrix',
   order: 2,
   desc: 'APP_STORE_MANAGEMENT_DESC',
-  skipAuth: true,
+  ksModule: 'openpitrix',
+  authKey: 'manage-app',
+  authAction: 'manage',
 };
 
-const workspaceAppManageMenu = {
-  parent: 'workspace',
-  name: 'apps',
-  title: 'APPS_MANAGEMENT',
+const workspaceAppManage = {
+  parent: 'workspace.apps',
+  name: 'app-templates',
+  title: 'APP_TEMPLATE_PL',
   icon: 'appcenter',
-  order: 3,
-  desc: 'APP_STORE_MANAGEMENT_DESC',
-  skipAuth: true,
-  children: [
-    {
-      name: 'apps',
-      title: 'APP_TEMPLATE_PL',
-      icon: 'appcenter',
-      skipAuth: true,
-    },
-  ],
+  order: 0,
+  authKey: 'app-templates',
 };
 
 const extensionConfig = {
   routes,
-  menus: [menu, workspaceAppManageMenu],
+  menus: [menu, workspaceAppManage],
   locales,
 };
 
-globals.context.registerExtension(extensionConfig);
+export default extensionConfig;
