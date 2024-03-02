@@ -7,7 +7,7 @@ const menu = {
   title: 'edgewize-io',
   icon: 'cluster',
   order: 0,
-  desc: '边缘计算',
+  desc: 'EDGEWIZE_COMPUTING',
   ksModule: 'openpitrix',
   authKey: 'manage-app',
   authAction: 'manage',
@@ -16,15 +16,15 @@ const menu = {
 const workspaceAppManageMenu = {
   parent: 'workspace',
   name: 'edgesetting',
-  title: '边缘设置',
+  title: 'EDGEWIZE_SETTING',
   icon: 'appcenter',
   order: 3,
-  desc: '边缘项目设置',
+  desc: 'EDGEWIZE_PROJECT_SETTING',
   skipAuth: true,
   children: [
     {
       name: 'edgesetting',
-      title: '设置边缘标签',
+      title: 'EDGEWIZE_LABELS_SETTING',
       icon: 'appcenter',
       skipAuth: true,
     },
