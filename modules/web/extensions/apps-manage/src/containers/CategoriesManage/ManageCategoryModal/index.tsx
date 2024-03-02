@@ -2,7 +2,7 @@ import React from 'react';
 import { RuleObject } from 'rc-field-form/lib/interface';
 import { Form, FormItem, Input, Modal, useForm } from '@kubed/components';
 
-import { CategoryDetail, Icon, getAnnotationsAliasName } from '@ks-console/shared';
+import { CategoryDetail, Icon } from '@ks-console/shared';
 
 import IconSelector from './IconSelector';
 import { Body } from './styles';
@@ -24,9 +24,7 @@ function ManageCategoryModal({
 }: Props): JSX.Element {
   const [form] = useForm();
 
-  const defaultVal = {
-    name: getAnnotationsAliasName(detail),
-  };
+  const defaultVal = detail;
   const nameValidator = (rule: RuleObject, value: string, callback: any) => {
     if (!value) {
       return callback();
@@ -73,7 +71,7 @@ function ManageCategoryModal({
       <Body>
         <Form form={form} initialValues={defaultVal}>
           <FormItem
-            name={['name']}
+            name={['metadata', 'name']}
             label={t('NAME')}
             help={t('CATEGORY_NAME_DESC')}
             rules={[
@@ -81,7 +79,7 @@ function ManageCategoryModal({
               { validator: nameValidator },
             ]}
           >
-            <Input autoComplete="off" maxLength={20} />
+            <Input disabled={!!detail?.metadata.name} autoComplete="off" maxLength={20} />
           </FormItem>
           <FormItem
             label={t('ALIAS')}
