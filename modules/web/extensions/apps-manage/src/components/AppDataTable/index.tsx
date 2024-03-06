@@ -39,11 +39,12 @@ function AppDataTable({
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
     });
-    const querys: Record<string, string | number> = {
+    const querys: Record<string, string | number | boolean> = {
       ...formattedParams,
       page: pageIndex + 1,
       limit: pageSize,
       conditions: `status=${parameters.status}`,
+      global: true,
     };
     if (categoryName) {
       querys.label = `application.kubesphere.io/app-category-name=${categoryName}`;
