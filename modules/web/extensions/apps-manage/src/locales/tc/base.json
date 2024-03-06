@@ -26,5 +26,6 @@
   "DELETED_SUCCESSFUL": "删除成功",
   "Submitter": "提交者",
   "RELEASE_SUCCESSFUL": "審核通過",
-  "APP_VERSION_STATUS_TO_BE_REVIEWED": "待稽核"
+  "APP_VERSION_STATUS_TO_BE_REVIEWED": "待稽核",
+  "deleting": "删除中"
 }
