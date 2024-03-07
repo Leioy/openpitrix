@@ -46,7 +46,7 @@ function AppDataTable({
       conditions: `status=${parameters.status}`,
     };
     if (categoryName) {
-      querys.label = `application.kubesphere.io/app-category-name=${categoryName},application.kubesphere.io/repo-name=upload`;
+      querys.labelSelector = `application.kubesphere.io/app-category-name=${categoryName},application.kubesphere.io/repo-name=upload`;
     }
 
     if (keyword) {
