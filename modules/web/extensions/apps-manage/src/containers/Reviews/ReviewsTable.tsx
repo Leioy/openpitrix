@@ -69,7 +69,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
               src={item.spec.icon}
               isBase64Str={!!item.spec.icon}
               iconSize={40}
-              iconLetter={item.spec.appType || '-'}
+              iconLetter={item.metadata.name || '-'}
             />
           }
           value={item.metadata.name}
