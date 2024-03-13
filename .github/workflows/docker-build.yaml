@@ -59,4 +59,4 @@ jobs:
           dockerfile: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ github.ref }}
+          tags: kubesphere/apps-manage:${GITHUB_REF#refs/tags/}
