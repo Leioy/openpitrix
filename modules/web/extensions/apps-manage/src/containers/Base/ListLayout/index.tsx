@@ -3,15 +3,13 @@ import styled from 'styled-components';
 import { Openpitrix } from '@kubed/icons';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { navs as navMenus } from './contants';
-import { NavMenu, NavTitle, useGlobalStore, permissionStore } from '@ks-console/shared';
-
-const PageSide = styled.div`
-  position: fixed;
-  top: 88px;
-  padding: 0 20px 40px;
-  width: 260px;
-  z-index: 99;
-`;
+import {
+  NavMenu,
+  NavTitle,
+  useGlobalStore,
+  permissionStore,
+  ListPageSide,
+} from '@ks-console/shared';
 
 const PageMain = styled.div`
   margin-left: 240px;
@@ -57,7 +55,7 @@ function ListLayout(): JSX.Element {
 
   return (
     <>
-      <PageSide>
+      <ListPageSide>
         <NavTitle
           icon={<Openpitrix variant="light" size={40} />}
           title={t(title)}
@@ -65,7 +63,7 @@ function ListLayout(): JSX.Element {
           style={{ marginBottom: '20px' }}
         />
         {navs && <NavMenu navs={navs} prefix={prefix} pathname={location.pathname} />}
-      </PageSide>
+      </ListPageSide>
       <PageMain>
         <Outlet />
       </PageMain>
