@@ -49,7 +49,7 @@ function DetailDrawer({
     versionID: detail.metadata.name,
   });
   const { data: files = {} } = fileStore.useQueryFiles(
-    { name: appName, versionID: detail.metadata.name },
+    { appName, versionID: detail.metadata.name },
     { enabled: !!appName && !!detail.metadata.name },
   );
   const readme = useMemo(() => {

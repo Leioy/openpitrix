@@ -26,5 +26,7 @@
   "DELETED_SUCCESSFUL": "Delete successful",
   "Submitter": "Submitter",
   "RELEASE_SUCCESSFUL": "Approved",
-  "APP_VERSION_STATUS_TO_BE_REVIEWED": "Audit"
+  "APP_VERSION_STATUS_TO_BE_REVIEWED": "Audit",
+  "APP_VERSION_STATUS_REJECTED": "REJECTED"
+
 }
