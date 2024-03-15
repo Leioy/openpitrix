@@ -1,7 +1,7 @@
 {
   "name": "名称",
-  "CREATE_CHARTS_APPS": "創建charts應用",
-  "CREATE_YAML_APPS": "創建yaml應用",
+  "CREATE_CHARTS_APPS": "創建 CHARTS 應用",
+  "CREATE_YAML_APPS": "創建 YAML 應用",
   "CREATE_TEMPLATE_APPS": "創建範本應用",
   "REPO_MANAGE": "repo 源管理",
   "APP_INSTANCES_MANAGE": "實例管理",
