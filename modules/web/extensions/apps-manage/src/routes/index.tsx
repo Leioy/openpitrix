@@ -9,12 +9,15 @@ import {
   AppStoreDetails,
   NewVersionList as VersionList,
   AppDeployDetailRoute,
+  WorkspaceLayout,
+  WorkspaceListLayout,
 } from '@ks-console/shared';
 
 import ListLayout from '../containers/Base/ListLayout';
 
 import Reviews from '../containers/Reviews';
 import RepoManage from '../containers/RepoManage';
+import AppDetails from '../containers/AppDetail/routes';
 
 import CategoriesManage from '../containers/CategoriesManage';
 import ApplicationManage from '../containers/AppInstanceManage';
@@ -22,6 +25,7 @@ import StoreManage from '../containers/StoreManage';
 import AppDetailPage from '../containers/AppDetailPage';
 
 const PATH = '/apps-manage';
+const appTemplatePath = 'workspaces/:workspace/app-templates';
 
 export default [
   {
@@ -76,6 +80,23 @@ export default [
       },
     ],
   },
+  {
+    path: appTemplatePath,
+    element: <WorkspaceLayout />,
+    children: [
+      {
+        element: <WorkspaceListLayout />,
+        children: [
+          {
+            index: true,
+            exact: true,
+            element: <StoreManage />,
+          },
+        ],
+      },
+    ],
+  },
+  ...AppDetails(appTemplatePath),
   {
     path: '/apps-manage/store/:appName',
     element: <AppDetailPage />,
