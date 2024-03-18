@@ -34,7 +34,7 @@ const extensionConfig = {
   routes,
   menus: [menu, workspaceAppManageMenu],
   locales,
-  sCheckLicense: true,
+  isCheckLicense: true,
 };
 
 export default extensionConfig;
