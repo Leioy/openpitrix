@@ -26,9 +26,9 @@ export function AppDataTable({
   emptyOptions,
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
+    const appType = workspace ? ',application.kubesphere.io/app-type in (helm,yaml)' : '';
     const otherQuery = {
-      label:
-        'application.kubesphere.io/repo-name=upload,application.kubesphere.io/app-type in (helm,yaml)',
+      label: `application.kubesphere.io/repo-name=upload${appType}`,
     };
     return {
       categoryID: categoryId,
