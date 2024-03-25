@@ -81,10 +81,11 @@ export default [
     ],
   },
   {
-    path: appTemplatePath,
+    path: '/',
     element: <WorkspaceLayout />,
     children: [
       {
+        path: appTemplatePath,
         element: <WorkspaceListLayout />,
         children: [
           {
@@ -94,9 +95,9 @@ export default [
           },
         ],
       },
+      ...AppDetails(appTemplatePath),
     ],
   },
-  ...AppDetails(appTemplatePath),
   {
     path: '/apps-manage/store/:appName',
     element: <AppDetailPage />,
