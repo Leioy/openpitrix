@@ -19,11 +19,12 @@ import {
   getLocalTime,
   getAuthKey,
   transferAppStatus,
-  getAnnotationsAliasName,
   getAnnotationsDescription,
   getDisplayName,
   getUserAliasName,
   AppType,
+  getCategoryDisplayName,
+  getDetailMetadataCategory,
 } from '@ks-console/shared';
 
 import { AppDataTable } from '../../components/AppDataTable';
@@ -55,15 +56,14 @@ export const TableItemField = styled(Field)`
 export function StoreManage(): JSX.Element {
   const params = useParams();
   const { workspace } = params;
-  const tableRef = useRef();
+  const tableRef = useRef<any>();
   const [selectData, setSelectedApp] = useStore<AppDetail>('selectedApp');
   const { data: categories } = useCategoryList({
     options: {
-      format: item => {
-        const name = getAnnotationsAliasName(item) || item.metadata.name;
+      format: (item: any) => {
         return {
           value: item?.metadata?.name,
-          label: name === 'kubesphere-app-uncategorized' ? t('APP_CATE_UNCATEGORIZED') : name,
+          label: getDetailMetadataCategory(item),
         };
       },
     },
@@ -88,7 +88,6 @@ export function StoreManage(): JSX.Element {
   async function handleDelete() {
     await deleteApp({ appName: selectData.metadata.name, workspace });
     setDelVisible(false);
-    // @ts-ignore TODO
     tableRef?.current?.refetch();
     notify.success(t('DELETED_SUCCESSFULLY'));
   }
@@ -150,7 +149,7 @@ export function StoreManage(): JSX.Element {
       canHide: true,
       width: '10%',
       render: status => (
-        // @ts-ignore TODO
+        // @ts-ignore
         <StatusIndicator type={status}>{transferAppStatus(status)}</StatusIndicator>
       ),
     },
@@ -179,7 +178,6 @@ export function StoreManage(): JSX.Element {
       field: 'metadata.resourceVersion',
       canHide: true,
       width: '10%',
-      // @ts-ignore TODO
       render: (_, record) =>
         record?.metadata.annotations?.['application.kubesphere.io/latest-app-version'] || '-',
     },
@@ -188,7 +186,6 @@ export function StoreManage(): JSX.Element {
       field: 'category_set',
       canHide: true,
       width: '10%',
-      // @ts-ignore TODO
       render: (_, record) => {
         const label = record?.metadata?.labels?.['application.kubesphere.io/app-category-name'];
         const aliasName = (categories as unknown as { label: string; value: string }[])?.find(
@@ -198,12 +195,7 @@ export function StoreManage(): JSX.Element {
           return aliasName.label;
         }
 
-        if (label === 'kubesphere-app-uncategorized') {
-          return t('APP_CATE_UNCATEGORIZED');
-        }
-        return t(`APP_CATE_${label?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-          defaultValue: label || '-',
-        });
+        return getCategoryDisplayName(label);
       },
     },
     {
@@ -254,7 +246,6 @@ export function StoreManage(): JSX.Element {
   });
 
   function editSuccess() {
-    // @ts-ignore TODO
     tableRef?.current?.refetch();
   }
 
@@ -270,7 +261,7 @@ export function StoreManage(): JSX.Element {
         <AppDataTable
           filter
           tableRef={tableRef}
-          // @ts-ignore TODO
+          // @ts-ignore
           columns={columns}
           workspace={workspace}
           toolbarRight={tableActions()}

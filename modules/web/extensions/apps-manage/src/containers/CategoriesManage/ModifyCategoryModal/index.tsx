@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, FormItem, Modal, useForm, Select } from '@kubed/components';
 
-import { CategoryDetail, Icon, getAnnotationsName } from '@ks-console/shared';
+import { CategoryDetail, Icon, getDetailMetadataCategory } from '@ks-console/shared';
 
 import { Body } from './styles';
 
@@ -25,18 +25,9 @@ function ModifyCategoryModal({
   const [category, setcategoryName] = useState<string>(categoryName || '');
 
   const options =
-    categories?.map(({ metadata }) => ({
-      label: t(
-        `APP_CATE_${getAnnotationsName({ metadata }, 'kubesphere.io/alias-name')
-          ?.toUpperCase()
-          .replace(/[^A-Z]+/g, '_')}`,
-        {
-          defaultValue:
-            getAnnotationsName({ metadata }, 'kubesphere.io/alias-name') ||
-            (metadata.name === 'kubesphere-app-uncategorized' ? '未分类' : metadata.name),
-        },
-      ),
-      value: metadata.name,
+    categories?.map(record => ({
+      label: getDetailMetadataCategory(record as any),
+      value: record.metadata?.name,
     })) ?? [];
 
   function handleOK(): void {

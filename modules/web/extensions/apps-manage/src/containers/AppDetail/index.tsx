@@ -12,13 +12,14 @@ import {
   getAvatar,
   getLocalTime,
   getAnnotationsDescription,
-  getAnnotationsAliasName,
   getDisplayName,
   getWorkspacesAliasName,
   DetailPagee,
+  getDetailMetadataCategory,
+  AppType,
 } from '@ks-console/shared';
 import AppTemplateEdit from '../../components/AppTemplateEdit';
-import { AppType, AppDetail } from '@ks-console/shared';
+import type { AppDetail } from '@ks-console/shared';
 
 const { useAppDetail, handleApp, useCategoryList, HANDLE_TYPE_TO_SHOW } = openpitrixStore;
 
@@ -36,7 +37,6 @@ export function AppDetailPage(): JSX.Element {
       path: `${PATH}/app-information`,
       title: t('APP_INFORMATION'),
     },
-    // TODO 临时注释
     // {
     //   path: `${PATH}/audit-records`,
     //   title: t('APP_REVIEW'),
@@ -57,11 +57,10 @@ export function AppDetailPage(): JSX.Element {
   const { data: categories } = useCategoryList({
     options: {
       autoFetch: !!workspace,
-      format: item => {
-        const name = getAnnotationsAliasName(item) || item.metadata.name;
+      format: (item: any) => {
         return {
           value: item?.metadata?.name,
-          label: name === 'kubesphere-app-uncategorized' ? t('APP_CATE_UNCATEGORIZED') : name,
+          label: getDetailMetadataCategory(item),
         };
       },
     },
@@ -128,22 +127,15 @@ export function AppDetailPage(): JSX.Element {
     { appName: appName, workspace },
     {
       enabled: !detail && !!appName,
-      onSuccess: appDetails => {
+      onSuccess: (appDetails: any) => {
         setDetail({ ...appDetails, refetchAppDetails });
       },
     },
   );
 
-  // 获取分类
-  const getDetailMetadataCategory = (record: any) => {
-    const label = record?.metadata?.labels?.['application.kubesphere.io/app-category-name'];
-    if (label === 'kubesphere-app-uncategorized') {
-      return t('APP_CATE_UNCATEGORIZED');
-    }
-    return t(`APP_CATE_${label?.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-      defaultValue: label || '-',
-    });
-  };
+  const label = detail?.metadata?.labels?.['application.kubesphere.io/app-category-name'];
+
+  const category = categories?.find((item: any) => item.value === label);
 
   const attrs = [
     {
@@ -156,13 +148,14 @@ export function AppDetailPage(): JSX.Element {
     },
     {
       label: t('CATEGORY'),
-      value: getDetailMetadataCategory(detail),
+      // @ts-ignore
+      value: category?.label || label,
       icon: 'edit',
     },
     {
       label: t('TYPE'),
       // @ts-ignore
-      value: AppType[detail?.spec.appType],
+      value: t(AppType[detail?.spec.appType]),
     },
     {
       label: t('WORKSPACE'),
