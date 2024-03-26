@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from 'react';
 
-import { Column, DataTable, openpitrixStore, useListQueryParams } from '@ks-console/shared';
+import { openpitrixStore, useListQueryParams, DataTable, Column } from '@ks-console/shared';
 
 const { getBaseUrl, SORT_KEY } = openpitrixStore;
 
@@ -9,58 +9,64 @@ type Props = {
   tableRef?: any;
   filter?: boolean;
   columns: Column[];
-  categoryName?: string;
+  categoryId?: string;
   batchActions?: ReactNode[] | null;
   toolbarRight?: ReactNode[] | null;
   emptyOptions?: any;
 };
 
-function AppDataTable({
+export function AppDataTable({
   columns,
-  categoryName,
+  categoryId,
   batchActions,
   toolbarRight,
   tableRef,
+  filter,
   workspace,
   emptyOptions,
 }: Props): JSX.Element {
   const queryParams: Record<string, unknown> = useMemo(() => {
+    const appType = workspace ? ',application.kubesphere.io/app-type in (helm,yaml)' : '';
+    const otherQuery = {
+      label: `application.kubesphere.io/repo-name=upload${appType}`,
+    };
     return {
-      category_id: categoryName,
+      categoryID: categoryId,
       order: SORT_KEY,
       status: 'active|rejected|passed|suspended|draft',
       // repo_id: 'repo-helm',
+      otherQuery,
     };
-  }, [categoryName]);
+  }, [categoryId]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
-    const { parameters, pageIndex, pageSize, filters } = params;
+    const { parameters, pageIndex, filters, pageSize } = params;
     const keyword = filters?.[0]?.value;
     const formattedParams: Record<string, any> = useListQueryParams({
       ...parameters,
-    });
-    const querys: Record<string, string | number | boolean> = {
-      ...formattedParams,
       page: pageIndex + 1,
-      limit: pageSize,
-      conditions: `status=${parameters.status}`,
+    });
+    if (filter) {
+      formattedParams.page = pageIndex + 1;
+      formattedParams.limit = pageSize;
+      delete formattedParams.paging;
+    }
+
+    if (!keyword) {
+      return formattedParams;
+    }
+
+    return {
+      ...formattedParams,
+      conditions: formattedParams.conditions,
+      name: keyword,
+      limit: 20,
+      page: pageIndex + 1,
     };
-    if (categoryName) {
-      querys.labelSelector = `application.kubesphere.io/app-category-name=${categoryName},application.kubesphere.io/repo-name=upload`;
-    }
-
-    if (keyword) {
-      querys.name = keyword;
-    }
-
-    return querys;
   };
 
   const formatServerData = (serverData: any) => {
-    return {
-      ...serverData,
-      totalItems: serverData.totalItems,
-    };
+    return serverData;
   };
 
   return (
@@ -72,7 +78,6 @@ function AppDataTable({
       url={getBaseUrl({ workspace }, 'apps')}
       columns={columns}
       parameters={queryParams}
-      format={data => data}
       batchActions={batchActions}
       toolbarRight={toolbarRight}
       serverDataFormat={formatServerData}

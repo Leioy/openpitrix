@@ -8,28 +8,35 @@ const menu = {
   icon: 'cluster',
   order: 0,
   desc: 'EDGEWIZE_COMPUTING',
-  ksModule: 'openpitrix',
-  authKey: 'manage-app',
+  ksModule: 'edgewize',
+  authKey: 'global-edge-cluster-management',
   authAction: 'manage',
 };
 
 const workspaceAppManageMenu = {
   parent: 'workspace',
-  name: 'edgesetting',
-  title: 'EDGEWIZE_SETTING',
+  name: 'edge-management',
+  title: 'EDGEWIZE_MANAGEMENT',
   icon: 'appcenter',
   order: 3,
   desc: 'EDGEWIZE_PROJECT_SETTING',
-  skipAuth: true,
   children: [
     {
-      name: 'edgesetting',
-      title: 'EDGEWIZE_LABELS_SETTING',
+      name: 'edge-templates',
+      title: 'EDGEWIZE_TEMPLATE',
       icon: 'appcenter',
-      skipAuth: true,
+      order: 0,
+      authKey: 'edge-app-templates',
+    },
+    {
+      name: 'edge-setting',
+      title: 'EDGEWIZE_LABELS',
+      icon: 'appcenter',
+      authKey: 'edge-workspaces',
     },
   ],
 };
+
 const extensionConfig = {
   routes,
   menus: [menu, workspaceAppManageMenu],

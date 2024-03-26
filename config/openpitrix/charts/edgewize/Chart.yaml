@@ -1,0 +1,9 @@
+apiVersion: v1
+name: edgewize-frontend
+description: Frontend of devops extension.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://kubesphere.io
+sources:
+  - https://github.com/kubesphere-extensions/openpitrix

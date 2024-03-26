@@ -1,8 +1,3 @@
-import { isEmpty } from 'lodash';
-import { LabeledValue } from '@kubed/components';
-
-import { CategoryDetail, isUnCategorizedCtg } from '@ks-console/shared';
-
 export function getScrollTop(): number {
   return window.pageYOffset !== undefined
     ? window.pageYOffset
@@ -30,33 +25,6 @@ export function transferReviewStatus(status: string): string {
 
 export function isAppsPageExact(): boolean {
   return location.pathname === '/apps';
-}
-
-export function getCategoryDisplayName(name: string): string {
-  return t(`APP_CATE_${name.toUpperCase().replace(/[^A-Z]+/g, '_')}`, {
-    defaultValue: name,
-  });
-}
-
-export function getAppCategoryNames(categories: CategoryDetail[]): string {
-  const names = categories.reduce((acc: string[], { metadata }: CategoryDetail) => {
-    // TODO  if (metadata.name && status !== 'disabled') {
-    if (metadata.name) {
-      const result = isUnCategorizedCtg(metadata.name)
-        ? t('APP_CATE_UNCATEGORIZED')
-        : metadata.name;
-      acc.push(t(result || metadata.name));
-    }
-    return acc;
-  }, []);
-
-  return isEmpty(names) ? '-' : names.join(', ');
-}
-
-export function getDefaultSelectFile(files: Record<string, string>, fileOptions: LabeledValue[]) {
-  const hasDefaultPreview = files['values.yaml'];
-  const firstFile = !isEmpty(fileOptions) ? fileOptions[0].value : '';
-  return hasDefaultPreview ? 'values.yaml' : firstFile;
 }
 
 // todo use compare version module

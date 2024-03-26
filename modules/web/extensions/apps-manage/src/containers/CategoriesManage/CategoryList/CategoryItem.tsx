@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 
-import { CategoryDetail, Icon, isUnCategorizedCtg } from '@ks-console/shared';
+import {
+  CategoryDetail,
+  Icon,
+  isUnCategorizedCtg,
+  getDetailMetadataCategory,
+} from '@ks-console/shared';
 
 import { Actions, Category, Others } from './styles';
 
@@ -19,7 +24,6 @@ function CategoryItem({
   onEditCategory,
   onDeleteCategory,
 }: Props): JSX.Element {
-  const displayName = detail?.metadata?.name;
   // @ts-ignore
   const icons = detail?.spec?.icon;
   const iconName = useMemo(() => {
@@ -29,34 +33,17 @@ function CategoryItem({
     return icons;
   }, [icons]);
 
-  function getName(name: string) {
-    const aliasName = detail.metadata?.annotations?.['kubesphere.io/alias-name'];
-    if (aliasName) {
-      return aliasName;
-    }
-    if (name === 'kubesphere-app-uncategorized') {
-      return 'UNCATEGORIZED';
-    }
-    return name;
-  }
   return (
     <Category onClick={() => onSelectCategory(detail)} className={`${isActive && 'active'}`}>
       {iconName && <Icon size={16} className="mr12" name={iconName} />}
-      {`${t(
-        `APP_CATE_${getName(displayName)
-          ?.toUpperCase()
-          .replace(/[^A-Z]+/g, '_')}`,
-        {
-          defaultValue: getName(displayName),
-        },
-      )}（${displayName}）`}
+      {getDetailMetadataCategory(detail as any)}
       <Others>
         <span className="total_count">{detail?.status.total || 0}</span>
         {!isUnCategorizedCtg(detail?.metadata.name) && (
           <Actions className="actions">
             <Icon
               name="trash"
-              onClick={e => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onDeleteCategory?.(detail);
@@ -64,7 +51,7 @@ function CategoryItem({
             />
             <Icon
               name="pen"
-              onClick={e => {
+              onClick={(e: any) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onEditCategory?.(detail);
