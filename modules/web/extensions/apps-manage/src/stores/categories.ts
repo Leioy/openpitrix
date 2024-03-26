@@ -70,5 +70,5 @@ export function updateCategory(category_id: string, data: any) {
 
 export function createCategory(data: Pick<CategoryDetail, 'metadata' | 'spec'>) {
   const url = getBaseUrl({}, resourceName);
-  return request.post(`${url}`, data);
+  return request.post(url, data);
 }
