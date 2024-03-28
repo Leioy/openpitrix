@@ -97,20 +97,20 @@ export function StoreManage(): JSX.Element {
     authKey,
     actions: [
       {
-        key: 'edit',
+        key: 'workspace-view-create-app-templates',
         icon: <Pen />,
         text: t('EDIT'),
-        action: 'edit',
+        action: 'workspace-view-create-app-templates',
         onClick: (_, app) => {
           setSelectedApp(app);
           setEditVisible(true);
         },
       },
       {
-        key: 'delete',
+        key: 'workspace-delete-app-templates',
         icon: <Icon name="trash" />,
         text: t('DELETE'),
-        action: 'delete',
+        action: 'workspace-delete-app-templates',
         onClick: (_, record) => {
           setDelVisible(true);
           setSelectedApp(record);
@@ -227,9 +227,9 @@ export function StoreManage(): JSX.Element {
     }
     return [
       {
-        key: 'create',
+        key: 'workspace-view-create-app-templates',
         text: t('CREATE'),
-        action: 'create',
+        action: 'workspace-view-create-app-templates',
         onClick: () => open(),
         props: {
           color: 'secondary',

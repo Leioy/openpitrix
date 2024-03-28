@@ -80,6 +80,7 @@ export function AppDetailPage(): JSX.Element {
     const action = [
       {
         key: 'edit',
+        action: 'workspace-view-create-app-templates',
         type: 'edit',
         icon: 'edit',
         text: t('EDIT'),
@@ -94,6 +95,7 @@ export function AppDetailPage(): JSX.Element {
     if (details?.status?.state === 'active' && !workspace) {
       action.push({
         key: 'suspend',
+        action: 'manage',
         type: 'control',
         icon: 'sort-descending',
         text: t('APP_SUSPEND'),
@@ -105,6 +107,7 @@ export function AppDetailPage(): JSX.Element {
     } else if (['draft', 'suspended'].includes(details?.status?.state) && !workspace) {
       action.push({
         key: 'recover',
+        action: 'manage',
         type: 'control',
         icon: 'sort-ascending',
         text: t('APP_LISTING'),
