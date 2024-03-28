@@ -204,7 +204,7 @@ export function StoreManage(): JSX.Element {
       canHide: true,
       width: '10%',
       // @ts-ignore
-      render: types => AppType[types as typeof AppType],
+      render: types => t(AppType[types as typeof AppType]),
     },
     {
       title: t('UPDATE_TIME_TCAP'),

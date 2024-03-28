@@ -39,11 +39,17 @@ export function NewVersionList() {
     setSelectRow(data);
     setDeployVisible(true);
   }
+  const actionKey = {
+    appKey: 'app-templates',
+    create: 'workspace-view-create-app-templates',
+    delete: 'workspace-delete-app-templates',
+  };
 
   return (
     <>
       <VersionList
         refresh={refresh}
+        actionKey={actionKey}
         onAddVersion={data => {
           if (!params.workspace) {
             setParams({
