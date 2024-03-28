@@ -9,7 +9,7 @@ type Props = {
   tableRef?: any;
   filter?: boolean;
   columns: Column[];
-  categoryId?: string;
+  categoryID?: string;
   batchActions?: ReactNode[] | null;
   toolbarRight?: ReactNode[] | null;
   emptyOptions?: any;
@@ -17,7 +17,7 @@ type Props = {
 
 export function AppDataTable({
   columns,
-  categoryId,
+  categoryID,
   batchActions,
   toolbarRight,
   tableRef,
@@ -31,13 +31,13 @@ export function AppDataTable({
       label: `application.kubesphere.io/repo-name=upload${appType}`,
     };
     return {
-      categoryID: categoryId,
+      categoryID,
       order: SORT_KEY,
       status: 'active|rejected|passed|suspended|draft',
       // repo_id: 'repo-helm',
       otherQuery,
     };
-  }, [categoryId]);
+  }, [categoryID]);
 
   const requestParamsTransformer = (params: Record<string, any>) => {
     const { parameters, pageIndex, filters, pageSize } = params;

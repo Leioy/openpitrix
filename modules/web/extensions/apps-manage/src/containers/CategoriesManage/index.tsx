@@ -210,7 +210,7 @@ function CategoriesManage(): JSX.Element {
               tableRef={tableRef}
               columns={columns as any}
               batchActions={renderBatchActions()}
-              categoryName={selectedCategory.metadata?.name}
+              categoryID={selectedCategory.metadata?.name}
             />
           )}
         </SecondColumn>
