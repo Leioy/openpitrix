@@ -7,7 +7,6 @@ import {
   AppsDashBoard,
   AppBaseLayout,
   AppStoreDetails,
-  NewVersionList as VersionList,
   AppDeployDetailRoute,
   WorkspaceLayout,
   WorkspaceListLayout,
@@ -23,7 +22,7 @@ import CategoriesManage from '../containers/CategoriesManage';
 import ApplicationManage from '../containers/AppInstanceManage';
 import StoreManage from '../containers/StoreManage';
 import AppDetailPage from '../containers/AppDetailPage';
-
+import VersionList from '../containers/AppDetail/VersionList';
 const PATH = '/apps-manage';
 const appTemplatePath = 'workspaces/:workspace/app-templates';
 
@@ -81,24 +80,6 @@ export default [
     ],
   },
   {
-    path: '/',
-    element: <WorkspaceLayout />,
-    children: [
-      {
-        path: appTemplatePath,
-        element: <WorkspaceListLayout />,
-        children: [
-          {
-            index: true,
-            exact: true,
-            element: <StoreManage />,
-          },
-        ],
-      },
-      ...AppDetails(appTemplatePath),
-    ],
-  },
-  {
     path: '/apps-manage/store/:appName',
     element: <AppDetailPage />,
     children: [
@@ -122,6 +103,24 @@ export default [
         path: 'app-instances',
         element: <InstanceList />,
       },
+    ],
+  },
+  {
+    path: '/',
+    element: <WorkspaceLayout />,
+    children: [
+      {
+        path: appTemplatePath,
+        element: <WorkspaceListLayout />,
+        children: [
+          {
+            index: true,
+            exact: true,
+            element: <StoreManage />,
+          },
+        ],
+      },
+      ...AppDetails(appTemplatePath),
     ],
   },
   ...AppDeployDetailRoute('/apps-manage/deploy'),

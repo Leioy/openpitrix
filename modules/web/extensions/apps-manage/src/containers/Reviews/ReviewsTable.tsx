@@ -11,6 +11,9 @@ import {
   openpitrixStore,
   useListQueryParams,
   AppsDeploySpaceModal,
+  getWorkspacesAliasName,
+  getUserAliasName,
+  getDisplayName,
 } from '@ks-console/shared';
 import { getReviewsUrl } from '../../stores';
 
@@ -72,7 +75,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
               iconLetter={item.metadata.name || '-'}
             />
           }
-          value={item.metadata.name}
+          value={getDisplayName(item)}
           label={getAnnotationsDescription(item) || '-'}
         />
       ),
@@ -82,14 +85,17 @@ function ReviewsTable({ type }: Props): JSX.Element {
       field: 'app_id',
       canHide: true,
       width: '15%',
-      render: (_, item) => item?.metadata?.labels?.['kubesphere.io/workspace'] || '-',
+      render: (_, item) => {
+        const workspace = item?.metadata?.labels?.['kubesphere.io/workspace'] || '-';
+        return getWorkspacesAliasName(workspace);
+      },
     },
     {
       title: t('Submitter'),
       field: 'reviewer',
       canHide: true,
       width: '15%',
-      render: (_, item) => item?.status?.userName || '-',
+      render: (_, item) => getUserAliasName(item?.status?.userName) || '-',
     },
     {
       title: t('STATUS'),

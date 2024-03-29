@@ -11,9 +11,10 @@ import {
   AppDetail,
   useBatchActions,
   DeleteConfirmModal,
-  getAnnotationsAliasName,
   StatusIndicator,
   transferAppStatus,
+  getAnnotationsAliasName,
+  getWorkspacesAliasName,
 } from '@ks-console/shared';
 import {
   useCategoryList,
@@ -72,7 +73,7 @@ function CategoriesManage(): JSX.Element {
       canHide: true,
       width: '25%',
       render: (_, app) => {
-        return get(app, 'metadata.labels["kubesphere.io/workspace"]', '-');
+        return getWorkspacesAliasName(get(app, 'metadata.labels["kubesphere.io/workspace"]', '-'));
       },
     },
     {
@@ -210,7 +211,7 @@ function CategoriesManage(): JSX.Element {
               tableRef={tableRef}
               columns={columns as any}
               batchActions={renderBatchActions()}
-              categoryName={selectedCategory.metadata?.name}
+              categoryID={selectedCategory.metadata?.name}
             />
           )}
         </SecondColumn>
