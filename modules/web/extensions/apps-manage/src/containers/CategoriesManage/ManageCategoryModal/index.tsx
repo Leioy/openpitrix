@@ -63,7 +63,7 @@ function ManageCategoryModal({
   return (
     <Modal
       visible={visible}
-      title={t('CATEGORY')}
+      title={t('APP_STORE_CATEGORY')}
       titleIcon={<Icon name="tag" size={20} />}
       onOk={handleOK}
       onCancel={onCancel}
@@ -73,22 +73,22 @@ function ManageCategoryModal({
           <FormItem
             name={['metadata', 'name']}
             label={t('NAME')}
-            help={t('CATEGORY_NAME_DESC')}
+            help={t('APP_STORE_CATEGORY_NAME_DESC')}
             rules={[
-              { required: true, message: t('ENTER_CATEGORY_NAME_TIP') },
+              { required: true, message: t('APP_STORE_ENTER_CATEGORY_NAME_TIP') },
               { validator: nameValidator },
             ]}
           >
             <Input disabled={!!detail?.metadata.name} autoComplete="off" maxLength={20} />
           </FormItem>
           <FormItem
-            label={t('ALIAS')}
-            help={t('ALIAS_DESC')}
+            label={t('APP_STORE_ALIAS')}
+            help={t('APP_STORE_ALIAS_DESC')}
             name={['metadata', 'annotations', 'kubesphere.io/alias-name']}
           >
             <Input maxLength={63} />
           </FormItem>
-          <FormItem name={['spec', 'icon']} label={t('ICON')}>
+          <FormItem name={['spec', 'icon']} label={t('APP_STORE_ICON')}>
             <IconSelector />
           </FormItem>
         </Form>

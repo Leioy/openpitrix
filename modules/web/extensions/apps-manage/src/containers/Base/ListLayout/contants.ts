@@ -2,11 +2,11 @@ export const navs = [
   {
     name: 'apps',
     children: [
-      { name: 'store', title: 'APPS', icon: 'appcenter' },
-      { name: 'categories', title: 'APP_CATEGORY_PL', icon: 'tag' },
-      { name: 'reviews', title: 'APP_REVIEW', icon: 'safe-notice' },
-      { name: 'repo', title: 'APP_REPOSITORY_PL', icon: 'safe-notice' },
-      { name: 'deploy', title: 'DEPLOY_MANAGE', icon: 'safe-notice' },
+      { name: 'store', title: 'APP_STORE_NAME', icon: 'appcenter' },
+      { name: 'categories', title: 'APP_STORE_APP_CATEGORY', icon: 'tag' },
+      { name: 'reviews', title: 'APP_STORE_REVIEW', icon: 'safe-notice' },
+      { name: 'repo', title: 'APP_STORE_REPOSITORY', icon: 'safe-notice' },
+      { name: 'deploy', title: 'APP_STORE_DEPLOY_MANAGEMENT', icon: 'safe-notice' },
     ],
   },
 ];

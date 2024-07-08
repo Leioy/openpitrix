@@ -7,10 +7,10 @@ import {
   AppsDashBoard,
   AppBaseLayout,
   AppStoreDetails,
-  AppDeployDetailRoute,
   WorkspaceLayout,
   WorkspaceListLayout,
 } from '@ks-console/shared';
+import { AppDeployDetailRoute } from '../shared';
 
 import ListLayout from '../containers/Base/ListLayout';
 

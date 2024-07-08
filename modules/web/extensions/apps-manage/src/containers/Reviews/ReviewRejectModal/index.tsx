@@ -22,13 +22,16 @@ function ReviewRejectModal({ visible, onOk, onCancel }: Props): JSX.Element {
       width={600}
       visible={visible}
       titleIcon={<SafeNotice size={20} />}
-      title={t('REJECTION_REASON')}
-      description={t('REJECT_REASON_DESC')}
+      title={t('APP_STORE_REJECTION_REASON')}
+      description={t('APP_STORE_REJECT_REASON_DESC')}
       onOk={handleReject}
       onCancel={onCancel}
     >
       <Form form={form} className="rejectForm" style={{ padding: '20px' }}>
-        <FormItem name={['message']} rules={[{ required: true, message: t('REJECT_REASON_TIP') }]}>
+        <FormItem
+          name={['message']}
+          rules={[{ required: true, message: t('APP_STORE_REJECT_REASON_TIP') }]}
+        >
           <Textarea />
         </FormItem>
       </Form>

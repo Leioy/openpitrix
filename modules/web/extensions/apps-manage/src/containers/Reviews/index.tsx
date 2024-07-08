@@ -11,15 +11,15 @@ function Reviews(): JSX.Element {
   const navs: NavItem[] = [
     {
       value: 'unprocessed',
-      label: t('NEW_SUBMIT'),
+      label: t('APP_STORE_NEW_SUBMIT'),
     },
     {
       value: 'processed',
-      label: t('COMPLETED'),
+      label: t('APP_STORE_COMPLETED'),
     },
     {
       value: 'all',
-      label: t('ALL'),
+      label: t('APP_STORE_ALL'),
     },
   ];
 
@@ -28,8 +28,8 @@ function Reviews(): JSX.Element {
       <Banner
         className="mb12"
         icon={<SafeNotice />}
-        title={t('APP_REVIEW')}
-        description={t('APP_REVIEW_DESC')}
+        title={t('APP_STORE_APP_REVIEW')}
+        description={t('APP_STORE_APP_REVIEW_DESC')}
       >
         <Navs data={navs} value={type} onChange={navigate} />
       </Banner>

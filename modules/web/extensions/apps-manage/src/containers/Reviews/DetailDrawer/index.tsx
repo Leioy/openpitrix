@@ -57,19 +57,19 @@ function DetailDrawer({
   }, [files]);
   const navs: NavItem[] = [
     {
-      label: t('APP_INFORMATION'),
+      label: t('APP_STORE_APP_INFORMATION'),
       value: 'appInfo',
     },
     {
-      label: t('DOCUMENTATION'),
+      label: t('APP_STORE_DOCUMENTATION'),
       value: 'readme',
     },
     {
-      label: t('CHART_FILES'),
+      label: t('APP_STORE_CHART_FILES'),
       value: 'configFiles',
     },
     {
-      label: t('UPDATE_LOG'),
+      label: t('APP_STORE_UPDATE_LOG'),
       value: 'updateLog',
     },
   ];
@@ -78,7 +78,7 @@ function DetailDrawer({
     readme: readme ? (
       <ReactMarkdown>{readme}</ReactMarkdown>
     ) : (
-      <p>{t('VERSION_INTRO_EMPTY_DESC')}</p>
+      <p>{t('APP_STORE_VERSION_INTRO_EMPTY_DESC')}</p>
     ),
     configFiles: (
       <>
@@ -98,8 +98,8 @@ function DetailDrawer({
     ),
     updateLog: (
       <>
-        <LabelText>{t('UPDATE_LOG')}</LabelText>
-        <pre>{versionDetail?.status.message || t('NO_UPDATE_LOG_DESC')}</pre>
+        <LabelText>{t('APP_STORE_UPDATE_LOG')}</LabelText>
+        <pre>{versionDetail?.status.message || t('APP_STORE_NO_UPDATE_LOG_DESC')}</pre>
       </>
     ),
   };
@@ -109,7 +109,11 @@ function DetailDrawer({
       <CloseModal color="dark" shadow onClick={onCancel}>
         <Icon name="close" size={24} color="white" />
       </CloseModal>
-      <Header icon={<SafeNotice />} title={t('APP_DETAILS')} description={t('APP_DETAILS_DESC')}>
+      <Header
+        icon={<SafeNotice />}
+        title={t('APP_STORE_APP_DETAILS')}
+        description={t('APP_STORE_APP_DETAILS_DESC')}
+      >
         <Navs data={navs} value={tabKey} onChange={setTabKey} />
       </Header>
       <Content style={{ height: `calc(100vh - ${showFooter ? '266px' : '194px'})` }}>
@@ -118,13 +122,13 @@ function DetailDrawer({
       {showFooter && (
         <Footer>
           <StyledButton className="mr12" color="error" onClick={onReject}>
-            {t('REJECT')}
+            {t('APP_STORE_REJECT')}
           </StyledButton>
           <StyledButton className="mr12" color="secondary" onClick={() => onDeploy(files)}>
-            {t('DEPLOYMENT')}
+            {t('APP_STORE_DEPLOYMENT')}
           </StyledButton>
           <StyledButton color="secondary" onClick={onOk} disabled={isConfirming}>
-            {t('APPROVE_AND_RELEASE')}
+            {t('APP_STORE_APPROVE_AND_RELEASE')}
           </StyledButton>
         </Footer>
       )}

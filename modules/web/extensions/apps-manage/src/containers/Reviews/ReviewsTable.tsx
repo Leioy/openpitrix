@@ -43,13 +43,19 @@ function ReviewsTable({ type }: Props): JSX.Element {
     order: 'status_time',
     status: REVIEW_QUERY_STATUS[type],
   };
+
+  const showReview = (item: any) => {
+    setSelectedRow(item);
+    setVisible(true);
+  };
+
   const renderItemActions = useItemActions({
     authKey: 'manage-app',
     actions: [
       {
         key: 'detail',
         icon: <Icon name="eye" />,
-        text: t('VIEW_DETAILS'),
+        text: t('APP_STORE_VIEW_DETAILS'),
         action: 'view',
         onClick: (_, record) => {
           showReview(record);
@@ -59,7 +65,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
   });
   const columns: Column[] = [
     {
-      title: t('NAME'),
+      title: t('APP_STORE_FIELD_NAME'),
       field: 'review_id',
       width: '30%',
       searchable: true,
@@ -81,7 +87,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
       ),
     },
     {
-      title: t('WORKSPACE'),
+      title: t('APP_STORE_FIELD_WORKSPACE'),
       field: 'app_id',
       canHide: true,
       width: '15%',
@@ -91,14 +97,14 @@ function ReviewsTable({ type }: Props): JSX.Element {
       },
     },
     {
-      title: t('Submitter'),
+      title: t('APP_STORE_Submitter'),
       field: 'reviewer',
       canHide: true,
       width: '15%',
       render: (_, item) => getUserAliasName(item?.status?.userName) || '-',
     },
     {
-      title: t('STATUS'),
+      title: t('APP_STORE_FIELD_STATUS'),
       field: 'status',
       canHide: true,
       width: '15%',
@@ -113,7 +119,7 @@ function ReviewsTable({ type }: Props): JSX.Element {
       },
     },
     {
-      title: t('UPDATE_TIME_TCAP'),
+      title: t('APP_STORE_FIELD_UPDATE_TIME'),
       field: 'status_time',
       canHide: true,
       width: '15%',
@@ -158,11 +164,6 @@ function ReviewsTable({ type }: Props): JSX.Element {
     setShowRejectModal(false);
   };
 
-  const showReview = (item: any) => {
-    setSelectedRow(item);
-    setVisible(true);
-  };
-
   const showReject = () => setShowRejectModal(true);
 
   const closeRejectModal = () => setShowRejectModal(false);
@@ -180,7 +181,9 @@ function ReviewsTable({ type }: Props): JSX.Element {
     });
     setIsSubmitting(false);
     onCancel();
-    notify.success(t(action === 'active' ? 'RELEASE_SUCCESSFUL' : 'REJECT_SUCCESSFUL'));
+    notify.success(
+      t(action === 'active' ? 'APP_STORE_RELEASE_SUCCESSFUL' : 'APP_STORE_REJECT_SUCCESSFUL'),
+    );
     tableRef.current?.refetch();
   };
 
@@ -200,8 +203,8 @@ function ReviewsTable({ type }: Props): JSX.Element {
         emptyOptions={{
           withoutTable: true,
           image: <Icon name="safeNotice" size={48} />,
-          title: t('APP_REVIEW_UNPROCESSED_EMPTY_DESC'),
-          description: t('APP_REVIEW_EMPTY_DESC'),
+          title: t('APP_STORE_APP_REVIEW_UNPROCESSED_EMPTY_DESC'),
+          description: t('APP_STORE_APP_REVIEW_EMPTY_DESC'),
         }}
       />
       {visible && (

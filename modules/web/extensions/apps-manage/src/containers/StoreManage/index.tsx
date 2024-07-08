@@ -99,7 +99,7 @@ export function StoreManage(): JSX.Element {
       {
         key: 'workspace-view-create-app-templates',
         icon: <Pen />,
-        text: t('EDIT'),
+        text: t('APP_STORE_EDIT'),
         action: 'workspace-view-create-app-templates',
         onClick: (_, app) => {
           setSelectedApp(app);
@@ -109,7 +109,7 @@ export function StoreManage(): JSX.Element {
       {
         key: 'workspace-delete-app-templates',
         icon: <Icon name="trash" />,
-        text: t('DELETE'),
+        text: t('APP_STORE_DELETE'),
         action: 'workspace-delete-app-templates',
         onClick: (_, record) => {
           setDelVisible(true);
@@ -121,7 +121,7 @@ export function StoreManage(): JSX.Element {
 
   const columns: Column<AppDetail>[] = [
     {
-      title: t('NAME'),
+      title: t('APP_STORE_FIELD_NAME'),
       field: 'metadata.name',
       width: '20%',
       searchable: true,
@@ -144,7 +144,7 @@ export function StoreManage(): JSX.Element {
       },
     },
     {
-      title: t('STATUS'),
+      title: t('APP_STORE_FIELD_STATUS'),
       field: 'status.state',
       canHide: true,
       width: '10%',
@@ -154,7 +154,7 @@ export function StoreManage(): JSX.Element {
       ),
     },
     {
-      title: t('WORKSPACE'),
+      title: t('APP_STORE_FIELD_WORKSPACE'),
       field: 'metadata.labels["kubesphere.io/workspace"]',
       canHide: true,
       width: '15%',
@@ -162,7 +162,7 @@ export function StoreManage(): JSX.Element {
         getWorkspacesAliasName(record?.metadata.labels['kubesphere.io/workspace']),
     },
     {
-      title: t('DEVELOPER'),
+      title: t('APP_STORE_FIELD_DEVELOPER'),
       field: 'maintainers',
       canHide: true,
       width: '10%',
@@ -174,7 +174,7 @@ export function StoreManage(): JSX.Element {
       },
     },
     {
-      title: t('LATEST_VERSION'),
+      title: t('APP_STORE_FIELD_NEWEST_VERSION'),
       field: 'metadata.resourceVersion',
       canHide: true,
       width: '10%',
@@ -182,7 +182,7 @@ export function StoreManage(): JSX.Element {
         record?.metadata.annotations?.['application.kubesphere.io/latest-app-version'] || '-',
     },
     {
-      title: t('CATEGORY'),
+      title: t('APP_STORE_FIELD_NEWEST_CATEGORY'),
       field: 'category_set',
       canHide: true,
       width: '10%',
@@ -199,7 +199,7 @@ export function StoreManage(): JSX.Element {
       },
     },
     {
-      title: t('App Templates'),
+      title: t('APP_STORE_FIELD_APP_TEMPLATE'),
       field: 'spec.appType',
       canHide: true,
       width: '10%',
@@ -207,7 +207,7 @@ export function StoreManage(): JSX.Element {
       render: types => t(AppType[types as typeof AppType]),
     },
     {
-      title: t('UPDATE_TIME_TCAP'),
+      title: t('APP_STORE_FIELD_UPDATE_TIME'),
       field: 'status.updateTime',
       canHide: true,
       width: '200px',
@@ -228,7 +228,7 @@ export function StoreManage(): JSX.Element {
     return [
       {
         key: 'workspace-view-create-app-templates',
-        text: t('CREATE'),
+        text: t('APP_STORE_CREATE'),
         action: 'workspace-view-create-app-templates',
         onClick: () => open(),
         props: {
@@ -254,7 +254,7 @@ export function StoreManage(): JSX.Element {
       <Banner
         className="mb12"
         icon={<Appcenter />}
-        title={t('App Templates')}
+        title={t('APP_STORE_FIELD_APP_TEMPLATE')}
         description={t('APP_STORE_DESC')}
       />
       {isInit && (
@@ -268,11 +268,11 @@ export function StoreManage(): JSX.Element {
           emptyOptions={{
             withoutTable: true,
             image: <Appcenter size={48} />,
-            title: t('NO_APP_DESC_FOUND'),
-            description: t('APP_CATEGORY_EMPTY_DESC'),
+            title: t('APP_STORE_NO_APP_DESC_FOUND'),
+            description: t('APP_STORE_APP_CATEGORY_EMPTY_DESC'),
             createButton: !!tableActions() && workspace && (
               <AddButton color="secondary" onClick={() => open()}>
-                {t('ADD')}
+                {t('APP_STORE_ADD')}
               </AddButton>
             ),
           }}

@@ -109,7 +109,7 @@ export function BasicInfoForm({
         </Col>
         <Col span={6}>
           <FormItem
-            label={t('VERSION')}
+            label={t('APP_STORE_VERSION')}
             name="versionID"
             rules={[{ required: true, message: t('VERSION_EMPTY_DESC') }]}
           >
@@ -130,7 +130,11 @@ export function BasicInfoForm({
       </Row>
       <Row>
         <Col span={6}>
-          <FormItem label={t('DESCRIPTION')} name="description" help={t('DESCRIPTION_DESC')}>
+          <FormItem
+            label={t('APP_STORE_DESCRIPTION')}
+            name="description"
+            help={t('APP_STORE_DESCRIPTION_DESC')}
+          >
             <Textarea maxLength={256} />
           </FormItem>
         </Col>

@@ -54,7 +54,7 @@ export function AppTemplateBaseInfForm({ form, confirmedBasicData }: Props): JSX
         </Col>
         <Col span={6}>
           <FormItem
-            label={t('VERSION')}
+            label={t('APP_STORE_VERSION')}
             name="versionID"
             rules={[{ required: true, message: t('VERSION_EMPTY_DESC') }]}
           >
@@ -64,10 +64,18 @@ export function AppTemplateBaseInfForm({ form, confirmedBasicData }: Props): JSX
       </Row>
       <Row>
         <Col span={6}>
-          <FormItem label={t('DESCRIPTION')} name="description1" help={t('DESCRIPTION_DESC')}>
+          <FormItem
+            label={t('APP_STORE_DESCRIPTION')}
+            name="description1"
+            help={t('APP_STORE_DESCRIPTION_DESC')}
+          >
             <Textarea maxLength={256} />
           </FormItem>
-          <FormItem label={t('DESCRIPTION')} name="description" help={t('DESCRIPTION_DESC')}>
+          <FormItem
+            label={t('APP_STORE_DESCRIPTION')}
+            name="description"
+            help={t('APP_STORE_DESCRIPTION_DESC')}
+          >
             <Textarea maxLength={256} />
           </FormItem>
         </Col>

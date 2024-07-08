@@ -1,5 +1,5 @@
 import React from 'react';
-import { RepoManage } from '@ks-console/shared';
+import { RepoManage } from '../../shared/components/Apps/RepoManage';
 
 function Repos(): JSX.Element {
   return <RepoManage />;

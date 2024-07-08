@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Applications } from '@ks-console/shared';
+import { Applications } from '../../shared/components/Apps/Applications';
 
 export function AppInstanceManage() {
   return <Applications />;

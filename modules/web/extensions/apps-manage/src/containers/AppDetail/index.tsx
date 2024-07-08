@@ -31,11 +31,11 @@ export function AppDetailPage(): JSX.Element {
   const defaultTabs = [
     {
       path: `${PATH}/versions`,
-      title: t('VERSIONS'),
+      title: t('APP_STORE_VERSION'),
     },
     {
       path: `${PATH}/app-information`,
-      title: t('APP_INFORMATION'),
+      title: t('APP_STORE_APP_INFORMATION'),
     },
     // {
     //   path: `${PATH}/audit-records`,
@@ -43,14 +43,16 @@ export function AppDetailPage(): JSX.Element {
     // },
     {
       path: `${PATH}/app-instances`,
-      title: t('APP_INSTANCES'),
+      title: t('APP_STORE_APP_INSTANCES'),
     },
   ];
   const [editVisible, setEditVisible] = useState(false);
 
   const tabs = useMemo(() => {
     if (isRadonDB(appName)) {
-      return defaultTabs.filter(({ title }) => !['APP_RELEASE', 'APP_INSTANCES'].includes(title));
+      return defaultTabs.filter(
+        ({ title }) => !['APP_RELEASE', 'APP_STORE_APP_INSTANCES'].includes(title),
+      );
     }
     return defaultTabs;
   }, []);
@@ -142,7 +144,7 @@ export function AppDetailPage(): JSX.Element {
 
   const attrs = [
     {
-      label: t('APP_ID'),
+      label: t('APP_STORE_APP_ID'),
       value: detail?.metadata?.name,
     },
     {
@@ -156,7 +158,7 @@ export function AppDetailPage(): JSX.Element {
       icon: 'edit',
     },
     {
-      label: t('TYPE'),
+      label: t('APP_STORE_TYPE'),
       // @ts-ignore
       value: t(AppType[detail?.spec.appType]),
     },
@@ -165,7 +167,7 @@ export function AppDetailPage(): JSX.Element {
       value: getWorkspacesAliasName(detail?.metadata?.labels?.['kubesphere.io/workspace'] || '-'),
     },
     {
-      label: t('CREATION_TIME_TCAP'),
+      label: t('APP_STORE_CREATION_TIME'),
       value: getLocalTime(detail?.metadata?.creationTimestamp || new Date().toDateString()).format(
         'YYYY-MM-DD HH:mm:ss',
       ),

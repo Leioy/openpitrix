@@ -38,7 +38,7 @@ function CategoriesManage(): JSX.Element {
   const [currentManageCategory, setCurrentManageCategory] = useState<CategoryDetail | undefined>();
   const columns: Column<AppDetail>[] = [
     {
-      title: t('NAME'),
+      title: t('APP_STORE_FIELD_NAME'),
       field: 'metadata.name',
       searchable: true,
       render: (name, app) => (
@@ -58,7 +58,7 @@ function CategoriesManage(): JSX.Element {
       ),
     },
     {
-      title: t('STATUS'),
+      title: t('APP_STORE_FIELD_STATUS'),
       field: 'status.state',
       canHide: true,
       width: '20%',
@@ -68,7 +68,7 @@ function CategoriesManage(): JSX.Element {
       ),
     },
     {
-      title: t('WORKSPACE'),
+      title: t('APP_STORE_FIELD_WORKSPACE'),
       field: 'metadata.labels["kubesphere.io/workspace"]',
       canHide: true,
       width: '25%',
@@ -77,7 +77,7 @@ function CategoriesManage(): JSX.Element {
       },
     },
     {
-      title: t('LATEST_VERSION'),
+      title: t('APP_STORE_FIELD_NEWEST_VERSION'),
       field: 'metadata.annotations["application.kubesphere.io/latest-app-version"]',
       canHide: true,
       width: '25%',
@@ -93,9 +93,20 @@ function CategoriesManage(): JSX.Element {
 
   const tableRef = useRef();
 
+  const closeModal = () => {
+    setModalType('');
+    setCurrentManageCategory(undefined);
+  };
+
+  const mutateSuccess = (message: string) => {
+    notify.success(message);
+    closeModal();
+    refresh();
+  };
+
   const modifyCategoryMutation = useAppModifyCateGoryMutation({
     onSuccess: () => {
-      mutateSuccess(t('MODIFY_CATEGORY_SUCCESSFULLY'));
+      mutateSuccess(t('APP_STORE_MODIFY_CATEGORY_SUCCESSFULLY'));
     },
   });
 
@@ -109,23 +120,12 @@ function CategoriesManage(): JSX.Element {
     actions: [
       {
         key: 'adjust',
-        text: t('CHANGE_CATEGORY'),
+        text: t('APP_STORE_CHANGE_CATEGORY'),
         action: 'delete',
         onClick: handleOpenChangeCategoryModal,
       },
     ],
   });
-
-  const closeModal = () => {
-    setModalType('');
-    setCurrentManageCategory(undefined);
-  };
-
-  const mutateSuccess = (message: string) => {
-    notify.success(message);
-    closeModal();
-    refresh();
-  };
 
   const handleCategoryDelete = async (): Promise<void> => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -136,7 +136,7 @@ function CategoriesManage(): JSX.Element {
     }
 
     await deleteCategory(metadata?.name);
-    mutateSuccess(t('DELETED_SUCCESSFULLY'));
+    mutateSuccess(t('APP_STORE_DELETED_SUCCESSFULLY'));
   };
 
   const handleOk = async (
@@ -150,7 +150,7 @@ function CategoriesManage(): JSX.Element {
       await updateCategory(categoryName, data);
     }
 
-    mutateSuccess(t(categoryName ? 'MODIFY_SUCCESSFUL' : 'CREATE_SUCCESSFUL'));
+    mutateSuccess(t(categoryName ? 'APP_STORE_MODIFY_SUCCESSFUL' : 'APP_STORE_CREATE_SUCCESSFUL'));
   };
 
   const handleModifyCategoryOk = async (category: string): Promise<Promise<void>> => {
@@ -184,15 +184,15 @@ function CategoriesManage(): JSX.Element {
       <Banner
         className="mb12"
         icon={<Icon name="tag" />}
-        title={t('APP_CATEGORY_PL')}
-        description={t('APP_CATEGORIES_DESC')}
+        title={t('APP_STORE_APP_CATEGORY_PL')}
+        description={t('APP_STORE_APP_CATEGORIES_DESC')}
       />
       <Columns>
         <FirstColumn>
           <LoadingOverlay visible={isLoading} />
           <Categories>
             <Head>
-              <label>{t('ALL_CATEGORIES_VALUE', { value: categories?.length })}</label>
+              <label>{t('APP_STORE_ALL_CATEGORIES_VALUE', { value: categories?.length })}</label>
               <Icon name="add" size={20} onClick={() => setModalType('manage')} />
             </Head>
             <CategoryList
@@ -228,7 +228,7 @@ function CategoriesManage(): JSX.Element {
       {modalType === 'delete' && (
         <DeleteConfirmModal
           visible={true}
-          tip={t('DELETE_CATEGORY_DESC', { name: currentManageCategory?.metadata?.name })}
+          tip={t('APP_STORE_DELETE_CATEGORY_DESC', { name: currentManageCategory?.metadata?.name })}
           onOk={handleCategoryDelete}
           onCancel={closeModal}
         />

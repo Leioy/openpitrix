@@ -41,7 +41,7 @@ function ModifyCategoryModal({
   return (
     <Modal
       visible={visible}
-      title={t('MODIFY_CATEGORY')}
+      title={t('APP_STORE_CHANGE_CATEGORY')}
       titleIcon={<Icon name="tag" size={20} />}
       onOk={handleOK}
       onCancel={onCancel}
@@ -50,9 +50,9 @@ function ModifyCategoryModal({
         <Form form={form} initialValues={{ category }}>
           <FormItem
             name={['category']}
-            label={t('MODIFY_CATEGORY')}
-            help={t('MODIFY_CATEGORY_HELP')}
-            rules={[{ required: true, message: t('MODIFY_CATEGORY_REQUIRED') }]}
+            label={t('APP_STORE_CHANGE_CATEGORY')}
+            help={t('APP_STORE_MODIFY_CATEGORY_HELP')}
+            rules={[{ required: true, message: t('APP_STORE_MODIFY_CATEGORY_REQUIRED') }]}
           >
             <Select value={category} options={options} onChange={setcategoryName} />
           </FormItem>
