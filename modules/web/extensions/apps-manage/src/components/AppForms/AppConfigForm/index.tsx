@@ -59,7 +59,7 @@ function AppConfigForm(
       setConfig({
         valuesYaml: file,
         valuesJSON: yaml.load(file),
-        valuesSchema: parser.safeParseJSON(files['values.schema.json']),
+        valuesSchema: parser.safeParseJSON(files?.['values.schema.json'] ?? ''),
       });
     }
   }, [files, isLoading]);

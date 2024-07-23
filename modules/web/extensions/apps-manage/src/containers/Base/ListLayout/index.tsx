@@ -39,7 +39,7 @@ function ListLayout(): JSX.Element {
       setTitle(namespace);
       setSubTitle(t('PROJECT'));
     } else if (workspace) {
-      navs = getWorkspaceNavs(workspace);
+      navs = getWorkspaceNavs(workspace, []);
       setNav(navKey, navs);
       setPrefix(`/workspaces/${workspace}`);
       setTitle(workspace);

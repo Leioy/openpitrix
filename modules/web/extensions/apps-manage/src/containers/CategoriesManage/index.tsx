@@ -32,7 +32,17 @@ import { Categories, Columns, FirstColumn, Head, SecondColumn, TableItemField } 
 import { getAuthKey } from '../../utils';
 
 function CategoriesManage(): JSX.Element {
-  const { data: categories = [], isLoading, refresh } = useCategoryList({ options: {} });
+  const {
+    data: categories = [],
+    isLoading,
+    refresh,
+  } = useCategoryList({
+    options: {
+      params: {
+        noLimit: true,
+      },
+    },
+  });
   const [modalType, setModalType] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryDetail>();
   const [currentManageCategory, setCurrentManageCategory] = useState<CategoryDetail | undefined>();
