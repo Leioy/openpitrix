@@ -23,6 +23,7 @@ import ApplicationManage from '../containers/AppInstanceManage';
 import StoreManage from '../containers/StoreManage';
 import AppDetailPage from '../containers/AppDetailPage';
 import VersionList from '../containers/AppDetail/VersionList';
+import { EdgeInstances } from '../containers/EdgeInstances';
 const PATH = '/apps-manage';
 const appTemplatePath = 'workspaces/:workspace/app-templates';
 
@@ -102,6 +103,10 @@ export default [
       {
         path: 'app-instances',
         element: <InstanceList />,
+      },
+      {
+        path: 'edge-instances',
+        element: <EdgeInstances />,
       },
     ],
   },
