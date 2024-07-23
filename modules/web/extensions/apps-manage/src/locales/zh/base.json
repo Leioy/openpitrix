@@ -28,5 +28,6 @@
   "RELEASE_SUCCESSFUL": "审核通过",
   "APP_VERSION_STATUS_TO_BE_REVIEWED": "待审核",
   "deleting": "删除中",
-  "APP_VERSION_STATUS_REJECTED": "已拒绝"
+  "APP_VERSION_STATUS_REJECTED": "已拒绝",
+  "APPSTORE_NODE_GROUP": "节点组"
 }

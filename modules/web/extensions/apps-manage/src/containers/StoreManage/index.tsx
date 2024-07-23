@@ -130,7 +130,7 @@ export function StoreManage(): JSX.Element {
           <TableItemField
             onClick={() => setSelectedApp(app as AppDetail)}
             label={getAnnotationsDescription(app)}
-            value={<Link to={`${name}?appType=${app.spec.appType}`}>{getDisplayName(app)}</Link>}
+            value={<Link to={`${name}`}>{getDisplayName(app)}</Link>}
             avatar={
               <Image
                 iconSize={40}

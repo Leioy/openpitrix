@@ -215,3 +215,13 @@ export function useApplicationsList(
     format: item => ({ ...dataItemFormatter(item), workspace, cluster }),
   });
 }
+export const useVersionList = (workspace: string, appName: string) => {
+  const url = `/kapis/application.kubesphere.io/v2/workspaces/${workspace}/apps/${appName}/versions`;
+  return useList({
+    url,
+    params: {
+      limit: -1,
+      sortBy: 'createTime',
+    },
+  });
+};

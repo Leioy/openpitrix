@@ -20,6 +20,7 @@ import {
 } from '@ks-console/shared';
 import AppTemplateEdit from '../../components/AppTemplateEdit';
 import type { AppDetail } from '@ks-console/shared';
+import { get } from 'lodash';
 
 const { useAppDetail, handleApp, useCategoryList, HANDLE_TYPE_TO_SHOW } = openpitrixStore;
 
@@ -28,32 +29,9 @@ export function AppDetailPage(): JSX.Element {
   const { appName = '', workspace } = useParams();
   const url = workspace ? `/workspaces/${workspace}/app-templates` : '/apps-manage/store';
   const PATH = `${url}/:appName`;
-  const defaultTabs = [
-    {
-      path: `${PATH}/versions`,
-      title: t('VERSIONS'),
-    },
-    {
-      path: `${PATH}/app-information`,
-      title: t('APP_INFORMATION'),
-    },
-    // {
-    //   path: `${PATH}/audit-records`,
-    //   title: t('APP_REVIEW'),
-    // },
-    {
-      path: `${PATH}/app-instances`,
-      title: t('APP_INSTANCES'),
-    },
-  ];
+
   const [editVisible, setEditVisible] = useState(false);
 
-  const tabs = useMemo(() => {
-    if (isRadonDB(appName)) {
-      return defaultTabs.filter(({ title }) => !['APP_RELEASE', 'APP_INSTANCES'].includes(title));
-    }
-    return defaultTabs;
-  }, []);
   const { data: categories } = useCategoryList({
     options: {
       autoFetch: !!workspace,
@@ -71,6 +49,43 @@ export function AppDetailPage(): JSX.Element {
   const [modalType, setModalType] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const appType = get(detail, 'metadata.labels["application.kubesphere.io/app-type"]');
+  const defaultTabs =
+    appType === 'edge'
+      ? [
+          {
+            path: `${PATH}/versions`,
+            title: t('VERSIONS'),
+          },
+          {
+            path: `${PATH}/app-information`,
+            title: t('APP_INFORMATION'),
+          },
+          {
+            path: `${PATH}/edge-instances`,
+            title: t('APP_INSTANCES'),
+          },
+        ]
+      : [
+          {
+            path: `${PATH}/versions`,
+            title: t('VERSIONS'),
+          },
+          {
+            path: `${PATH}/app-information`,
+            title: t('APP_INFORMATION'),
+          },
+          {
+            path: `${PATH}/app-instances`,
+            title: t('APP_INSTANCES'),
+          },
+        ];
+  const tabs = useMemo(() => {
+    if (isRadonDB(appName)) {
+      return defaultTabs.filter(({ title }) => !['APP_RELEASE', 'APP_INSTANCES'].includes(title));
+    }
+    return defaultTabs;
+  }, []);
   useEffect(() => {
     if (locations.search) {
       sessionStorage.setItem('appType', locations.search);
